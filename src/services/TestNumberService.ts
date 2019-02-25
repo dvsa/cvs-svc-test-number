@@ -3,6 +3,8 @@ import {TestNumber} from "../models/TestNumber";
 import {Service} from "../models/injector/ServiceDecorator";
 import {HTTPResponse} from "../utils/HTTPResponse";
 import {DynamoDBService} from "./DynamoDBService";
+import {Configuration} from "../utils/Configuration";
+import {DocumentClient} from "aws-sdk/lib/dynamodb/document_client";
 
 @Service()
 export class TestNumberService {
@@ -26,9 +28,14 @@ export class TestNumberService {
                 const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber)
                 return this.dbClient.put(testNumber)
                     .then(() => {
+                        this.dbClient.delete({testNumber: lastTestNumber.testNumber})
                         return testNumber;
                     })
                     .catch((error: AWSError) => {
+                        if(error.statusCode === 400 && error.message === "The conditional request failed"){
+                                return this.createTestNumber()
+                        }
+                        console.error(error)
                         throw new HTTPResponse(error.statusCode, { error: `${error.code}: ${error.message}
                         At: ${error.hostname} - ${error.region}
                         Request id: ${error.requestId}` });
@@ -40,20 +47,9 @@ export class TestNumberService {
         return this.dbClient.scan()
             .then((data:any) => {
                 if(data.Count === 0){
-                    return {testNumber: 'W01A000',
-                            id: 'W01',
-                            certLetter: 'A',
-                            sequenceNumber: '000'}
+                    return Configuration.getInstance().getTestNumberInitialValue()
                 } else {
-                    let testNumbers = data.Items
-                    let sortedTestNumbers = testNumbers.sort((testNumber1:TestNumber, testNumber2:TestNumber) => {
-                        if(testNumber1.testNumber < testNumber2.testNumber)
-                            return 1
-                        if(testNumber1.testNumber < testNumber2.testNumber)
-                            return 2
-                        return 0
-                    })
-                    return sortedTestNumbers[0]
+                    return data.Items[0]
                 }
             })
             .catch((error: AWSError) => {

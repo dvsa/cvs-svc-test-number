@@ -99,6 +99,8 @@ class Configuration {
         return this.config.dynamodb[env];
     }
 
+    public getTestNumberInitialValue(): any {
+        return this.config.testNumberinitialValue
+    }
 }
-
 export { Configuration, IFunctionEvent };

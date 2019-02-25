@@ -57,7 +57,11 @@ export class DynamoDBService {
         const query: DocumentClient.PutItemInput = {
             TableName: this.tableName,
             Item: item,
-            ReturnValues: "ALL_OLD"
+            ReturnValues: "ALL_OLD",
+            ConditionExpression: "testNumber <> :testNumberVal",
+            ExpressionAttributeValues: {
+                ":testNumberVal": item.testNumber
+            }
         };
 
         return DynamoDBService.client.put(query)

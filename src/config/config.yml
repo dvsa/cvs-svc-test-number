@@ -18,3 +18,8 @@ dynamodb:
 serverless:
   basePath: /${BRANCH}
   port: 3008
+testNumberinitialValue:
+  testNumber: W01A000
+  id: W01
+  certLetter: A
+  sequenceNumber: 000
