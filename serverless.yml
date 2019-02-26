@@ -1,0 +1,50 @@
+service: cvs-svc-test-number
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+  - serverless-plugin-typescript
+
+functions:
+  generateTestNumber:
+    handler: src/handler.handler
+    events:
+    - http:
+        path: test-number
+        method: post
+
+resources:
+  Resources:
+    Users:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: cvs-local-test-number
+        AttributeDefinitions:
+        - AttributeName: testNumber
+          AttributeType: S
+        KeySchema:
+        - AttributeName: testNumber
+          KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+custom:
+  serverless-offline:
+    port: 3008
+  dynamodb:
+    start:
+      port: 8006
+      inMemory: true
+      migrate: true
+      seed: false
+      noStart: true
+    seed:
+      activities:
+        sources:
+        - table: cvs-local-test-number
+          sources: [./tests/resources/testNumbers.json]

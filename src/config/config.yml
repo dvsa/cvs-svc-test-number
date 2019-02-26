@@ -1,0 +1,25 @@
+functions:
+- generateTestNumber:
+    method: POST
+    path: /test-number
+    proxy: null
+    function: generateTestNumber
+dynamodb:
+  local:
+    params:
+      region: localhost
+      endpoint: http://localhost:8006
+    table: cvs-local-test-number
+    keys:
+      - testNumber
+  remote:
+    params: {}
+    table: cvs-${BRANCH}-test-number
+serverless:
+  basePath: /${BRANCH}
+  port: 3008
+testNumberinitialValue:
+  testNumber: W01A000
+  id: W01
+  certLetter: A
+  sequenceNumber: 000
