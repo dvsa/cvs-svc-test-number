@@ -1,10 +1,10 @@
-import {AWSError} from "aws-sdk";
-import {TestNumber} from "../models/TestNumber";
-import {Service} from "../models/injector/ServiceDecorator";
-import {HTTPResponse} from "../utils/HTTPResponse";
-import {DynamoDBService} from "./DynamoDBService";
-import {Configuration} from "../utils/Configuration";
-import {DocumentClient} from "aws-sdk/lib/dynamodb/document_client";
+import { AWSError } from "aws-sdk";
+import { TestNumber } from "../models/TestNumber";
+import { Service } from "../models/injector/ServiceDecorator";
+import { HTTPResponse } from "../utils/HTTPResponse";
+import { DynamoDBService } from "./DynamoDBService";
+import { Configuration } from "../utils/Configuration";
+import { DocumentClient } from "aws-sdk/lib/dynamodb/document_client";
 
 @Service()
 export class TestNumberService {
@@ -24,103 +24,107 @@ export class TestNumberService {
      */
     public async createTestNumber(): Promise<TestNumber> {
         return this.getLastTestNumber()
-            .then(lastTestNumber => {
-                const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber)
+            .then((lastTestNumber) => {
+                const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber);
                 return this.dbClient.put(testNumber)
                     .then(() => {
-                        this.dbClient.delete({testNumber: lastTestNumber.testNumber})
+                        this.dbClient.delete({ testNumber: lastTestNumber.testNumber });
                         return testNumber;
                     })
                     .catch((error: AWSError) => {
-                        if(error.statusCode === 400 && error.message === "The conditional request failed"){
-                                return this.createTestNumber()
+                        if (error.statusCode === 400 && error.message === "The conditional request failed") {
+                            return this.createTestNumber();
                         }
-                        console.error(error)
-                        throw new HTTPResponse(error.statusCode, { error: `${error.code}: ${error.message}
+                        console.error(error);
+                        throw new HTTPResponse(error.statusCode, {
+                            error: `${error.code}: ${error.message}
                         At: ${error.hostname} - ${error.region}
-                        Request id: ${error.requestId}` });
+                        Request id: ${error.requestId}`
+                        });
                     });
-            })
+            });
     }
 
-    public async getLastTestNumber(): Promise<TestNumber>{
+    public async getLastTestNumber(): Promise<TestNumber> {
         return this.dbClient.scan()
-            .then((data:any) => {
-                if(data.Count === 0){
-                    return Configuration.getInstance().getTestNumberInitialValue()
+            .then((data: any) => {
+                if (data.Count === 0) {
+                    return Configuration.getInstance().getTestNumberInitialValue();
                 } else {
-                    return data.Items[0]
+                    return data.Items[0];
                 }
             })
             .catch((error: AWSError) => {
-                throw new HTTPResponse(error.statusCode, { error: `${error.code}: ${error.message}
+                throw new HTTPResponse(error.statusCode, {
+                    error: `${error.code}: ${error.message}
                     At: ${error.hostname} - ${error.region}
-                    Request id: ${error.requestId}` });
-            })
+                    Request id: ${error.requestId}`
+                });
+            });
     }
 
-    createNextTestNumberObject(testNumberObject: TestNumber) : TestNumber{
-        let testNumber = testNumberObject.testNumber
+    public createNextTestNumberObject(testNumberObject: TestNumber): TestNumber {
+        const testNumber = testNumberObject.testNumber;
 
-        let cvsIdLetter = testNumber.substring(0,1)
-        let cvsIdNumber = testNumber.substring(1,3)
-        let certLetter = testNumber.substring(3,4)
-        let sequenceNumber = testNumber.substring(4,7)
+        let cvsIdLetter = testNumber.substring(0, 1);
+        let cvsIdNumber = testNumber.substring(1, 3);
+        let certLetter = testNumber.substring(3, 4);
+        let sequenceNumber = testNumber.substring(4, 7);
 
 
-        if(parseInt(sequenceNumber) === 999){
-            sequenceNumber = '001'
-            if(certLetter === 'Z'){
-                certLetter = 'A'
-                if(parseInt(cvsIdNumber) === 99) {
-                    cvsIdNumber = '01'
-                    cvsIdLetter = String.fromCharCode(cvsIdLetter.charCodeAt(0) + 1)
+        if (parseInt(sequenceNumber, 10) === 999) {
+            sequenceNumber = "001";
+            if (certLetter === "Z") {
+                certLetter = "A";
+                if (parseInt(cvsIdNumber, 10) === 99) {
+                    cvsIdNumber = "01";
+                    cvsIdLetter = String.fromCharCode(cvsIdLetter.charCodeAt(0) + 1);
                 } else {
-                    cvsIdNumber = (parseInt(cvsIdNumber) + 1).toString().padStart(2,'0')
+                    cvsIdNumber = (parseInt(cvsIdNumber, 10) + 1).toString().padStart(2, "0");
                 }
             } else {
-                certLetter = String.fromCharCode(certLetter.charCodeAt(0) + 1)
+                certLetter = String.fromCharCode(certLetter.charCodeAt(0) + 1);
             }
 
         } else {
-            sequenceNumber = (parseInt(sequenceNumber) + 1).toString().padStart(3,'0')
+            sequenceNumber = (parseInt(sequenceNumber, 10) + 1).toString().padStart(3, "0");
         }
 
-        let newTestNumber = cvsIdLetter + cvsIdNumber + certLetter + sequenceNumber
-        newTestNumber = this.appendCheckSumToTestNumber(newTestNumber)
+        let newTestNumber = cvsIdLetter + cvsIdNumber + certLetter + sequenceNumber;
+        newTestNumber = this.appendCheckSumToTestNumber(newTestNumber);
 
-        let newTestNumberObject: TestNumber = {
+        const newTestNumberObject: TestNumber = {
             id: cvsIdLetter + cvsIdNumber,
-            certLetter: certLetter,
-            sequenceNumber: sequenceNumber,
+            certLetter,
+            sequenceNumber,
             testNumber: newTestNumber
-        }
+        };
 
-        return newTestNumberObject
+        return newTestNumberObject;
     }
 
-    appendCheckSumToTestNumber(testNumber: string){
-        let originalTestNumber = testNumber
-        let firstLetterAlphabeticalIndex = (testNumber.charCodeAt(0)-64).toString()
-        let secondLetterAlphabeticalIndex = (testNumber.charCodeAt(3)-64).toString()
-        testNumber = firstLetterAlphabeticalIndex + testNumber.substring(1,3) + secondLetterAlphabeticalIndex + testNumber.substring(4,7)
-        testNumber = testNumber.substring(0,2) + (parseInt(testNumber.charAt(2))*3).toString() + testNumber.substring(3,6) + (parseInt(testNumber.charAt(6))*3).toString() + testNumber.substring(7,testNumber.length)
+    public appendCheckSumToTestNumber(testNumber: string) {
+        const originalTestNumber = testNumber;
+        const firstLetterAlphabeticalIndex = (testNumber.charCodeAt(0) - 64).toString();
+        const secondLetterAlphabeticalIndex = (testNumber.charCodeAt(3) - 64).toString();
+        testNumber = firstLetterAlphabeticalIndex + testNumber.substring(1, 3) + secondLetterAlphabeticalIndex + testNumber.substring(4, 7);
+        testNumber = testNumber.substring(0, 2) + (parseInt(testNumber.charAt(2), 10) * 3).toString() + testNumber.substring(3, 6) + (parseInt(testNumber.charAt(6), 10) * 3).toString() + testNumber.substring(7, testNumber.length);
 
-        let checkSum = 0
-        for(let i = 0; i < testNumber.length; i++){
-            checkSum = checkSum + parseInt(testNumber.charAt(i))
+        let checkSum = 0;
+        for (let i = 0; i < testNumber.length; i++) {
+            checkSum = checkSum + parseInt(testNumber.charAt(i), 10);
         }
 
-        let stringCheckSum
-        if(checkSum < 10) {
-            stringCheckSum = checkSum.toString().padStart(2, '0')
-        } else if (checkSum > 99){
-            stringCheckSum = (checkSum - 100).toString()
+        let stringCheckSum;
+        if (checkSum < 10) {
+            stringCheckSum = checkSum.toString().padStart(2, "0");
+        } else if (checkSum > 99) {
+            stringCheckSum = (checkSum - 100).toString();
         } else {
-            stringCheckSum = checkSum.toString()
+            stringCheckSum = checkSum.toString();
         }
 
-        return originalTestNumber + stringCheckSum
+        return originalTestNumber + stringCheckSum;
     }
 
 }

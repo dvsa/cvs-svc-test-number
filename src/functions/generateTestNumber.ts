@@ -8,7 +8,7 @@ const generateTestNumber: Handler = async (event: any, context?: Context): Promi
     const testNumberService = Injector.resolve<TestNumberService>(TestNumberService);
 
     return testNumberService.createTestNumber()
-        .then((testNumber : TestNumber) => {
+        .then((testNumber: TestNumber) => {
             return new HTTPResponse(200, testNumber);
         })
         .catch((error: HTTPResponse) => {

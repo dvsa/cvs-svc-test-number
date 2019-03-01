@@ -100,7 +100,7 @@ class Configuration {
     }
 
     public getTestNumberInitialValue(): any {
-        return this.config.testNumberinitialValue
+        return this.config.testNumberinitialValue;
     }
 }
 export { Configuration, IFunctionEvent };
