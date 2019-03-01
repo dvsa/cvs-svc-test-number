@@ -15,6 +15,7 @@
     "member-ordering": false,
     "ordered-imports": false,
     "jsdoc-format": true,
-    "completed-docs": [true, "methods"]
+    "completed-docs": [true, "methods"],
+    "interface-name" : false
   }
 }

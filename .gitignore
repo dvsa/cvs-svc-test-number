@@ -31,3 +31,10 @@ node_modules/**
 
 # Source maps
 *.map
+
+#coverage
+.nyc_output/**
+coverage/**
+
+#sonarqube
+.scannerwork/**
