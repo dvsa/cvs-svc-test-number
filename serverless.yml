@@ -44,7 +44,7 @@ custom:
       seed: false
       noStart: true
     seed:
-      activities:
+      test-number:
         sources:
         - table: cvs-local-test-number
           sources: [./tests/resources/testNumbers.json]
