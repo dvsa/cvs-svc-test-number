@@ -47,4 +47,4 @@ custom:
       test-number:
         sources:
         - table: cvs-local-test-number
-          sources: [./tests/resources/testNumbers.json]
+          sources: [./tests/resources/test-number.json]
