@@ -38,7 +38,7 @@ dynamodb:
   local:
     params:
       region: localhost
-      endpoint: http://localhost:8006
+      endpoint: http://localhost:8008
     table: cvs-local-test-number
     keys:
       - id

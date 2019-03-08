@@ -14,7 +14,7 @@
     "prepush": "BRANCH=local npm test && npm run tslint",
     "predeploy": "npm install && npm run prepush",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
-    "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
+    "sonar-scanner": "npm run tslint && npm run coverage",
     "coverage": "nyc mocha tests/unit/*.unitTest.ts && nyc report --reporter=lcov"
   },
   "nyc": {

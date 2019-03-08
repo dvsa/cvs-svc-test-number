@@ -38,13 +38,13 @@ custom:
     port: 3008
   dynamodb:
     start:
-      port: 8006
+      port: 8008
       inMemory: true
       migrate: true
       seed: false
       noStart: true
     seed:
-      activities:
+      test-number:
         sources:
         - table: cvs-local-test-number
-          sources: [./tests/resources/testNumbers.json]
+          sources: [./tests/resources/test-number.json]
