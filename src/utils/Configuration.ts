@@ -93,8 +93,18 @@ class Configuration {
             throw new Error("DynamoDB config is not defined in the config file.");
         }
 
-        // Not defining BRANCH will default to local
-        const env: string = (!process.env.BRANCH || process.env.BRANCH === "local") ? "local" : "remote";
+        // Not defining BRANCH will default to remote
+        var env
+        switch (process.env.BRANCH) {
+        case 'local':
+            env = 'local'
+            break
+        case 'local-global':
+            env = 'local-global'
+            break
+        default:
+            env = 'remote'
+        }
 
         return this.config.dynamodb[env];
     }
