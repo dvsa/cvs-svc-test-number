@@ -12,6 +12,11 @@ dynamodb:
     table: cvs-local-test-number
     keys:
       - testNumber
+  local-global:
+    params:
+      region: localhost
+      endpoint: http://localhost:8000
+    table: cvs-local-global-test-number
   remote:
     params: {}
     table: cvs-${BRANCH}-test-number
