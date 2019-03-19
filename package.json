@@ -57,6 +57,7 @@
     "@types/uuid": "^3.4.4",
     "chai": "^4.2.0",
     "gulp": "^4.0.0",
+    "lambda-tester": "^3.5.0",
     "mocha": "^5.2.0",
     "nyc": "^13.3.0",
     "reflect-metadata": "^0.1.13",
