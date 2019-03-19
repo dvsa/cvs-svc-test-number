@@ -13,10 +13,6 @@ plugins:
 functions:
   generateTestNumber:
     handler: src/handler.handler
-    events:
-    - http:
-        path: test-number
-        method: post
 
 resources:
   Resources:
