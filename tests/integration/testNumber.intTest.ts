@@ -3,13 +3,13 @@ import {expect} from "chai";
 import {Injector} from "../../src/models/injector/Injector";
 import {TestNumberService} from "../../src/services/TestNumberService";
 import {TestNumber} from "../../src/models/TestNumber";
-import {generateTestNumber} from "../../src/functions/generateTestNumber"
+import {generateTestNumber} from "../../src/functions/generateTestNumber";
+import lambdaTester from "lambda-tester";
 
-const LambdaTester = require('lambda-tester');
 const testNumberService: TestNumberService = Injector.resolve<TestNumberService>(TestNumberService);
 
 describe("POST /test-number", () => {
-
+    const lambda = lambdaTester(generateTestNumber);
     context("when a new test-number is requested the very first time(no data in db)", () => {
         it("should respond with HTTP 200 and testNumber W01A001", () => {
             const expectedFirstTestNumber: TestNumber = {
@@ -18,13 +18,13 @@ describe("POST /test-number", () => {
                 certLetter: "A",
                 sequenceNumber: "001"
             };
-            return LambdaTester(generateTestNumber)
+            return lambda
             .expectResolve((response: any) => {
-                expect("access-control-allow-origin", "*")
-                expect("access-control-allow-credentials", "true")
-                expect(200)
+                expect("access-control-allow-origin", "*");
+                expect("access-control-allow-credentials", "true");
+                expect(200);
                 expect(JSON.parse(response.body)).to.eql(expectedFirstTestNumber);
-            })
+            });
         });
     });
 
@@ -36,13 +36,13 @@ describe("POST /test-number", () => {
                 certLetter: "A",
                 sequenceNumber: "002"
             };
-            return LambdaTester(generateTestNumber)
+            return lambda
             .expectResolve((response: any) => {
-                expect("access-control-allow-origin", "*")
-                expect("access-control-allow-credentials", "true")
-                expect(200)
+                expect("access-control-allow-origin", "*");
+                expect("access-control-allow-credentials", "true");
+                expect(200);
                 expect(JSON.parse(response.body)).to.eql(expectedFirstTestNumber);
-            })
+            });
         });
     });
 

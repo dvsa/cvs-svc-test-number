@@ -45,6 +45,9 @@ export class TestNumberService {
             });
     }
 
+    /**
+     * Retrieves the last test number
+     */
     public async getLastTestNumber(): Promise<TestNumber> {
         return this.dbClient.scan()
             .then((data: any) => {
@@ -63,6 +66,10 @@ export class TestNumberService {
             });
     }
 
+    /**
+     * Calculates and creates the next test number object based on the last test number
+     * @param testNumberObject - last test number
+     */
     public createNextTestNumberObject(testNumberObject: TestNumber): TestNumber {
         const testNumber = testNumberObject.testNumber;
 
@@ -103,6 +110,10 @@ export class TestNumberService {
         return newTestNumberObject;
     }
 
+    /**
+     * Appends calculated checksum to the test number
+     * @param testNumber - the test number
+     */
     public appendCheckSumToTestNumber(testNumber: string) {
         const originalTestNumber = testNumber;
         const firstLetterAlphabeticalIndex = (testNumber.charCodeAt(0) - 64).toString();
