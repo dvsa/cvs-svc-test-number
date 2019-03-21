@@ -44,6 +44,7 @@
     "joi": "^14.3.1",
     "node-yaml": "^3.1.1",
     "path-parser": "^4.2.0",
+    "reflect-metadata": "^0.1.13",
     "ts-node-register": "^1.0.0",
     "uuid": "^3.3.2"
   },
@@ -61,7 +62,6 @@
     "lambda-tester": "^3.5.0",
     "mocha": "^5.2.0",
     "nyc": "^13.3.0",
-    "reflect-metadata": "^0.1.13",
     "serverless": "^1.36.3",
     "serverless-dynamodb-local": "0.2.35",
     "serverless-offline": "^4.2.0",
