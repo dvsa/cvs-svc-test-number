@@ -22,7 +22,7 @@ export class TestNumberService {
      * Creates a new test number in the database.
      * @param activity - the payload containing the activity
      */
-    public async createTestNumber(): Promise<TestNumber> {
+    public createTestNumber(): Promise<TestNumber> {
         return this.getLastTestNumber()
             .then((lastTestNumber) => {
                 const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber);
@@ -48,7 +48,7 @@ export class TestNumberService {
     /**
      * Retrieves the last test number
      */
-    public async getLastTestNumber(): Promise<TestNumber> {
+    public getLastTestNumber(): Promise<TestNumber> {
         return this.dbClient.scan()
             .then((data: any) => {
                 if (data.Count === 0) {
