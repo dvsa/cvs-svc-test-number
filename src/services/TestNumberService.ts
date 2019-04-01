@@ -32,10 +32,10 @@ export class TestNumberService {
                         return testNumber;
                     })
                     .catch((error: AWSError) => {
+                        console.error(error);
                         if (error.statusCode === 400 && error.message === "The conditional request failed") {
                             return this.createTestNumber();
                         }
-                        console.error(error);
                         throw new HTTPResponse(error.statusCode, {
                             error: `${error.code}: ${error.message}
                         At: ${error.hostname} - ${error.region}
