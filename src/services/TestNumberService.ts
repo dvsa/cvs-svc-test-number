@@ -28,8 +28,10 @@ export class TestNumberService {
                 const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber);
                 return this.dbClient.put(testNumber)
                     .then(() => {
-                        this.dbClient.delete({ testNumber: lastTestNumber.testNumber });
-                        return testNumber;
+                        return this.dbClient.delete({ testNumber: lastTestNumber.testNumber })
+                            .then(() => {
+                                return testNumber;
+                            });
                     })
                     .catch((error: AWSError) => {
                         console.error(error);
