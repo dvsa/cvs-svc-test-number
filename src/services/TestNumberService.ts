@@ -121,7 +121,7 @@ export class TestNumberService {
         const firstLetterAlphabeticalIndex = (testNumber.charCodeAt(0) - 64).toString();
         const secondLetterAlphabeticalIndex = (testNumber.charCodeAt(3) - 64).toString();
         testNumber = firstLetterAlphabeticalIndex + testNumber.substring(1, 3) + secondLetterAlphabeticalIndex + testNumber.substring(4, 7);
-        testNumber = testNumber.substring(0, 2) + (parseInt(testNumber.charAt(2), 10) * 3).toString() + testNumber.substring(3, 6) + (parseInt(testNumber.charAt(6), 10) * 3).toString() + testNumber.substring(7, testNumber.length);
+        testNumber = testNumber.substring(0, 2) + (parseInt(testNumber.charAt(2), 10) * 3).toString() + testNumber.substring(3, 5) + (parseInt(testNumber.charAt(5), 10) * 3).toString() + testNumber.substring(6, testNumber.length);
 
         let checkSum = 0;
         for (let i = 0; i < testNumber.length; i++) {
