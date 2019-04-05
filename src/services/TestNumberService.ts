@@ -117,12 +117,17 @@ export class TestNumberService {
      * @param testNumber - the test number
      */
     public appendCheckSumToTestNumber(testNumber: string) {
-        const testNumberWithoutLetters = testNumber.replace(/\D/g,'');
+        const testNumberWithoutLetters = testNumber.replace(/\D/g, "");
 
         const firstLetterAlphabeticalIndex = (testNumber.charCodeAt(0) - 64);
         const secondLetterAlphabeticalIndex = (testNumber.charCodeAt(3) - 64);
 
-        let checkSum = firstLetterAlphabeticalIndex + parseInt(testNumberWithoutLetters.charAt(0), 10) + parseInt(testNumberWithoutLetters.charAt(1), 10) * 3 + secondLetterAlphabeticalIndex + parseInt(testNumberWithoutLetters.charAt(2), 10) + parseInt(testNumberWithoutLetters.charAt(3), 10) * 3 + parseInt(testNumberWithoutLetters.charAt(4), 10)
+        const checkSum = firstLetterAlphabeticalIndex
+            + parseInt(testNumberWithoutLetters.charAt(0), 10)
+            + parseInt(testNumberWithoutLetters.charAt(1), 10) * 3
+            + secondLetterAlphabeticalIndex + parseInt(testNumberWithoutLetters.charAt(2), 10)
+            + parseInt(testNumberWithoutLetters.charAt(3), 10) * 3
+            + parseInt(testNumberWithoutLetters.charAt(4), 10);
 
         let stringCheckSum;
         if (checkSum < 10) {
