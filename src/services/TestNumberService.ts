@@ -117,16 +117,12 @@ export class TestNumberService {
      * @param testNumber - the test number
      */
     public appendCheckSumToTestNumber(testNumber: string) {
-        const originalTestNumber = testNumber;
-        const firstLetterAlphabeticalIndex = (testNumber.charCodeAt(0) - 64).toString();
-        const secondLetterAlphabeticalIndex = (testNumber.charCodeAt(3) - 64).toString();
-        testNumber = firstLetterAlphabeticalIndex + testNumber.substring(1, 3) + secondLetterAlphabeticalIndex + testNumber.substring(4, 7);
-        testNumber = testNumber.substring(0, 2) + (parseInt(testNumber.charAt(2), 10) * 3).toString() + testNumber.substring(3, 5) + (parseInt(testNumber.charAt(5), 10) * 3).toString() + testNumber.substring(6, testNumber.length);
+        const testNumberWithoutLetters = testNumber.replace(/\D/g,'');
 
-        let checkSum = 0;
-        for (let i = 0; i < testNumber.length; i++) {
-            checkSum = checkSum + parseInt(testNumber.charAt(i), 10);
-        }
+        const firstLetterAlphabeticalIndex = (testNumber.charCodeAt(0) - 64);
+        const secondLetterAlphabeticalIndex = (testNumber.charCodeAt(3) - 64);
+
+        let checkSum = firstLetterAlphabeticalIndex + parseInt(testNumberWithoutLetters.charAt(0), 10) + parseInt(testNumberWithoutLetters.charAt(1), 10) * 3 + secondLetterAlphabeticalIndex + parseInt(testNumberWithoutLetters.charAt(2), 10) + parseInt(testNumberWithoutLetters.charAt(3), 10) * 3 + parseInt(testNumberWithoutLetters.charAt(4), 10)
 
         let stringCheckSum;
         if (checkSum < 10) {
@@ -137,7 +133,7 @@ export class TestNumberService {
             stringCheckSum = checkSum.toString();
         }
 
-        return originalTestNumber + stringCheckSum;
+        return testNumber + stringCheckSum;
     }
 
 }
