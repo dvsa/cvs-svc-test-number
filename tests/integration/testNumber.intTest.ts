@@ -13,7 +13,7 @@ describe("POST /test-number", () => {
     context("when a new test-number is requested the very first time(no data in db)", () => {
         it("should respond with HTTP 200 and testNumber W01A001", () => {
             const expectedFirstTestNumber: TestNumber = {
-                testNumber: "W01A00108",
+                testNumber: "W01A00128",
                 id: "W01",
                 certLetter: "A",
                 sequenceNumber: "001"
@@ -31,7 +31,7 @@ describe("POST /test-number", () => {
     context("when a new test-number is requested when other test-numbers already exists in db", () => {
         it("should respond with HTTP 200 and a next valid test number", () => {
             const expectedFirstTestNumber: TestNumber = {
-                testNumber: "W01A00209",
+                testNumber: "W01A00229",
                 id: "W01",
                 certLetter: "A",
                 sequenceNumber: "002"
