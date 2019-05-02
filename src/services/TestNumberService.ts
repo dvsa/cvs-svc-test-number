@@ -1,4 +1,4 @@
-import { AWSError } from "aws-sdk";
+import { AWSError } from "aws-sdk"; // Only used as a type, so not wrapped by XRay
 import { TestNumber } from "../models/TestNumber";
 import { Service } from "../models/injector/ServiceDecorator";
 import { HTTPResponse } from "../utils/HTTPResponse";
