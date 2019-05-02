@@ -1,5 +1,7 @@
+/* tslint:disable */
 const AWSXRay = require("aws-xray-sdk");
 const AWS = AWSXRay.captureAWS(require("aws-sdk"));
+/* tslint:enable */
 import {DocumentClient} from "aws-sdk/lib/dynamodb/document_client";
 import {PromiseResult} from "aws-sdk/lib/request";
 import {Configuration} from "../utils/Configuration";
