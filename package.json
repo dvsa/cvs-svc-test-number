@@ -15,7 +15,8 @@
     "predeploy": "npm install && npm run prepush",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
-    "coverage": "nyc mocha tests/unit/*.unitTest.ts && nyc report --reporter=lcov"
+    "coverage": "nyc mocha tests/unit/*.unitTest.ts && nyc report --reporter=lcov",
+    "audit-dep": "npm audit --json | audit-filter --nsp-config=.nsprc --audit=-"
   },
   "nyc": {
     "include": [
@@ -58,6 +59,7 @@
     "@types/node": "^10.12.18",
     "@types/supertest": "^2.0.7",
     "@types/uuid": "^3.4.4",
+    "audit-filter": "^0.4.3",
     "chai": "^4.2.0",
     "gulp": "^4.0.0",
     "lambda-tester": "^3.5.0",
