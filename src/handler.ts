@@ -2,11 +2,18 @@ import {APIGatewayProxyResult, Callback, Context, Handler} from "aws-lambda";
 import Path from "path-parser";
 import {Configuration, IFunctionEvent} from "./utils/Configuration";
 import {HTTPResponse} from "./utils/HTTPResponse";
+// @ts-ignore
+import { default as warmer } from "lambda-warmer";
 
 const handler: Handler = async (event: any, context: Context, callback: Callback): Promise<APIGatewayProxyResult> => {
     // Request integrity checks
     if (!event) {
         return new HTTPResponse(400, "AWS event is empty. Check your test event.");
+    }
+
+    // Support warming events via lambda-warmer
+    if (await warmer(event)) {
+        return new HTTPResponse(200, "warmed");
     }
 
     if (event.body) {
