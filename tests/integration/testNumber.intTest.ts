@@ -1,5 +1,3 @@
-import {describe, Done} from "mocha";
-import {expect} from "chai";
 import {Injector} from "../../src/models/injector/Injector";
 import {TestNumberService} from "../../src/services/TestNumberService";
 import {TestNumber} from "../../src/models/TestNumber";
@@ -10,6 +8,12 @@ const testNumberService: TestNumberService = Injector.resolve<TestNumberService>
 
 describe("POST /test-number", () => {
     const lambda = lambdaTester(generateTestNumber);
+    beforeAll(async () => {
+        // Reset the Database
+        const latestNumber: TestNumber = await testNumberService.getLastTestNumber();
+        await testNumberService.dbClient.batchDelete([{testNumber: latestNumber.testNumber}]);
+    });
+
     context("when a new test-number is requested the very first time(no data in db)", () => {
         it("should respond with HTTP 200 and testNumber W01A001", () => {
             const expectedFirstTestNumber: TestNumber = {
@@ -20,10 +24,10 @@ describe("POST /test-number", () => {
             };
             return lambda
             .expectResolve((response: any) => {
-                expect("access-control-allow-origin", "*");
-                expect("access-control-allow-credentials", "true");
-                expect(200);
-                expect(JSON.parse(response.body)).to.eql(expectedFirstTestNumber);
+                expect(response.headers["Access-Control-Allow-Origin"]).toEqual("*");
+                expect(response.headers["Access-Control-Allow-Credentials"]).toEqual(true);
+                expect(response.statusCode).toEqual(200);
+                expect(expectedFirstTestNumber).toEqual(JSON.parse(response.body));
             });
         });
     });
@@ -38,18 +42,18 @@ describe("POST /test-number", () => {
             };
             return lambda
             .expectResolve((response: any) => {
-                expect("access-control-allow-origin", "*");
-                expect("access-control-allow-credentials", "true");
-                expect(200);
-                expect(JSON.parse(response.body)).to.eql(expectedFirstTestNumber);
+                expect(response.headers["Access-Control-Allow-Origin"]).toEqual("*");
+                expect(response.headers["Access-Control-Allow-Credentials"]).toEqual(true);
+                expect(response.statusCode).toEqual(200);
+                expect(expectedFirstTestNumber).toEqual(JSON.parse(response.body));
             });
         });
     });
 
 });
 
-after((done: Done) => {
-        testNumberService.dbClient.batchDelete([{testNumber: "W01A001"}, {testNumber: "W01A002"}])
-            .then(() => done());
-    });
+afterAll((done) => {
+    testNumberService.dbClient.batchDelete([{testNumber: "W01A001"}, {testNumber: "W01A002"}])
+        .then(() => done());
+});
 

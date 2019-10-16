@@ -214,7 +214,7 @@ describe("TestNumberService", () => {
                     sequenceNumber: "002"
                 };
 
-                const error400 = new Error("The conditional request failed")
+                const error400 = new Error("The conditional request failed");
                 // @ts-ignore;
                 error400.statusCode = 400;
 
@@ -250,7 +250,7 @@ describe("TestNumberService", () => {
                 error.statusCode = 418;
 
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
-                const putSpy = jest.fn().mockRejectedValueOnce(error)
+                const putSpy = jest.fn().mockRejectedValueOnce(error);
                 DynamoDBService.prototype.put = putSpy;
                 const delSpy = jest.fn().mockResolvedValue("");
                 DynamoDBService.prototype.delete = delSpy;
