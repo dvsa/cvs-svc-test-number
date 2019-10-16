@@ -125,7 +125,8 @@ export class TestNumberService {
         const checkSum = firstLetterAlphabeticalIndex
             + parseInt(testNumberWithoutLetters.charAt(0), 10)
             + parseInt(testNumberWithoutLetters.charAt(1), 10) * 3
-            + secondLetterAlphabeticalIndex + parseInt(testNumberWithoutLetters.charAt(2), 10)
+            + secondLetterAlphabeticalIndex
+            + parseInt(testNumberWithoutLetters.charAt(2), 10)
             + parseInt(testNumberWithoutLetters.charAt(3), 10) * 3
             + parseInt(testNumberWithoutLetters.charAt(4), 10);
 
