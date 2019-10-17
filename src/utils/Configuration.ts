@@ -21,7 +21,7 @@ class Configuration {
     private static instance: Configuration;
     private readonly config: any;
 
-    private constructor(configPath: string) {
+    constructor(configPath: string) {
         this.config = yml.readSync(configPath);
 
         // Replace environment variable references
