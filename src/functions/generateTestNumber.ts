@@ -1,11 +1,11 @@
 import {APIGatewayProxyResult, Context, Handler} from "aws-lambda";
-import {Injector} from "../models/injector/Injector";
 import {TestNumberService} from "../services/TestNumberService";
 import {HTTPResponse} from "../utils/HTTPResponse";
 import {TestNumber} from "../models/TestNumber";
+import {DynamoDBService} from "../services/DynamoDBService";
 
 const generateTestNumber: Handler = async (event: any, context?: Context): Promise<APIGatewayProxyResult> => {
-    const testNumberService = Injector.resolve<TestNumberService>(TestNumberService);
+    const testNumberService = new TestNumberService(new DynamoDBService());
 
     return testNumberService.createTestNumber()
         .then((testNumber: TestNumber) => {

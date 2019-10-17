@@ -4,9 +4,8 @@ import {TestNumber} from "../../src/models/TestNumber";
 import {generateTestNumber} from "../../src/functions/generateTestNumber";
 import lambdaTester from "lambda-tester";
 
-const testNumberService: TestNumberService = Injector.resolve<TestNumberService>(TestNumberService);
-
 describe("POST /test-number", () => {
+    const testNumberService: TestNumberService = Injector.resolve<TestNumberService>(TestNumberService);
     const lambda = lambdaTester(generateTestNumber);
     beforeAll(async () => {
         // Reset the Database
@@ -50,10 +49,11 @@ describe("POST /test-number", () => {
         });
     });
 
+    afterAll((done) => {
+        testNumberService.dbClient.batchDelete([{testNumber: "W01A001"}, {testNumber: "W01A002"}])
+          .then(() => done());
+    });
 });
 
-afterAll((done) => {
-    testNumberService.dbClient.batchDelete([{testNumber: "W01A001"}, {testNumber: "W01A002"}])
-        .then(() => done());
-});
+
 
