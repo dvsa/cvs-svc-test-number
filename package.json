@@ -9,13 +9,13 @@
     "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
     "test": "jest --testMatch=\"**/*.unitTest.ts\"",
-    "test-i": "jest --testMatch=\"**/*.intTest.ts\"",
+    "test-i": "jest --testMatch=\"**/*.intTest.ts\" --runInBAnd",
     "tslint": "tslint src/**/*.ts tests/**/*.ts",
     "prepush": "BRANCH=local npm test && npm run tslint",
     "predeploy": "npm install && npm run prepush",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
-    "coverage": "jest --testMatch=\"**/*.*Test.ts\" --coverage",
+    "coverage": "jest --testMatch=\"**/*.*Test.ts\" --coverage --runInBand",
     "audit-dep": "npm audit --json | audit-filter --nsp-config=.nsprc --audit=-"
   },
   "nyc": {
