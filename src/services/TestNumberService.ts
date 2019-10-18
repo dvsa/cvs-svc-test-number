@@ -1,12 +1,9 @@
 import { AWSError } from "aws-sdk"; // Only used as a type, so not wrapped by XRay
 import { TestNumber } from "../models/TestNumber";
-import { Service } from "../models/injector/ServiceDecorator";
 import { HTTPResponse } from "../utils/HTTPResponse";
 import { DynamoDBService } from "./DynamoDBService";
 import { Configuration } from "../utils/Configuration";
-import { DocumentClient } from "aws-sdk/lib/dynamodb/document_client";
 
-@Service()
 export class TestNumberService {
     public readonly dbClient: DynamoDBService;
 

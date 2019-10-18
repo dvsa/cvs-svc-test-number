@@ -1,11 +1,11 @@
-import {Injector} from "../../src/models/injector/Injector";
 import {TestNumberService} from "../../src/services/TestNumberService";
 import {TestNumber} from "../../src/models/TestNumber";
 import {generateTestNumber} from "../../src/functions/generateTestNumber";
 import lambdaTester from "lambda-tester";
+import {DynamoDBService} from "../../src/services/DynamoDBService";
 
 describe("POST /test-number", () => {
-    const testNumberService: TestNumberService = Injector.resolve<TestNumberService>(TestNumberService);
+    const testNumberService: TestNumberService = new TestNumberService(new DynamoDBService());
     const lambda = lambdaTester(generateTestNumber);
     beforeAll(async () => {
         // Reset the Database
