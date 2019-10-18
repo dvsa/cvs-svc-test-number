@@ -1,13 +1,11 @@
-import {Injector} from "../../src/models/injector/Injector";
 import {TestNumberService} from "../../src/services/TestNumberService";
-import {DynamoDBMockService} from "../models/DynamoDBMockService";
 import {TestNumber} from "../../src/models/TestNumber";
 import {DynamoDBService} from "../../src/services/DynamoDBService";
 import {HTTPResponse} from "../../src/utils/HTTPResponse";
-import {AWSError} from "aws-sdk";
+jest.mock("../../src/services/DynamoDBService");
 
 describe("TestNumberService", () => {
-    const testNumberService: TestNumberService = Injector.resolve<TestNumberService>(TestNumberService, [DynamoDBMockService]);
+    const testNumberService = new TestNumberService(new DynamoDBService());
     beforeEach(() => {
         jest.restoreAllMocks();
         jest.resetModules();
@@ -111,6 +109,9 @@ describe("TestNumberService", () => {
     });
 
     describe("getLastTestNumber",  () => {
+        beforeEach(() => {
+            jest.resetAllMocks();
+        });
         it("returns expected value on successful DBService query", async ()  => {
             const aTestNumber = {
                 testNumber: "A00A00002",
