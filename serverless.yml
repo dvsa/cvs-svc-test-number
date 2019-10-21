@@ -53,3 +53,5 @@ custom:
         sources:
         - table: cvs-local-test-number
           sources: [./tests/resources/test-number.json]
+    stages:
+      - dev
