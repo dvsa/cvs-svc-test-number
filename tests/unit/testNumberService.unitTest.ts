@@ -1,5 +1,5 @@
 import {TestNumberService} from "../../src/services/TestNumberService";
-import { TestNumber } from '../../src/models/TestNumber';
+import { TestNumber } from "../../src/models/TestNumber";
 import {DynamoDBService} from "../../src/services/DynamoDBService";
 import {HTTPResponse} from "../../src/utils/HTTPResponse";
 jest.mock("../../src/services/DynamoDBService");
