@@ -28,3 +28,4 @@ testNumberinitialValue:
   id: W01
   certLetter: A
   sequenceNumber: "000"
+  testNumberKey: 1

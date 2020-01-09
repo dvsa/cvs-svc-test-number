@@ -25,10 +25,7 @@ export class TestNumberService {
                 const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber);
                 return this.dbClient.put(testNumber)
                     .then(() => {
-                        return this.dbClient.delete({ testNumber: lastTestNumber.testNumber })
-                            .then(() => {
-                                return testNumber;
-                            });
+                        return testNumber;
                     })
                     .catch((error: AWSError) => {
                         console.error(error);
@@ -103,7 +100,8 @@ export class TestNumberService {
             id: cvsIdLetter + cvsIdNumber,
             certLetter,
             sequenceNumber,
-            testNumber: newTestNumber
+            testNumber: newTestNumber,
+            testNumberKey: 1
         };
 
         return newTestNumberObject;
