@@ -19,7 +19,8 @@ describe("POST /test-number", () => {
                 testNumber: "W01A00128",
                 id: "W01",
                 certLetter: "A",
-                sequenceNumber: "001"
+                sequenceNumber: "001",
+                testNumberKey: 1
             };
             return lambda
             .expectResolve((response: any) => {
@@ -37,7 +38,8 @@ describe("POST /test-number", () => {
                 testNumber: "W01A00229",
                 id: "W01",
                 certLetter: "A",
-                sequenceNumber: "002"
+                sequenceNumber: "002",
+                testNumberKey: 1
             };
             return lambda
             .expectResolve((response: any) => {
