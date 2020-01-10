@@ -9,8 +9,7 @@ describe("POST /test-number", () => {
     const lambda = lambdaTester(generateTestNumber);
     beforeAll(async () => {
         // Reset the Database
-        const latestNumber: TestNumber = await testNumberService.getLastTestNumber();
-        await testNumberService.dbClient.batchDelete([{testNumber: latestNumber.testNumber}]);
+         await testNumberService.dbClient.batchDelete([{testNumberKey: 1}]);
     });
 
     context("when a new test-number is requested the very first time(no data in db)", () => {
@@ -52,7 +51,7 @@ describe("POST /test-number", () => {
     });
 
     afterAll((done) => {
-        testNumberService.dbClient.batchDelete([{testNumber: "W01A001"}, {testNumber: "W01A002"}])
+        testNumberService.dbClient.delete([{testNumberKey: 1}])
           .then(() => done());
     });
 });

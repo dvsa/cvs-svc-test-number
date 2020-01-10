@@ -30,10 +30,10 @@ resources:
       Properties:
         TableName: cvs-local-test-number
         AttributeDefinitions:
-        - AttributeName: testNumber
-          AttributeType: S
+        - AttributeName: testNumberKey
+          AttributeType: N
         KeySchema:
-        - AttributeName: testNumber
+        - AttributeName: testNumberKey
           KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -46,8 +46,8 @@ custom:
       port: 8008
       inMemory: true
       migrate: true
-      seed: false
-      noStart: true
+      seed: true
+      noStart: false
     seed:
       test-number:
         sources:
