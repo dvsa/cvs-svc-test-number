@@ -183,9 +183,7 @@ describe("TestNumberService", () => {
                     testNumberKey: 1
                 };
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
-                DynamoDBService.prototype.put = jest.fn().mockResolvedValue("");
-                const delSpy = jest.fn().mockResolvedValue("");
-                DynamoDBService.prototype.delete = delSpy;
+                DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue("");
                 const service = new TestNumberService(new DynamoDBService());
                 const output = await service.createTestNumber();
                 expect(expectedNextTestNumber).toEqual(output);
@@ -208,13 +206,10 @@ describe("TestNumberService", () => {
                 };
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
                 const putSpy = jest.fn().mockResolvedValue("");
-                DynamoDBService.prototype.put = putSpy;
-                const delSpy = jest.fn().mockResolvedValue("");
-                DynamoDBService.prototype.delete = delSpy;
+                DynamoDBService.prototype.transactWrite = putSpy;
                 const service = new TestNumberService(new DynamoDBService());
                 await service.createTestNumber();
                 expect(putSpy.mock. calls[0][0]).toEqual(expectedNextTestNumber);
-                // expect(delSpy.mock.calls[0][0]).toEqual({ testNumber: "W01A00128" });
             });
         });
         context("when DBClient.put throws a 400 \"The conditional request failed\" error", () => {
@@ -240,9 +235,7 @@ describe("TestNumberService", () => {
 
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
                 const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce("");
-                DynamoDBService.prototype.put = putSpy;
-                const delSpy = jest.fn().mockResolvedValue("");
-                DynamoDBService.prototype.delete = delSpy;
+                DynamoDBService.prototype.transactWrite = putSpy;
 
                 const service = new TestNumberService(new DynamoDBService());
                 await service.createTestNumber();
@@ -265,10 +258,8 @@ describe("TestNumberService", () => {
                 error.statusCode = 418;
 
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
-                const putSpy = jest.fn().mockRejectedValueOnce(error);
-                DynamoDBService.prototype.put = putSpy;
-                const delSpy = jest.fn().mockResolvedValue("");
-                DynamoDBService.prototype.delete = delSpy;
+                const transactSpy = jest.fn().mockRejectedValueOnce(error);
+                DynamoDBService.prototype.transactWrite = transactSpy;
 
                 const service = new TestNumberService(new DynamoDBService());
                 try {

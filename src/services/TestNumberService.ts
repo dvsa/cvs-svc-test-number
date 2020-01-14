@@ -23,7 +23,7 @@ export class TestNumberService {
         return this.getLastTestNumber()
             .then((lastTestNumber) => {
                 const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber);
-                return this.dbClient.put(testNumber)
+                return this.dbClient.transactWrite(testNumber)
                     .then(() => {
                         return testNumber;
                     })

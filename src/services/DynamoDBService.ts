@@ -174,4 +174,39 @@ export class DynamoDBService {
 
         return Promise.all(promiseBatch);
     }
+
+    /**
+     * Performs a write transaction on the specified table.
+     * @param item - the item to be inserted or updated during the transaciton.
+     */
+    public transactWrite(item: any): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
+        const query: DocumentClient.TransactWriteItemsInput = { TransactItems: [
+            {
+                Put: {
+                    TableName: this.tableName,
+                    Item: item,
+                    ConditionExpression: "testNumber <> :testNumberVal",
+                    ExpressionAttributeValues: {
+                        ":testNumberVal": item.testNumber
+                    }
+                }
+            }
+        ]};
+        return  DynamoDBService.client.transactWrite(query).promise();
+    }
+
+    /**
+     * Performs a read transaction on the specified table using provided key.
+     * @param key - the key of the item you wish to fetch
+     */
+    public transactGetByTestNumberKey(key: DocumentClient.Key): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
+        const query: DocumentClient.TransactGetItemsInput = { TransactItems: [
+            {
+              Get: {  TableName: this.tableName,
+                Key: key,
+              }
+            }
+        ]};
+        return  DynamoDBService.client.transactGet(query).promise();
+    }
 }
