@@ -38,7 +38,7 @@ export class TestNumberService {
                     })
                     .catch((error: AWSError) => {
                         console.error(error); // limit to 5 attempts
-                        if (error.statusCode === 400 && error.message === "The conditional request failed") {
+                        if (error.statusCode === 400) {
                             return this.createTestNumber(maxAttempts + 1, error);
                         }
                         throw new HTTPResponse(error.statusCode, {
