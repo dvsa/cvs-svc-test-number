@@ -7,33 +7,23 @@ import {DynamoDBService} from "../../src/services/DynamoDBService";
 describe("POST /test-number", () => {
     const testNumberService: TestNumberService = new TestNumberService(new DynamoDBService());
     const lambda = lambdaTester(generateTestNumber);
+    const expectedFirstTestNumber: TestNumber = {
+        testNumber: "W01A00128",
+        id: "W01",
+        certLetter: "A",
+        sequenceNumber: "001",
+        testNumberKey: 1
+    };
+
     beforeAll(async () => {
         // Reset the Database
          await testNumberService.dbClient.batchDelete([{testNumberKey: 1}]);
+         await testNumberService.dbClient.put(expectedFirstTestNumber);
     });
 
-    context("when a new test-number is requested the very first time(no data in db)", () => {
-        it("should respond with HTTP 200 and testNumber W01A001", () => {
-            const expectedFirstTestNumber: TestNumber = {
-                testNumber: "W01A00128",
-                id: "W01",
-                certLetter: "A",
-                sequenceNumber: "001",
-                testNumberKey: 1
-            };
-            return lambda
-            .expectResolve((response: any) => {
-                expect(response.headers["Access-Control-Allow-Origin"]).toEqual("*");
-                expect(response.headers["Access-Control-Allow-Credentials"]).toEqual(true);
-                expect(response.statusCode).toEqual(200);
-                expect(expectedFirstTestNumber).toEqual(JSON.parse(response.body));
-            });
-        });
-    });
-
-    context("when a new test-number is requested when other test-numbers already exists in db", () => {
+    context("when a new test-number is requested when only the seed data is present", () => {
         it("should respond with HTTP 200 and a next valid test number", () => {
-            const expectedFirstTestNumber: TestNumber = {
+            const nextTestNumber: TestNumber = {
                 testNumber: "W01A00229",
                 id: "W01",
                 certLetter: "A",
@@ -45,7 +35,7 @@ describe("POST /test-number", () => {
                 expect(response.headers["Access-Control-Allow-Origin"]).toEqual("*");
                 expect(response.headers["Access-Control-Allow-Credentials"]).toEqual(true);
                 expect(response.statusCode).toEqual(200);
-                expect(expectedFirstTestNumber).toEqual(JSON.parse(response.body));
+                expect(nextTestNumber).toEqual(JSON.parse(response.body));
             });
         });
     });

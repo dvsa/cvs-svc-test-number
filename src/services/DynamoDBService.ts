@@ -181,15 +181,14 @@ export class DynamoDBService {
      * @param oldItem - the current item that already exists in the database.
      */
     public transactWrite(item: any, oldItem?: any): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
-        console.log(`new test number ${item.testNumber} and old test number ${oldItem.testNumber}`);
         const query: DocumentClient.TransactWriteItemsInput = { TransactItems: [
             {
                 Put: {
                     TableName: this.tableName,
                     Item: item,
-                    ConditionExpression: "testNumber = :testNumberVal",
+                    ConditionExpression: "testNumber = :OldTestNumber",
                     ExpressionAttributeValues: {
-                        ":testNumberVal": oldItem.testNumber
+                        ":OldTestNumber": oldItem.testNumber
                     }
                 }
             }
