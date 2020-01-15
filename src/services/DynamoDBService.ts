@@ -178,35 +178,22 @@ export class DynamoDBService {
     /**
      * Performs a write transaction on the specified table.
      * @param item - the item to be inserted or updated during the transaciton.
+     * @param oldItem - the current item that already exists in the database.
      */
-    public transactWrite(item: any): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
+    public transactWrite(item: any, oldItem?: any): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
+        console.log(`new test number ${item.testNumber} and old test number ${oldItem.testNumber}`);
         const query: DocumentClient.TransactWriteItemsInput = { TransactItems: [
             {
                 Put: {
                     TableName: this.tableName,
                     Item: item,
-                    ConditionExpression: "testNumber <> :testNumberVal",
+                    ConditionExpression: "testNumber = :testNumberVal",
                     ExpressionAttributeValues: {
-                        ":testNumberVal": item.testNumber
+                        ":testNumberVal": oldItem.testNumber
                     }
                 }
             }
         ]};
         return  DynamoDBService.client.transactWrite(query).promise();
-    }
-
-    /**
-     * Performs a read transaction on the specified table using provided key.
-     * @param key - the key of the item you wish to fetch
-     */
-    public transactGetByTestNumberKey(key: DocumentClient.Key): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
-        const query: DocumentClient.TransactGetItemsInput = { TransactItems: [
-            {
-              Get: {  TableName: this.tableName,
-                Key: key,
-              }
-            }
-        ]};
-        return  DynamoDBService.client.transactGet(query).promise();
     }
 }

@@ -17,20 +17,30 @@ export class TestNumberService {
 
     /**
      * Creates a new test number in the database.
-     * @param activity - the payload containing the activity
+     * @param maxAttempt - Maximum number of attempts for generating a Test Number
      */
-    public createTestNumber(): Promise<TestNumber> {
+    public createTestNumber(maxAttempts: number, awsError: AWSError|null): Promise<TestNumber> {
+        console.log( `max attempts ${maxAttempts}`);
+        if (maxAttempts > 5) {
+            if (awsError) {
+            throw new HTTPResponse(400, {
+                error: `${awsError.code}: ${awsError.message}
+            At: ${awsError.hostname} - ${awsError.region}
+            Request id: ${awsError.requestId}`
+            });
+            }
+        }
         return this.getLastTestNumber()
             .then((lastTestNumber) => {
                 const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber);
-                return this.dbClient.transactWrite(testNumber)
+                return this.dbClient.transactWrite(testNumber, lastTestNumber)
                     .then(() => {
                         return testNumber;
                     })
                     .catch((error: AWSError) => {
-                        console.error(error);
+                        console.error(error); // limit to 5 attempts
                         if (error.statusCode === 400 && error.message === "The conditional request failed") {
-                            return this.createTestNumber();
+                            return this.createTestNumber(maxAttempts + 1, error);
                         }
                         throw new HTTPResponse(error.statusCode, {
                             error: `${error.code}: ${error.message}
@@ -47,6 +57,7 @@ export class TestNumberService {
     public getLastTestNumber(): Promise<TestNumber> {
         return this.dbClient.scan()
             .then((data: any) => {
+                console.log(`data for testNumber is ${JSON.stringify(data)}`);
                 if (data.Count === 0) {
                     return Configuration.getInstance().getTestNumberInitialValue();
                 } else {
