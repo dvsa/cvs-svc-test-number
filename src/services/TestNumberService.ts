@@ -20,7 +20,6 @@ export class TestNumberService {
      * @param maxAttempt - Maximum number of attempts for generating a Test Number
      */
     public createTestNumber(maxAttempts: number, awsError: AWSError|null): Promise<TestNumber> {
-        console.log( `max attempts ${maxAttempts}`);
         if (maxAttempts > 5) {
             if (awsError) {
             throw new HTTPResponse(400, {
@@ -57,7 +56,6 @@ export class TestNumberService {
     public getLastTestNumber(): Promise<TestNumber> {
         return this.dbClient.scan()
             .then((data: any) => {
-                console.log(`data for testNumber is ${JSON.stringify(data)}`);
                 if (data.Count === 0) {
                     return Configuration.getInstance().getTestNumberInitialValue();
                 } else {
