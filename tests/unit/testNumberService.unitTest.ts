@@ -185,7 +185,7 @@ describe("TestNumberService", () => {
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
                 DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue("");
                 const service = new TestNumberService(new DynamoDBService());
-                const output = await service.createTestNumber();
+                const output = await service.createTestNumber(1, null);
                 expect(expectedNextTestNumber).toEqual(output);
             });
 
@@ -208,7 +208,7 @@ describe("TestNumberService", () => {
                 const putSpy = jest.fn().mockResolvedValue("");
                 DynamoDBService.prototype.transactWrite = putSpy;
                 const service = new TestNumberService(new DynamoDBService());
-                await service.createTestNumber();
+                await service.createTestNumber(1, null);
                 expect(putSpy.mock. calls[0][0]).toEqual(expectedNextTestNumber);
             });
         });
@@ -238,7 +238,7 @@ describe("TestNumberService", () => {
                 DynamoDBService.prototype.transactWrite = putSpy;
 
                 const service = new TestNumberService(new DynamoDBService());
-                await service.createTestNumber();
+                await service.createTestNumber(0, null);
                 expect(putSpy.mock.calls.length).toEqual(2);
             });
         });
@@ -263,7 +263,7 @@ describe("TestNumberService", () => {
 
                 const service = new TestNumberService(new DynamoDBService());
                 try {
-                    await service.createTestNumber();
+                    await service.createTestNumber(1, null);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(418);

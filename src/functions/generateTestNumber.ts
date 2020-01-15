@@ -7,7 +7,7 @@ import {DynamoDBService} from "../services/DynamoDBService";
 const generateTestNumber: Handler = async (event: any, context?: Context): Promise<APIGatewayProxyResult> => {
     const testNumberService = new TestNumberService(new DynamoDBService());
 
-    return testNumberService.createTestNumber()
+    return testNumberService.createTestNumber(1, null)
         .then((testNumber: TestNumber) => {
             return new HTTPResponse(200, testNumber);
         })
