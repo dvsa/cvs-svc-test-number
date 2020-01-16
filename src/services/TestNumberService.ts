@@ -6,7 +6,6 @@ import { Configuration } from "../utils/Configuration";
 
 export class TestNumberService {
     public readonly dbClient: DynamoDBService;
-
     /**
      * Constructor for the TestNumberService class
      * @param dynamo
@@ -17,10 +16,11 @@ export class TestNumberService {
 
     /**
      * Creates a new test number in the database.
-     * @param maxAttempt - Maximum number of attempts for generating a Test Number
+     * @param attempt - the current number of attempts for generating a Test Number.
+     * @param awsError - AWS error to be passed when the request fails otherwise null.
      */
-    public createTestNumber(maxAttempts: number, awsError: AWSError|null): Promise<TestNumber> {
-        if (maxAttempts > 5) {
+    public createTestNumber(attempts: number, awsError: AWSError|null): Promise<TestNumber> {
+        if (attempts > Configuration.getInstance().getMaxAttempts()) {
             if (awsError) {
             throw new HTTPResponse(400, {
                 error: `${awsError.code}: ${awsError.message}
@@ -38,8 +38,8 @@ export class TestNumberService {
                     })
                     .catch((error: AWSError) => {
                         console.error(error); // limit to 5 attempts
-                        if (error.statusCode === 400) {
-                            return this.createTestNumber(maxAttempts + 1, error);
+                        if (error.statusCode === 400 && error.message.toLowerCase().includes("the conditional request failed")) {
+                            return this.createTestNumber(attempts + 1, error);
                         }
                         throw new HTTPResponse(error.statusCode, {
                             error: `${error.code}: ${error.message}
