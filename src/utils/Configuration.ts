@@ -116,5 +116,13 @@ class Configuration {
     public getTestNumberInitialValue(): any {
         return this.config.testNumberinitialValue;
     }
+
+    /**
+     * Retrieves the test number initial value
+     * @returns number
+     */
+    public getMaxAttempts(): number {
+        return this.config.maxAttempts;
+    }
 }
 export { Configuration, IFunctionEvent };
