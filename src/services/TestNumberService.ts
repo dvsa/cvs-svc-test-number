@@ -39,7 +39,7 @@ export class TestNumberService {
                     .catch((error: AWSError) => {
                         console.error(error); // limit to 5 attempts
                         if (error.statusCode === 400 && error.message.toLowerCase().includes("the conditional request failed")) {
-                            console.error(`Insert attempt ${attempts + 1} of ${Configuration.getInstance().getMaxAttempts()}.`);
+                            console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
                             return this.createTestNumber(attempts + 1, error);
                         }
                         throw new HTTPResponse(error.statusCode, {
