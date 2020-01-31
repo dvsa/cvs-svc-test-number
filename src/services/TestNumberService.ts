@@ -38,7 +38,7 @@ export class TestNumberService {
                     })
                     .catch((error: AWSError) => {
                         console.error(error); // limit to 5 attempts
-                        if (error.statusCode === 400 && error.message.toLowerCase().includes("the conditional request failed")) {
+                        if (error.statusCode === 400 && error.message.includes("Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]")) {
                             console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
                             return this.createTestNumber(attempts + 1, error);
                         }

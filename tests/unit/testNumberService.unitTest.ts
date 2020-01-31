@@ -212,7 +212,7 @@ describe("TestNumberService", () => {
                 expect(putSpy.mock. calls[0][0]).toEqual(expectedNextTestNumber);
             });
         });
-        context("when DBClient.put throws a 400 \"The conditional request failed\" error", () => {
+        context("when DBClient.put throws a 400 \"Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]\" error", () => {
             it("tries again", async () => {
                 const lastTestNumber: TestNumber = {
                     testNumber: "W01A00128",
@@ -229,7 +229,7 @@ describe("TestNumberService", () => {
                     testNumberKey: 1
                 };
 
-                const error400 = new Error("The conditional request failed");
+                const error400 = new Error("Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]");
                 // @ts-ignore;
                 error400.statusCode = 400;
 
