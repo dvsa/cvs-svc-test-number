@@ -1,8 +1,10 @@
-import { AWSError } from "aws-sdk"; // Only used as a type, so not wrapped by XRay
+import { AWSError, HttpResponse } from "aws-sdk"; // Only used as a type, so not wrapped by XRay
 import { TestNumber } from "../models/TestNumber";
 import { HTTPResponse } from "../utils/HTTPResponse";
 import { DynamoDBService } from "./DynamoDBService";
 import { Configuration } from "../utils/Configuration";
+import { STATUS_CODES } from "http";
+import { Http2ServerResponse } from "http2";
 
 export class TestNumberService {
     public readonly dbClient: DynamoDBService;
@@ -34,11 +36,12 @@ export class TestNumberService {
                 const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber);
                 return this.dbClient.transactWrite(testNumber, lastTestNumber)
                     .then(() => {
+                        console.log("Test Number Generated successfully");
                         return testNumber;
                     })
                     .catch((error: AWSError) => {
                         console.error(error); // limit to 5 attempts
-                        if (error.statusCode === 400 && error.message.includes("Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]")) {
+                        if (error.statusCode === 400 ) {
                             console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
                             return this.createTestNumber(attempts + 1, error);
                         }
