@@ -118,6 +118,14 @@ class Configuration {
     }
 
     /**
+     * Retrieves the trailer id initial value
+     * @returns any
+     */
+    public getTrailerIdInitialValue(): any {
+        return this.config.trailerIdInitialValue;
+    }
+
+    /**
      * Retrieves the test number initial value
      * @returns number
      */

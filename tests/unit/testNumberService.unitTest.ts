@@ -1,11 +1,13 @@
-import {TestNumberService} from "../../src/services/TestNumberService";
-import { TestNumber } from "../../src/models/TestNumber";
+import {NumberService} from "../../src/services/NumberService";
+import {TestNumber, TrailerId} from "../../src/models/NumberModel";
 import {DynamoDBService} from "../../src/services/DynamoDBService";
 import {HTTPResponse} from "../../src/utils/HTTPResponse";
+import {NUMBER_TYPE} from "../../src/assets/Enums";
+
 jest.mock("../../src/services/DynamoDBService");
 
-describe("TestNumberService", () => {
-    const testNumberService = new TestNumberService(new DynamoDBService());
+describe("NumberService", () => {
+    const numberService = new NumberService(new DynamoDBService());
     beforeEach(() => {
         jest.restoreAllMocks();
         jest.resetModules();
@@ -27,7 +29,7 @@ describe("TestNumberService", () => {
                     sequenceNumber: "002",
                     testNumberKey: 1
                 };
-                expect(testNumberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
+                expect(numberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
 
                 lastTestNumber = {
                     testNumber: "W01A99982",
@@ -43,7 +45,7 @@ describe("TestNumberService", () => {
                     sequenceNumber: "001",
                     testNumberKey: 1
                 };
-                expect(testNumberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
+                expect(numberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
 
                 lastTestNumber = {
                     testNumber: "W01Z99907",
@@ -59,7 +61,7 @@ describe("TestNumberService", () => {
                     sequenceNumber: "001",
                     testNumberKey: 1
                 };
-                expect(testNumberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
+                expect(numberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
 
                 lastTestNumber = {
                     testNumber: "W99Z99941",
@@ -75,7 +77,7 @@ describe("TestNumberService", () => {
                     sequenceNumber: "001",
                     testNumberKey: 1
                 };
-                expect(testNumberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
+                expect(numberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
             });
 
             it("Should have correct CheckSum numbers (10 < checksum < 100)", () => {
@@ -86,7 +88,7 @@ describe("TestNumberService", () => {
                     sequenceNumber: "919",
                     testNumberKey: 1
                 };
-                const newTestNumber = testNumberService.createNextTestNumberObject(lastTestNumber);
+                const newTestNumber = numberService.createNextTestNumberObject(lastTestNumber);
                 // next number should be X99Q920 = [24 + 9 + 27 + 17 + 9 + 6 + 0] = 92;
                 expect("92").toEqual(newTestNumber.testNumber.substring(7, 9));
             });
@@ -99,7 +101,7 @@ describe("TestNumberService", () => {
                     sequenceNumber: "998",
                     testNumberKey: 1
                 };
-                const newTestNumber = testNumberService.createNextTestNumberObject(lastTestNumber);
+                const newTestNumber = numberService.createNextTestNumberObject(lastTestNumber);
                 // next number should be W99Z999 = [23 + 9 + 27 + 26 + 27 + 9 + 9] = 130 => 30;
                 expect("30").toEqual(newTestNumber.testNumber.substring(7, 9));
             });
@@ -139,18 +141,80 @@ describe("TestNumberService", () => {
                     sequenceNumber: "000",
                     testNumberKey: 1
                 };
-                const newTestNumber = testNumberService.createNextTestNumberObject(lastTestNumber);
+                const newTestNumber = numberService.createNextTestNumberObject(lastTestNumber);
                 // next number should be A00A001 = [1 + 0 + 0 + 1 + 0 + 0 + 1] = 3 => 03;
                 expect("03").toEqual(newTestNumber.testNumber.substring(7, 9));
             });
         });
     });
 
-    describe("getLastTestNumber",  () => {
+    describe("createNextTrailerIdObject", () => {
+        context("when trying to create a new trailerId", () => {
+            it("should return proper nextTrailerId", () => {
+                let lastTrailerId: TrailerId = {
+                    trailerId: "C530001",
+                    trailerLetter: "C",
+                    sequenceNumber: 530001,
+                    testNumberKey: 2
+                };
+                let expectedNextTrailerId: TrailerId = {
+                    trailerId: "C530002",
+                    trailerLetter: "C",
+                    sequenceNumber: 530002,
+                    testNumberKey: 2
+                };
+                expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(expectedNextTrailerId);
+
+                lastTrailerId = {
+                    trailerId: "C530004",
+                    trailerLetter: "C",
+                    sequenceNumber: 530004,
+                    testNumberKey: 2
+                };
+                expectedNextTrailerId = {
+                    trailerId: "C530005",
+                    trailerLetter: "C",
+                    sequenceNumber: 530005,
+                    testNumberKey: 2
+                };
+                expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(expectedNextTrailerId);
+
+                lastTrailerId = {
+                    trailerId: "C530456",
+                    trailerLetter: "C",
+                    sequenceNumber: 530456,
+                    testNumberKey: 2
+                };
+                expectedNextTrailerId = {
+                    trailerId: "C530457",
+                    trailerLetter: "C",
+                    sequenceNumber: 530457,
+                    testNumberKey: 2
+                };
+                expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(expectedNextTrailerId);
+
+                lastTrailerId = {
+                    trailerId: "C123456",
+                    trailerLetter: "C",
+                    sequenceNumber: 123456,
+                    testNumberKey: 2
+                };
+                expectedNextTrailerId = {
+                    trailerId: "C123457",
+                    trailerLetter: "C",
+                    sequenceNumber: 123457,
+                    testNumberKey: 2
+                };
+                expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(expectedNextTrailerId);
+            });
+        });
+    });
+
+    describe("getLastTestNumber", () => {
         beforeEach(() => {
             jest.resetAllMocks();
         });
-        it("returns expected value on successful DBService query", async ()  => {
+        it("returns expected value on successful DBService query", async () => {
             const aTestNumber = {
                 testNumber: "A00A00002",
                 id: "A00",
@@ -159,11 +223,11 @@ describe("TestNumberService", () => {
                 testNumberKey: 1
             };
             DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [aTestNumber], Count: 1});
-            const service = new TestNumberService(new DynamoDBService());
-            const output = await service.getLastTestNumber();
+            const service = new NumberService(new DynamoDBService());
+            const output = await service.getLastNumber();
             expect(aTestNumber).toEqual(output);
         });
-        it("returns default value on empty DB return", async ()  => {
+        it("returns default value on empty DB return", async () => {
             const defaultTestNumber = {
                 testNumber: "W01A000",
                 id: "W01",
@@ -172,19 +236,63 @@ describe("TestNumberService", () => {
                 testNumberKey: 1
             };
             DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [], Count: 0});
-            const service = new TestNumberService(new DynamoDBService());
-            const output = await service.getLastTestNumber();
+            const service = new NumberService(new DynamoDBService());
+            const output = await service.getLastNumber();
             expect(defaultTestNumber).toEqual(output);
         });
-        it("throws expected errors if DBService request fails", async ()  => {
+        it("throws expected errors if DBService request fails", async () => {
             const error = new Error("I broke");
             // @ts-ignore
             error.statusCode = 418;
 
             DynamoDBService.prototype.scan = jest.fn().mockRejectedValue(error);
-            const service = new TestNumberService(new DynamoDBService());
+            const service = new NumberService(new DynamoDBService());
             try {
-                await service.getLastTestNumber();
+                await service.getLastNumber();
+            } catch (e) {
+                expect(e).toBeInstanceOf(HTTPResponse);
+                expect(e.statusCode).toEqual(418);
+            }
+        });
+    });
+
+    describe("getLastTrailerId", () => {
+        beforeEach(() => {
+            jest.resetAllMocks();
+        });
+        it("returns expected value on successful DBService query", async () => {
+            const trailerIdObj = {
+                trailerId: "C530000",
+                trailerLetter: "C",
+                sequenceNumber: 530000,
+                testNumberKey: 2
+            };
+            DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [trailerIdObj], Count: 1});
+            const service = new NumberService(new DynamoDBService());
+            const output = await service.getLastNumber(NUMBER_TYPE.TRAILER_ID);
+            expect(trailerIdObj).toEqual(output);
+        });
+        it("returns default value on empty DB return", async () => {
+            const defaultTrailerId = {
+                trailerId: "C530000",
+                trailerLetter: "C",
+                sequenceNumber: 530000,
+                testNumberKey: 2
+            };
+            DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [], Count: 0});
+            const service = new NumberService(new DynamoDBService());
+            const output = await service.getLastNumber(NUMBER_TYPE.TRAILER_ID);
+            expect(defaultTrailerId).toEqual(output);
+        });
+        it("throws expected errors if DBService request fails", async () => {
+            const error = new Error("I broke");
+            // @ts-ignore
+            error.statusCode = 418;
+
+            DynamoDBService.prototype.scan = jest.fn().mockRejectedValue(error);
+            const service = new NumberService(new DynamoDBService());
+            try {
+                await service.getLastNumber(NUMBER_TYPE.TRAILER_ID);
             } catch (e) {
                 expect(e).toBeInstanceOf(HTTPResponse);
                 expect(e.statusCode).toEqual(418);
@@ -211,7 +319,7 @@ describe("TestNumberService", () => {
                 };
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
                 DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue("");
-                const service = new TestNumberService(new DynamoDBService());
+                const service = new NumberService(new DynamoDBService());
                 const output = await service.createTestNumber(1, null);
                 expect(expectedNextTestNumber).toEqual(output);
             });
@@ -234,9 +342,9 @@ describe("TestNumberService", () => {
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
                 const putSpy = jest.fn().mockResolvedValue("");
                 DynamoDBService.prototype.transactWrite = putSpy;
-                const service = new TestNumberService(new DynamoDBService());
+                const service = new NumberService(new DynamoDBService());
                 await service.createTestNumber(1, null);
-                expect(putSpy.mock. calls[0][0]).toEqual(expectedNextTestNumber);
+                expect(putSpy.mock.calls[0][0]).toEqual(expectedNextTestNumber);
             });
         });
         context("when DBClient.put throws a 400 \"Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]\" error", () => {
@@ -264,7 +372,7 @@ describe("TestNumberService", () => {
                 const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce("");
                 DynamoDBService.prototype.transactWrite = putSpy;
 
-                const service = new TestNumberService(new DynamoDBService());
+                const service = new NumberService(new DynamoDBService());
                 await service.createTestNumber(0, null);
                 expect(putSpy.mock.calls.length).toEqual(2);
             });
@@ -288,12 +396,144 @@ describe("TestNumberService", () => {
                 const transactSpy = jest.fn().mockRejectedValueOnce(error);
                 DynamoDBService.prototype.transactWrite = transactSpy;
 
-                const service = new TestNumberService(new DynamoDBService());
+                const service = new NumberService(new DynamoDBService());
                 try {
                     await service.createTestNumber(1, null);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(418);
+                }
+            });
+        });
+
+        context("when the function retried more than 5 times", () => {
+            it("throws an HTTPResponse error", async () => {
+                const awsError: any = {
+                    code: "400",
+                    message: "Attempted more than 5 times",
+                    hostname: "someHostname",
+                    region: "eu-east1",
+                    requestId: "123454"
+                };
+                const service = new NumberService(new DynamoDBService());
+                try {
+                    await service.createTestNumber(6, awsError);
+                } catch (e) {
+                    expect(e).toBeInstanceOf(HTTPResponse);
+                    expect(e.statusCode).toEqual(400);
+                }
+            });
+        });
+    });
+
+    describe("createTrailerId", () => {
+        context("happy path", () => {
+            it("returns next trailerId based on current number in DB", async () => {
+                const lastTrailerId: TrailerId = {
+                    trailerId: "C530000",
+                    trailerLetter: "C",
+                    sequenceNumber: 530000,
+                    testNumberKey: 2
+                };
+                const expectedNextTrailerId: TrailerId = {
+                    trailerId: "C530001",
+                    trailerLetter: "C",
+                    sequenceNumber: 530001,
+                    testNumberKey: 2
+                };
+                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTrailerId], Count: 1});
+                DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue("");
+                const service = new NumberService(new DynamoDBService());
+                const output = await service.createTrailerId(1, null);
+                expect(expectedNextTrailerId).toEqual(output);
+            });
+
+            it("Calls DB services with correct params", async () => {
+                const lastTrailerId: TrailerId = {
+                    trailerId: "C530001",
+                    trailerLetter: "C",
+                    sequenceNumber: 530001,
+                    testNumberKey: 2
+                };
+                const expectedNextTrailerId: TrailerId = {
+                    trailerId: "C530002",
+                    trailerLetter: "C",
+                    sequenceNumber: 530002,
+                    testNumberKey: 2
+                };
+                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTrailerId], Count: 1});
+                const putSpy = jest.fn().mockResolvedValue("");
+                DynamoDBService.prototype.transactWrite = putSpy;
+                const service = new NumberService(new DynamoDBService());
+                await service.createTrailerId(1, null);
+                expect(putSpy.mock.calls[0][0]).toEqual(expectedNextTrailerId);
+            });
+        });
+        context("when DBClient.put throws a 400 \"Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]\" error", () => {
+            it("tries again", async () => {
+                const lastTrailerId: TrailerId = {
+                    trailerId: "C530001",
+                    trailerLetter: "C",
+                    sequenceNumber: 530001,
+                    testNumberKey: 2
+                };
+
+                const error400 = new Error("Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]");
+                // @ts-ignore;
+                error400.statusCode = 400;
+
+                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTrailerId], Count: 1});
+                const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce("");
+                DynamoDBService.prototype.transactWrite = putSpy;
+
+                const service = new NumberService(new DynamoDBService());
+                await service.createTrailerId(0, null);
+                expect(putSpy.mock.calls.length).toEqual(2);
+            });
+        });
+
+        context("when DBClient.put throws any other error", () => {
+            it("throws an HTTPResponse error", async () => {
+                const lastTrailerId: TrailerId = {
+                    trailerId: "C530001",
+                    trailerLetter: "C",
+                    sequenceNumber: 530001,
+                    testNumberKey: 2
+                };
+
+                const error = new Error("Oh no!");
+                // @ts-ignore
+                error.statusCode = 418;
+
+                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTrailerId], Count: 1});
+                const transactSpy = jest.fn().mockRejectedValueOnce(error);
+                DynamoDBService.prototype.transactWrite = transactSpy;
+
+                const service = new NumberService(new DynamoDBService());
+                try {
+                    await service.createTrailerId(1, null);
+                } catch (e) {
+                    expect(e).toBeInstanceOf(HTTPResponse);
+                    expect(e.statusCode).toEqual(418);
+                }
+            });
+        });
+
+        context("when the function retried more than 5 times", () => {
+            it("throws an HTTPResponse error", async () => {
+                const awsError: any = {
+                    code: "400",
+                    message: "Attempted more than 5 times",
+                    hostname: "someHostname",
+                    region: "eu-east1",
+                    requestId: "123454"
+                };
+                const service = new NumberService(new DynamoDBService());
+                try {
+                    await service.createTrailerId(6, awsError);
+                } catch (e) {
+                    expect(e).toBeInstanceOf(HTTPResponse);
+                    expect(e.statusCode).toEqual(400);
                 }
             });
         });

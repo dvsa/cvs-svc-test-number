@@ -5,3 +5,10 @@ export interface TestNumber {
     certLetter: string;
     sequenceNumber: string;
 }
+
+export interface TrailerId {
+    trailerId: string;
+    trailerLetter: string;
+    sequenceNumber: number;
+    testNumberKey: number;
+}
