@@ -4,6 +4,11 @@ functions:
     path: /test-number
     proxy: null
     function: generateTestNumber
+- generateTrailerId:
+    method: POST
+    path: /trailerId
+    proxy: null
+    function: generateTrailerId
 dynamodb:
   local:
     params:
@@ -38,4 +43,9 @@ testNumberinitialValue:
   certLetter: A
   sequenceNumber: "000"
   testNumberKey: 1
+trailerIdInitialValue:
+  trailerId: C530000
+  trailerLetter: C
+  sequenceNumber: 530000
+  testNumberKey: 2
 maxAttempts: 2

@@ -1,6 +1,7 @@
 import {DocumentClient} from "aws-sdk/lib/dynamodb/document_client";
 import {PromiseResult} from "aws-sdk/lib/request";
 import {Configuration} from "../utils/Configuration";
+import {NUMBER_TYPE} from "../assets/Enums";
 /* tslint:disable */
 let AWS: { DynamoDB: { DocumentClient: new (arg0: any) => DocumentClient; }; };
 if (process.env._X_AMZN_TRACE_ID) {
@@ -9,6 +10,7 @@ if (process.env._X_AMZN_TRACE_ID) {
     console.log("Serverless Offline detected; skipping AWS X-Ray setup")
     AWS = require("aws-sdk");
 }
+
 /* tslint:enable */
 
 export class DynamoDBService {
@@ -33,7 +35,7 @@ export class DynamoDBService {
      * @returns Promise<PromiseResult<DocumentClient.ScanOutput, AWS.AWSError>>
      */
     public scan(): Promise<PromiseResult<DocumentClient.ScanOutput, AWS.AWSError>> {
-        return DynamoDBService.client.scan({ TableName: this.tableName })
+        return DynamoDBService.client.scan({TableName: this.tableName})
             .promise();
     }
 
@@ -50,7 +52,7 @@ export class DynamoDBService {
         };
 
         if (attributes) {
-            Object.assign(query, { AttributesToGet: attributes });
+            Object.assign(query, {AttributesToGet: attributes});
         }
 
         return DynamoDBService.client.get(query)
@@ -116,7 +118,7 @@ export class DynamoDBService {
             };
 
             return DynamoDBService.client.batchGet(query)
-            .promise();
+                .promise();
         });
 
         return Promise.all(promiseBatch);
@@ -138,12 +140,12 @@ export class DynamoDBService {
         const promiseBatch: Array<Promise<PromiseResult<DocumentClient.BatchWriteItemOutput, AWS.AWSError>>> = itemBatches.map((batch: any[]) => {
             const query: DocumentClient.BatchWriteItemInput = {
                 RequestItems: {
-                    [this.tableName]: batch.map((item: any) => ({ PutRequest: { Item: item } })),
+                    [this.tableName]: batch.map((item: any) => ({PutRequest: {Item: item}})),
                 },
             };
 
             return DynamoDBService.client.batchWrite(query)
-            .promise();
+                .promise();
         });
 
         return Promise.all(promiseBatch);
@@ -165,12 +167,12 @@ export class DynamoDBService {
         const promiseBatch: Array<Promise<PromiseResult<DocumentClient.BatchWriteItemOutput, AWS.AWSError>>> = keyBatches.map((batch: any[]) => {
             const query: DocumentClient.BatchWriteItemInput = {
                 RequestItems: {
-                    [this.tableName]: batch.map((item: any) => ({ DeleteRequest: { Key: item } })),
+                    [this.tableName]: batch.map((item: any) => ({DeleteRequest: {Key: item}})),
                 },
             };
 
             return DynamoDBService.client.batchWrite(query)
-            .promise();
+                .promise();
         });
 
         return Promise.all(promiseBatch);
@@ -181,19 +183,34 @@ export class DynamoDBService {
      * @param item - the item to be inserted or updated during the transaciton.
      * @param oldItem - the current item that already exists in the database.
      */
-    public transactWrite(item: any, oldItem?: any): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
-        const query: DocumentClient.TransactWriteItemsInput = { TransactItems: [
-            {
-                Put: {
-                    TableName: this.tableName,
-                    Item: item,
-                    ConditionExpression: "testNumber = :OldTestNumber",
-                    ExpressionAttributeValues: {
-                        ":OldTestNumber": oldItem.testNumber
+    public transactWrite(item: any, oldItem?: any, numberType: string = NUMBER_TYPE.TEST_NUMBER): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
+        const query: DocumentClient.TransactWriteItemsInput = {
+            TransactItems: [
+                {
+                    Put: {
+                        TableName: this.tableName,
+                        Item: item,
+                        ConditionExpression: "",
+                        ExpressionAttributeValues: {}
                     }
                 }
-            }
-        ]};
-        return  DynamoDBService.client.transactWrite(query).promise();
+            ]
+        };
+        if (numberType === "trailerId") {
+            Object.assign(query.TransactItems[0].Put, {
+                ConditionExpression: "trailerId = :oldTrailerId",
+                ExpressionAttributeValues: {
+                    ":oldTrailerId": oldItem.trailerId
+                }
+            });
+        } else {
+            Object.assign(query.TransactItems[0].Put, {
+                ConditionExpression: "testNumber = :OldTestNumber",
+                ExpressionAttributeValues: {
+                    ":OldTestNumber": oldItem.testNumber
+                }
+            });
+        }
+        return DynamoDBService.client.transactWrite(query).promise();
     }
 }
