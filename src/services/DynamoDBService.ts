@@ -196,7 +196,7 @@ export class DynamoDBService {
                 }
             ]
         };
-        if (numberType === "trailerId") {
+        if (numberType === NUMBER_TYPE.TRAILER_ID) {
             Object.assign(query.TransactItems[0].Put, {
                 ConditionExpression: "trailerId = :oldTrailerId",
                 ExpressionAttributeValues: {
