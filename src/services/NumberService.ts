@@ -21,7 +21,7 @@ export class NumberService {
      * @param attempt - the current number of attempts for generating a Test Number.
      * @param awsError - AWS error to be passed when the request fails otherwise null.
      */
-    public createTestNumber(attempts: number, awsError: AWSError | null): Promise<TestNumber> {
+    public createNumber(attempts: number, awsError: AWSError | null, numberType: NUMBER_TYPE.TRAILER_ID | NUMBER_TYPE.TEST_NUMBER = NUMBER_TYPE.TEST_NUMBER): Promise<TestNumber | TrailerId> {
         if (attempts > Configuration.getInstance().getMaxAttempts()) {
             if (awsError) {
                 throw new HTTPResponse(400, {
@@ -31,19 +31,24 @@ export class NumberService {
                 });
             }
         }
-        return this.getLastNumber()
-            .then((lastTestNumber) => {
-                const testNumber: TestNumber = this.createNextTestNumberObject(lastTestNumber as TestNumber);
-                return this.dbClient.transactWrite(testNumber, lastTestNumber)
+        return this.getLastNumber(numberType)
+            .then((lastNumber) => {
+                let nextNumber: TestNumber | TrailerId;
+                if (numberType === NUMBER_TYPE.TRAILER_ID) {
+                    nextNumber = this.createNextTrailerIdObject(lastNumber as TrailerId);
+                } else {
+                    nextNumber = this.createNextTestNumberObject(lastNumber as TestNumber);
+                }
+                return this.dbClient.transactWrite(nextNumber, lastNumber, numberType)
                     .then(() => {
-                        console.log("Test Number Generated successfully");
-                        return testNumber;
+                        console.log(`${numberType} Generated successfully`);
+                        return nextNumber;
                     })
                     .catch((error: AWSError) => {
                         console.error(error); // limit to 5 attempts
                         if (error.statusCode === 400) {
                             console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
-                            return this.createTestNumber(attempts + 1, error);
+                            return this.createNumber(attempts + 1, error, numberType);
                         }
                         throw new HTTPResponse(error.statusCode, {
                             error: `${error.code}: ${error.message}
@@ -53,45 +58,6 @@ export class NumberService {
                     });
             });
     }
-
-    /**
-     * Creates a new trailer id in the database.
-     * @param attempt - the current number of attempts for generating a TrailerId.
-     * @param awsError - AWS error to be passed when the request fails otherwise null.
-     */
-    public createTrailerId(attempts: number, awsError: AWSError | null): Promise<TrailerId> {
-        if (attempts > Configuration.getInstance().getMaxAttempts()) {
-            if (awsError) {
-                throw new HTTPResponse(400, {
-                    error: `${awsError.code}: ${awsError.message}
-            At: ${awsError.hostname} - ${awsError.region}
-            Request id: ${awsError.requestId}`
-                });
-            }
-        }
-        return this.getLastNumber(NUMBER_TYPE.TRAILER_ID)
-            .then((lastTrailerId) => {
-                const nextTrailerId: TrailerId = this.createNextTrailerIdObject(lastTrailerId as TrailerId);
-                return this.dbClient.transactWrite(nextTrailerId, lastTrailerId, NUMBER_TYPE.TRAILER_ID)
-                    .then(() => {
-                        console.log("TrailerId Generated successfully");
-                        return nextTrailerId;
-                    })
-                    .catch((error: AWSError) => {
-                        console.error(error); // limit to 5 attempts
-                        if (error.statusCode === 400) {
-                            console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
-                            return this.createTrailerId(attempts + 1, error);
-                        }
-                        throw new HTTPResponse(error.statusCode, {
-                            error: `${error.code}: ${error.message}
-                        At: ${error.hostname} - ${error.region}
-                        Request id: ${error.requestId}`
-                        });
-                    });
-            });
-    }
-
 
     /**
      * Retrieves the last test number or trailerId based on the numberType param
