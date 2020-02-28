@@ -300,7 +300,7 @@ describe("NumberService", () => {
         });
     });
 
-    describe("createTestNumber", () => {
+    describe("createNumber", () => {
         context("happy path", () => {
             it("returns next test number based on current number in DB", async () => {
                 const lastTestNumber: TestNumber = {
@@ -320,7 +320,7 @@ describe("NumberService", () => {
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
                 DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue("");
                 const service = new NumberService(new DynamoDBService());
-                const output = await service.createTestNumber(1, null);
+                const output = await service.createNumber(1, null);
                 expect(expectedNextTestNumber).toEqual(output);
             });
 
@@ -343,7 +343,7 @@ describe("NumberService", () => {
                 const putSpy = jest.fn().mockResolvedValue("");
                 DynamoDBService.prototype.transactWrite = putSpy;
                 const service = new NumberService(new DynamoDBService());
-                await service.createTestNumber(1, null);
+                await service.createNumber(1, null);
                 expect(putSpy.mock.calls[0][0]).toEqual(expectedNextTestNumber);
             });
         });
@@ -373,7 +373,7 @@ describe("NumberService", () => {
                 DynamoDBService.prototype.transactWrite = putSpy;
 
                 const service = new NumberService(new DynamoDBService());
-                await service.createTestNumber(0, null);
+                await service.createNumber(0, null);
                 expect(putSpy.mock.calls.length).toEqual(2);
             });
         });
@@ -398,7 +398,7 @@ describe("NumberService", () => {
 
                 const service = new NumberService(new DynamoDBService());
                 try {
-                    await service.createTestNumber(1, null);
+                    await service.createNumber(1, null);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(418);
@@ -417,7 +417,7 @@ describe("NumberService", () => {
                 };
                 const service = new NumberService(new DynamoDBService());
                 try {
-                    await service.createTestNumber(6, awsError);
+                    await service.createNumber(6, awsError);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(400);
@@ -444,7 +444,7 @@ describe("NumberService", () => {
                 DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTrailerId], Count: 1});
                 DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue("");
                 const service = new NumberService(new DynamoDBService());
-                const output = await service.createTrailerId(1, null);
+                const output = await service.createNumber(1, null, NUMBER_TYPE.TRAILER_ID);
                 expect(expectedNextTrailerId).toEqual(output);
             });
 
@@ -465,7 +465,7 @@ describe("NumberService", () => {
                 const putSpy = jest.fn().mockResolvedValue("");
                 DynamoDBService.prototype.transactWrite = putSpy;
                 const service = new NumberService(new DynamoDBService());
-                await service.createTrailerId(1, null);
+                await service.createNumber(1, null, NUMBER_TYPE.TRAILER_ID);
                 expect(putSpy.mock.calls[0][0]).toEqual(expectedNextTrailerId);
             });
         });
@@ -487,7 +487,7 @@ describe("NumberService", () => {
                 DynamoDBService.prototype.transactWrite = putSpy;
 
                 const service = new NumberService(new DynamoDBService());
-                await service.createTrailerId(0, null);
+                await service.createNumber(0, null, NUMBER_TYPE.TRAILER_ID);
                 expect(putSpy.mock.calls.length).toEqual(2);
             });
         });
@@ -511,7 +511,7 @@ describe("NumberService", () => {
 
                 const service = new NumberService(new DynamoDBService());
                 try {
-                    await service.createTrailerId(1, null);
+                    await service.createNumber(1, null, NUMBER_TYPE.TRAILER_ID);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(418);
@@ -530,7 +530,7 @@ describe("NumberService", () => {
                 };
                 const service = new NumberService(new DynamoDBService());
                 try {
-                    await service.createTrailerId(6, awsError);
+                    await service.createNumber(6, awsError, NUMBER_TYPE.TRAILER_ID);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(400);
