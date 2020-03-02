@@ -29,6 +29,7 @@ describe("POST /test-number", () => {
                 sequenceNumber: "001",
                 testNumberKey: 1
             };
+            expect.assertions(4);
             return lambda
                 .expectResolve((response: any) => {
                     expect(response.headers["Access-Control-Allow-Origin"]).toEqual("*");

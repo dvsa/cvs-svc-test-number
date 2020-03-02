@@ -28,7 +28,7 @@ describe("POST /trailerId", () => {
                 sequenceNumber: 530001,
                 testNumberKey: 2
             };
-            expect(true).toEqual(true);
+            expect.assertions(4);
             return lambda
                 .expectResolve((response: any) => {
                     expect(response.headers["Access-Control-Allow-Origin"]).toEqual("*");
