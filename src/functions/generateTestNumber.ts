@@ -8,7 +8,7 @@ const generateTestNumber: Handler = async (event: any, context?: Context): Promi
     const numberService = new NumberService(new DynamoDBService());
     return numberService.createTestNumber(1, null)
         .then((testNumber: TestNumber) => {
-            return new HTTPResponse(200, testNumber as TestNumber);
+            return new HTTPResponse(200, testNumber);
         })
         .catch((error: HTTPResponse) => {
             console.log(error.body);

@@ -9,7 +9,7 @@ const generateTrailerId: Handler = async (event: any, context?: Context): Promis
 
     return numberService.createTrailerId(1, null)
         .then((trailerId: TrailerId) => {
-            return new HTTPResponse(200, trailerId as TrailerId);
+            return new HTTPResponse(200, trailerId);
         })
         .catch((error: HTTPResponse) => {
             console.log(error.body);
