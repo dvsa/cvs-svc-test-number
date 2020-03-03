@@ -183,34 +183,20 @@ export class DynamoDBService {
      * @param item - the item to be inserted or updated during the transaciton.
      * @param oldItem - the current item that already exists in the database.
      */
-    public transactWrite(item: any, oldItem?: any, numberType: string = NUMBER_TYPE.TEST_NUMBER): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
+    public transactWrite(item: any, transactExpression: { ConditionExpression: string, ExpressionAttributeValues: any }): Promise<PromiseResult<DocumentClient.TransactWriteItemsOutput, AWS.AWSError>> {
         const query: DocumentClient.TransactWriteItemsInput = {
             TransactItems: [
                 {
                     Put: {
                         TableName: this.tableName,
                         Item: item,
-                        ConditionExpression: "",
-                        ExpressionAttributeValues: {}
+                        ConditionExpression: transactExpression.ConditionExpression,
+                        ExpressionAttributeValues: transactExpression.ExpressionAttributeValues
+
                     }
                 }
             ]
         };
-        if (numberType === NUMBER_TYPE.TRAILER_ID) {
-            Object.assign(query.TransactItems[0].Put, {
-                ConditionExpression: "trailerId = :oldTrailerId",
-                ExpressionAttributeValues: {
-                    ":oldTrailerId": oldItem.trailerId
-                }
-            });
-        } else {
-            Object.assign(query.TransactItems[0].Put, {
-                ConditionExpression: "testNumber = :OldTestNumber",
-                ExpressionAttributeValues: {
-                    ":OldTestNumber": oldItem.testNumber
-                }
-            });
-        }
         return DynamoDBService.client.transactWrite(query).promise();
     }
 }

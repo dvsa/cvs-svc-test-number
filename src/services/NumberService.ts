@@ -3,7 +3,7 @@ import {TestNumber, TrailerId} from "../models/NumberModel";
 import {HTTPResponse} from "../utils/HTTPResponse";
 import {DynamoDBService} from "./DynamoDBService";
 import {Configuration} from "../utils/Configuration";
-import {NUMBER_KEY, NUMBER_TYPE} from "../assets/Enums";
+import {NUMBER_KEY} from "../assets/Enums";
 
 export class NumberService {
     public readonly dbClient: DynamoDBService;
@@ -17,11 +17,11 @@ export class NumberService {
     }
 
     /**
-     * Creates a new test number in the database.
+     * Checks if number of attempts is bigger than the configured number of attempts and throws an error
      * @param attempt - the current number of attempts for generating a Test Number.
      * @param awsError - AWS error to be passed when the request fails otherwise null.
      */
-    public createNumber(attempts: number, awsError: AWSError | null, numberType: NUMBER_TYPE.TRAILER_ID | NUMBER_TYPE.TEST_NUMBER = NUMBER_TYPE.TEST_NUMBER): Promise<TestNumber | TrailerId> {
+    public manageAttempts(attempts: number, awsError: AWSError | null) {
         if (attempts > Configuration.getInstance().getMaxAttempts()) {
             if (awsError) {
                 throw new HTTPResponse(400, {
@@ -31,24 +31,34 @@ export class NumberService {
                 });
             }
         }
-        return this.getLastNumber(numberType)
-            .then((lastNumber) => {
-                let nextNumber: TestNumber | TrailerId;
-                if (numberType === NUMBER_TYPE.TRAILER_ID) {
-                    nextNumber = this.createNextTrailerIdObject(lastNumber as TrailerId);
-                } else {
-                    nextNumber = this.createNextTestNumberObject(lastNumber as TestNumber);
-                }
-                return this.dbClient.transactWrite(nextNumber, lastNumber, numberType)
+    }
+
+    /**
+     * Creates a new test number in the database.
+     * @param attempt - the current number of attempts for generating a Test Number.
+     * @param awsError - AWS error to be passed when the request fails otherwise null.
+     */
+    public createTestNumber(attempts: number, awsError: AWSError | null): Promise<TestNumber> {
+        this.manageAttempts(attempts, awsError);
+        return this.getLastTestNumber()
+            .then((lastTestNumber) => {
+                const nextTestNumberObject = this.createNextTestNumberObject(lastTestNumber);
+                const transactExpression = {
+                    ConditionExpression: "testNumber = :OldTestNumber",
+                    ExpressionAttributeValues: {
+                        ":OldTestNumber": lastTestNumber.testNumber
+                    }
+                };
+                return this.dbClient.transactWrite(nextTestNumberObject, transactExpression)
                     .then(() => {
-                        console.log(`${numberType} Generated successfully`);
-                        return nextNumber;
+                        console.log(`Test Number Generated successfully`);
+                        return nextTestNumberObject;
                     })
                     .catch((error: AWSError) => {
                         console.error(error); // limit to 5 attempts
                         if (error.statusCode === 400) {
                             console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
-                            return this.createNumber(attempts + 1, error, numberType);
+                            return this.createTestNumber(attempts + 1, error);
                         }
                         throw new HTTPResponse(error.statusCode, {
                             error: `${error.code}: ${error.message}
@@ -60,26 +70,71 @@ export class NumberService {
     }
 
     /**
-     * Retrieves the last test number or trailerId based on the numberType param
-     * @param numberType - type of number to be retrieved from the DB - default is testNumber
+     * Creates a new test number in the database.
+     * @param attempt - the current number of attempts for generating a Test Number.
+     * @param awsError - AWS error to be passed when the request fails otherwise null.
      */
-    public getLastNumber(numberType: NUMBER_TYPE.TRAILER_ID | NUMBER_TYPE.TEST_NUMBER = NUMBER_TYPE.TEST_NUMBER): Promise<TestNumber | TrailerId> {
-        return this.dbClient.scan()
-            .then((data: any) => {
-                if (data.Count === 0) {
-                    if (numberType === NUMBER_TYPE.TRAILER_ID) {
-                        return Configuration.getInstance().getTrailerIdInitialValue();
+    public createTrailerId(attempts: number, awsError: AWSError | null): Promise<TrailerId> {
+        this.manageAttempts(attempts, awsError);
+        return this.getLastTrailerId()
+            .then((lastTrailerId) => {
+                const nextTrailerIdObject = this.createNextTrailerIdObject(lastTrailerId);
+                const transactExpression = {
+                    ConditionExpression: "trailerId = :oldTrailerId",
+                    ExpressionAttributeValues: {
+                        ":oldTrailerId": lastTrailerId.trailerId
                     }
-                    return Configuration.getInstance().getTestNumberInitialValue();
-                } else {
-                    for (const numberObj of data.Items) {
-                        if (numberType === NUMBER_TYPE.TEST_NUMBER && numberObj.testNumberKey === NUMBER_KEY.TEST_NUMBER) {
-                            return numberObj;
-                        } else if (numberType === NUMBER_TYPE.TRAILER_ID && numberObj.testNumberKey === NUMBER_KEY.TRAILER_ID) {
-                            return numberObj;
+                };
+                return this.dbClient.transactWrite(nextTrailerIdObject, transactExpression)
+                    .then(() => {
+                        console.log(`TrailerId Generated successfully`);
+                        return nextTrailerIdObject;
+                    })
+                    .catch((error: AWSError) => {
+                        console.error(error); // limit to 5 attempts
+                        if (error.statusCode === 400) {
+                            console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
+                            return this.createTrailerId(attempts + 1, error);
                         }
-                    }
+                        throw new HTTPResponse(error.statusCode, {
+                            error: `${error.code}: ${error.message}
+                        At: ${error.hostname} - ${error.region}
+                        Request id: ${error.requestId}`
+                        });
+                    });
+            });
+    }
+
+    /**
+     * Retrieves the last test number
+     */
+    public getLastTestNumber(): Promise<TestNumber> {
+        return this.dbClient.get({testNumberKey: NUMBER_KEY.TEST_NUMBER})
+            .then((data: any) => {
+                if (!data.Item) {
+                    return Configuration.getInstance().getTestNumberInitialValue();
                 }
+                return data.Item;
+            })
+            .catch((error: AWSError) => {
+                throw new HTTPResponse(error.statusCode, {
+                    error: `${error.code}: ${error.message}
+                    At: ${error.hostname} - ${error.region}
+                    Request id: ${error.requestId}`
+                });
+            });
+    }
+
+    /**
+     * Retrieves the last test number
+     */
+    public getLastTrailerId(): Promise<TrailerId> {
+        return this.dbClient.get({testNumberKey: NUMBER_KEY.TRAILER_ID})
+            .then((data: any) => {
+                if (!data.Item) {
+                    return Configuration.getInstance().getTrailerIdInitialValue();
+                }
+                return data.Item;
             })
             .catch((error: AWSError) => {
                 throw new HTTPResponse(error.statusCode, {
