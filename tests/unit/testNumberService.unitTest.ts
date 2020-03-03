@@ -2,7 +2,6 @@ import {NumberService} from "../../src/services/NumberService";
 import {TestNumber, TrailerId} from "../../src/models/NumberModel";
 import {DynamoDBService} from "../../src/services/DynamoDBService";
 import {HTTPResponse} from "../../src/utils/HTTPResponse";
-import {NUMBER_TYPE} from "../../src/assets/Enums";
 
 jest.mock("../../src/services/DynamoDBService");
 
@@ -222,9 +221,9 @@ describe("NumberService", () => {
                 sequenceNumber: "000",
                 testNumberKey: 1
             };
-            DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [aTestNumber], Count: 1});
+            DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: aTestNumber});
             const service = new NumberService(new DynamoDBService());
-            const output = await service.getLastNumber();
+            const output = await service.getLastTestNumber();
             expect(aTestNumber).toEqual(output);
         });
         it("returns default value on empty DB return", async () => {
@@ -235,9 +234,9 @@ describe("NumberService", () => {
                 sequenceNumber: "000",
                 testNumberKey: 1
             };
-            DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [], Count: 0});
+            DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: null});
             const service = new NumberService(new DynamoDBService());
-            const output = await service.getLastNumber();
+            const output = await service.getLastTestNumber();
             expect(defaultTestNumber).toEqual(output);
         });
         it("throws expected errors if DBService request fails", async () => {
@@ -245,10 +244,10 @@ describe("NumberService", () => {
             // @ts-ignore
             error.statusCode = 418;
 
-            DynamoDBService.prototype.scan = jest.fn().mockRejectedValue(error);
+            DynamoDBService.prototype.get = jest.fn().mockRejectedValue(error);
             const service = new NumberService(new DynamoDBService());
             try {
-                await service.getLastNumber();
+                await service.getLastTestNumber();
             } catch (e) {
                 expect(e).toBeInstanceOf(HTTPResponse);
                 expect(e.statusCode).toEqual(418);
@@ -267,9 +266,9 @@ describe("NumberService", () => {
                 sequenceNumber: 530000,
                 testNumberKey: 2
             };
-            DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [trailerIdObj], Count: 1});
+            DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: trailerIdObj});
             const service = new NumberService(new DynamoDBService());
-            const output = await service.getLastNumber(NUMBER_TYPE.TRAILER_ID);
+            const output = await service.getLastTrailerId();
             expect(trailerIdObj).toEqual(output);
         });
         it("returns default value on empty DB return", async () => {
@@ -279,9 +278,9 @@ describe("NumberService", () => {
                 sequenceNumber: 530000,
                 testNumberKey: 2
             };
-            DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [], Count: 0});
+            DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: null});
             const service = new NumberService(new DynamoDBService());
-            const output = await service.getLastNumber(NUMBER_TYPE.TRAILER_ID);
+            const output = await service.getLastTrailerId();
             expect(defaultTrailerId).toEqual(output);
         });
         it("throws expected errors if DBService request fails", async () => {
@@ -289,10 +288,10 @@ describe("NumberService", () => {
             // @ts-ignore
             error.statusCode = 418;
 
-            DynamoDBService.prototype.scan = jest.fn().mockRejectedValue(error);
+            DynamoDBService.prototype.get = jest.fn().mockRejectedValue(error);
             const service = new NumberService(new DynamoDBService());
             try {
-                await service.getLastNumber(NUMBER_TYPE.TRAILER_ID);
+                await service.getLastTrailerId();
             } catch (e) {
                 expect(e).toBeInstanceOf(HTTPResponse);
                 expect(e.statusCode).toEqual(418);
@@ -300,7 +299,7 @@ describe("NumberService", () => {
         });
     });
 
-    describe("createNumber", () => {
+    describe("createTestNumber", () => {
         context("happy path", () => {
             it("returns next test number based on current number in DB", async () => {
                 const lastTestNumber: TestNumber = {
@@ -317,10 +316,10 @@ describe("NumberService", () => {
                     sequenceNumber: "002",
                     testNumberKey: 1
                 };
-                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastTestNumber});
                 DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue("");
                 const service = new NumberService(new DynamoDBService());
-                const output = await service.createNumber(1, null);
+                const output = await service.createTestNumber(1, null);
                 expect(expectedNextTestNumber).toEqual(output);
             });
 
@@ -339,11 +338,11 @@ describe("NumberService", () => {
                     sequenceNumber: "002",
                     testNumberKey: 1
                 };
-                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastTestNumber});
                 const putSpy = jest.fn().mockResolvedValue("");
                 DynamoDBService.prototype.transactWrite = putSpy;
                 const service = new NumberService(new DynamoDBService());
-                await service.createNumber(1, null);
+                await service.createTestNumber(1, null);
                 expect(putSpy.mock.calls[0][0]).toEqual(expectedNextTestNumber);
             });
         });
@@ -368,12 +367,12 @@ describe("NumberService", () => {
                 // @ts-ignore;
                 error400.statusCode = 400;
 
-                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastTestNumber});
                 const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce("");
                 DynamoDBService.prototype.transactWrite = putSpy;
 
                 const service = new NumberService(new DynamoDBService());
-                await service.createNumber(0, null);
+                await service.createTestNumber(0, null);
                 expect(putSpy.mock.calls.length).toEqual(2);
             });
         });
@@ -392,13 +391,13 @@ describe("NumberService", () => {
                 // @ts-ignore
                 error.statusCode = 418;
 
-                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTestNumber], Count: 1});
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastTestNumber});
                 const transactSpy = jest.fn().mockRejectedValueOnce(error);
                 DynamoDBService.prototype.transactWrite = transactSpy;
 
                 const service = new NumberService(new DynamoDBService());
                 try {
-                    await service.createNumber(1, null);
+                    await service.createTestNumber(1, null);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(418);
@@ -417,7 +416,7 @@ describe("NumberService", () => {
                 };
                 const service = new NumberService(new DynamoDBService());
                 try {
-                    await service.createNumber(6, awsError);
+                    await service.createTestNumber(6, awsError);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(400);
@@ -441,10 +440,10 @@ describe("NumberService", () => {
                     sequenceNumber: 530001,
                     testNumberKey: 2
                 };
-                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTrailerId], Count: 1});
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastTrailerId});
                 DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue("");
                 const service = new NumberService(new DynamoDBService());
-                const output = await service.createNumber(1, null, NUMBER_TYPE.TRAILER_ID);
+                const output = await service.createTrailerId(1, null);
                 expect(expectedNextTrailerId).toEqual(output);
             });
 
@@ -461,11 +460,11 @@ describe("NumberService", () => {
                     sequenceNumber: 530002,
                     testNumberKey: 2
                 };
-                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTrailerId], Count: 1});
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastTrailerId});
                 const putSpy = jest.fn().mockResolvedValue("");
                 DynamoDBService.prototype.transactWrite = putSpy;
                 const service = new NumberService(new DynamoDBService());
-                await service.createNumber(1, null, NUMBER_TYPE.TRAILER_ID);
+                await service.createTrailerId(1, null);
                 expect(putSpy.mock.calls[0][0]).toEqual(expectedNextTrailerId);
             });
         });
@@ -482,12 +481,12 @@ describe("NumberService", () => {
                 // @ts-ignore;
                 error400.statusCode = 400;
 
-                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTrailerId], Count: 1});
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastTrailerId});
                 const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce("");
                 DynamoDBService.prototype.transactWrite = putSpy;
 
                 const service = new NumberService(new DynamoDBService());
-                await service.createNumber(0, null, NUMBER_TYPE.TRAILER_ID);
+                await service.createTrailerId(0, null);
                 expect(putSpy.mock.calls.length).toEqual(2);
             });
         });
@@ -505,13 +504,13 @@ describe("NumberService", () => {
                 // @ts-ignore
                 error.statusCode = 418;
 
-                DynamoDBService.prototype.scan = jest.fn().mockResolvedValue({Items: [lastTrailerId], Count: 1});
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastTrailerId});
                 const transactSpy = jest.fn().mockRejectedValueOnce(error);
                 DynamoDBService.prototype.transactWrite = transactSpy;
 
                 const service = new NumberService(new DynamoDBService());
                 try {
-                    await service.createNumber(1, null, NUMBER_TYPE.TRAILER_ID);
+                    await service.createTrailerId(1, null);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(418);
@@ -530,7 +529,7 @@ describe("NumberService", () => {
                 };
                 const service = new NumberService(new DynamoDBService());
                 try {
-                    await service.createNumber(6, awsError, NUMBER_TYPE.TRAILER_ID);
+                    await service.createTrailerId(6, awsError);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(400);

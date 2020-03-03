@@ -7,7 +7,7 @@ describe("generate Test Number Function", () => {
   it("should invoke NumberService", async () => {
     let ctx: any = mockContext();
     const mock = jest.fn().mockResolvedValue("Something");
-    NumberService.prototype.createNumber = mock;
+    NumberService.prototype.createTestNumber = mock;
 
     await generateTestNumber({}, ctx, () => { return; });
     expect(mock.mock.calls).toHaveLength(1);
@@ -18,7 +18,7 @@ describe("generate Test Number Function", () => {
   it("should return a 200 response on success", async () => {
     let ctx: any = mockContext();
 
-    NumberService.prototype.createNumber = jest.fn().mockResolvedValue("Something");
+    NumberService.prototype.createTestNumber = jest.fn().mockResolvedValue("Something");
 
     const output = await generateTestNumber({}, ctx, () => { return; });
     expect(output).toBeInstanceOf(HTTPResponse);
@@ -32,7 +32,7 @@ describe("generate Test Number Function", () => {
     let ctx: any = mockContext();
 
     const myError = new Error("Oh no!");
-    NumberService.prototype.createNumber = jest.fn().mockImplementation(() => Promise.reject(myError));
+    NumberService.prototype.createTestNumber = jest.fn().mockImplementation(() => Promise.reject(myError));
 
     expect.assertions(2);
     const output = await generateTestNumber({}, ctx, () => { return; });

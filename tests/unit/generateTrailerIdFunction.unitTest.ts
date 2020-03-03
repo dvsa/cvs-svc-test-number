@@ -8,7 +8,7 @@ describe("generate TrailerId Function", () => {
         let ctx: any = mockContext();
 
         const mock = jest.fn().mockResolvedValue("Something");
-        NumberService.prototype.createNumber = mock;
+        NumberService.prototype.createTrailerId = mock;
 
         await generateTrailerId({}, ctx, () => { return; });
         expect(mock.mock.calls).toHaveLength(1);
@@ -19,7 +19,7 @@ describe("generate TrailerId Function", () => {
     it("should return a 200 response on success", async () => {
         let ctx: any = mockContext();
 
-        NumberService.prototype.createNumber = jest.fn().mockResolvedValue("Something");
+        NumberService.prototype.createTrailerId = jest.fn().mockResolvedValue("Something");
 
         const output = await generateTrailerId({}, ctx, () => { return; });
         expect(output).toBeInstanceOf(HTTPResponse);
@@ -33,7 +33,7 @@ describe("generate TrailerId Function", () => {
         let ctx: any = mockContext();
 
         const myError = new Error("Oh no!");
-        NumberService.prototype.createNumber = jest.fn().mockImplementation(() => Promise.reject(myError));
+        NumberService.prototype.createTrailerId = jest.fn().mockImplementation(() => Promise.reject(myError));
 
         expect.assertions(2);
         const output = await generateTrailerId({}, ctx, () => { return; });
