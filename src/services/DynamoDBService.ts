@@ -23,6 +23,7 @@ export class DynamoDBService {
         this.tableName = config.table;
 
         if (!DynamoDBService.client) {
+            console.log("config for DynamoDB Client: ", config.params);
             DynamoDBService.client = new AWS.DynamoDB.DocumentClient(config.params);
         }
     }
