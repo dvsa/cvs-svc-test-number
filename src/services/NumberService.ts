@@ -34,6 +34,18 @@ export class NumberService {
     }
 
     /**
+     * Throws an AWSError
+     * @param error - the AWSError
+     */
+    public formatAWSError(error: AWSError) {
+        return new HTTPResponse(error.statusCode, {
+            error: `${error.code}: ${error.message}
+                        At: ${error.hostname} - ${error.region}
+                        Request id: ${error.requestId}`
+        });
+    }
+
+    /**
      * Creates a new test number in the database.
      * @param attempt - the current number of attempts for generating a Test Number.
      * @param awsError - AWS error to be passed when the request fails otherwise null.
@@ -60,11 +72,7 @@ export class NumberService {
                             console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
                             return this.createTestNumber(attempts + 1, error);
                         }
-                        throw new HTTPResponse(error.statusCode, {
-                            error: `${error.code}: ${error.message}
-                        At: ${error.hostname} - ${error.region}
-                        Request id: ${error.requestId}`
-                        });
+                        throw this.formatAWSError(error);
                     });
             });
     }
@@ -96,11 +104,7 @@ export class NumberService {
                             console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
                             return this.createTrailerId(attempts + 1, error);
                         }
-                        throw new HTTPResponse(error.statusCode, {
-                            error: `${error.code}: ${error.message}
-                        At: ${error.hostname} - ${error.region}
-                        Request id: ${error.requestId}`
-                        });
+                        throw this.formatAWSError(error);
                     });
             });
     }
@@ -117,11 +121,7 @@ export class NumberService {
                 return data.Item;
             })
             .catch((error: AWSError) => {
-                throw new HTTPResponse(error.statusCode, {
-                    error: `${error.code}: ${error.message}
-                    At: ${error.hostname} - ${error.region}
-                    Request id: ${error.requestId}`
-                });
+                throw this.formatAWSError(error);
             });
     }
 
@@ -137,11 +137,7 @@ export class NumberService {
                 return data.Item;
             })
             .catch((error: AWSError) => {
-                throw new HTTPResponse(error.statusCode, {
-                    error: `${error.code}: ${error.message}
-                    At: ${error.hostname} - ${error.region}
-                    Request id: ${error.requestId}`
-                });
+                throw this.formatAWSError(error);
             });
     }
 
