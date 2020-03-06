@@ -141,8 +141,8 @@ export class TestNumberService {
 
         if (checkSum > 99) {
             checkSum = checkSum % 100;
-           }
+        }
         return testNumber + checkSum.toString().padStart(2, "0");
-       }
+    }
 
 }
