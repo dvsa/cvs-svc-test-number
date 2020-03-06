@@ -140,14 +140,14 @@ export class TestNumberService {
 
         let stringCheckSum;
         if (checkSum < 10) {
-            stringCheckSum = checkSum.toString().padStart(2, "0");
+            stringCheckSum = checkSum.toString();
         } else if (checkSum > 99) {
             stringCheckSum = (checkSum - 100).toString();
         } else {
             stringCheckSum = checkSum.toString();
         }
 
-        return testNumber + stringCheckSum;
+        return testNumber + stringCheckSum.padStart(2, "0");
     }
 
 }
