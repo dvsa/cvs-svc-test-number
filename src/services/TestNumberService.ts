@@ -130,7 +130,7 @@ export class TestNumberService {
         const firstLetterAlphabeticalIndex = (testNumber.charCodeAt(0) - 64);
         const secondLetterAlphabeticalIndex = (testNumber.charCodeAt(3) - 64);
 
-        const checkSum = firstLetterAlphabeticalIndex
+        let checkSum = firstLetterAlphabeticalIndex
             + parseInt(testNumberWithoutLetters.charAt(0), 10)
             + parseInt(testNumberWithoutLetters.charAt(1), 10) * 3
             + secondLetterAlphabeticalIndex
@@ -138,16 +138,11 @@ export class TestNumberService {
             + parseInt(testNumberWithoutLetters.charAt(3), 10) * 3
             + parseInt(testNumberWithoutLetters.charAt(4), 10);
 
-        let stringCheckSum;
-        if (checkSum < 10) {
-            stringCheckSum = checkSum.toString();
-        } else if (checkSum > 99) {
-            stringCheckSum = (checkSum - 100).toString();
-        } else {
-            stringCheckSum = checkSum.toString();
-        }
 
-        return testNumber + stringCheckSum.padStart(2, "0");
-    }
+        if (checkSum > 99) {
+            checkSum = checkSum % 100;
+           }
+        return testNumber + checkSum.toString().padStart(2, "0");
+       }
 
 }
