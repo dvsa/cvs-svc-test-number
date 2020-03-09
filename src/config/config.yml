@@ -9,6 +9,11 @@ functions:
     path: /trailerId
     proxy: null
     function: generateTrailerId
+- generateSystemNumber:
+    method: POST
+    path: /system-number
+    proxy: null
+    function: generateSystemNumber
 dynamodb:
   local:
     params:
@@ -48,4 +53,7 @@ trailerIdInitialValue:
   trailerLetter: C
   sequenceNumber: 530000
   testNumberKey: 2
+systemNumberInitialValue:
+  systemNumber: "10000000"
+  testNumberKey: 3
 maxAttempts: 2

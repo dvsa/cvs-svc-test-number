@@ -14,9 +14,10 @@ describe("The configuration service", () => {
             process.env.BRANCH = "local";
             const configService = Configuration.getInstance();
             const functions = configService.getFunctions();
-            expect(functions.length).toEqual(2);
+            expect(functions.length).toEqual(3);
             expect(functions[0].name).toEqual("generateTestNumber");
             expect(functions[1].name).toEqual("generateTrailerId");
+            expect(functions[2].name).toEqual("generateSystemNumber");
 
             const DBConfig = configService.getDynamoDBConfig();
             expect(DBConfig).toEqual(configService.getConfig().dynamodb.local);
@@ -26,9 +27,10 @@ describe("The configuration service", () => {
             process.env.BRANCH = "local-global";
             const configService = Configuration.getInstance();
             const functions = configService.getFunctions();
-            expect(functions.length).toEqual(2);
+            expect(functions.length).toEqual(3);
             expect(functions[0].name).toEqual("generateTestNumber");
             expect(functions[1].name).toEqual("generateTrailerId");
+            expect(functions[2].name).toEqual("generateSystemNumber");
 
             const DBConfig = configService.getDynamoDBConfig();
             expect(DBConfig).toEqual(configService.getConfig().dynamodb["local-global"]);
@@ -38,9 +40,10 @@ describe("The configuration service", () => {
             process.env.BRANCH = "CVSB-XXX";
             const configService = Configuration.getInstance();
             const functions = configService.getFunctions();
-            expect(functions.length).toEqual(2);
+            expect(functions.length).toEqual(3);
             expect(functions[0].name).toEqual("generateTestNumber");
             expect(functions[1].name).toEqual("generateTrailerId");
+            expect(functions[2].name).toEqual("generateSystemNumber");
 
             const DBConfig = configService.getDynamoDBConfig();
             expect(DBConfig).toEqual(configService.getConfig().dynamodb.remote);

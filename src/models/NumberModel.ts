@@ -12,3 +12,8 @@ export interface TrailerId {
     sequenceNumber: number;
     testNumberKey: number;
 }
+
+export interface SystemNumber {
+    systemNumber: string;
+    testNumberKey: number;
+}
