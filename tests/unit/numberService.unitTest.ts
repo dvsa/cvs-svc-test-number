@@ -1,5 +1,5 @@
 import {NumberService} from "../../src/services/NumberService";
-import {TestNumber, TrailerId} from "../../src/models/NumberModel";
+import {SystemNumber, TestNumber, TrailerId} from "../../src/models/NumberModel";
 import {DynamoDBService} from "../../src/services/DynamoDBService";
 import {HTTPResponse} from "../../src/utils/HTTPResponse";
 
@@ -209,6 +209,52 @@ describe("NumberService", () => {
         });
     });
 
+    describe("createNextSystemNumberObject", () => {
+        context("when trying to create a new system number", () => {
+            it("should return proper nextSystemNumber", () => {
+                let lastSystemNumber: SystemNumber = {
+                    systemNumber: "10000001",
+                    testNumberKey: 3
+                };
+                let expectedNextSystemNumber: SystemNumber = {
+                    systemNumber: "10000002",
+                    testNumberKey: 3
+                };
+                expect(numberService.createNextSystemNumberObject(lastSystemNumber)).toEqual(expectedNextSystemNumber);
+
+                lastSystemNumber = {
+                    systemNumber: "10000003",
+                    testNumberKey: 3
+                };
+                expectedNextSystemNumber = {
+                    systemNumber: "10000004",
+                    testNumberKey: 3
+                };
+                expect(numberService.createNextSystemNumberObject(lastSystemNumber)).toEqual(expectedNextSystemNumber);
+
+                lastSystemNumber = {
+                    systemNumber: "10023454",
+                    testNumberKey: 3
+                };
+                expectedNextSystemNumber = {
+                    systemNumber: "10023455",
+                    testNumberKey: 3
+                };
+                expect(numberService.createNextSystemNumberObject(lastSystemNumber)).toEqual(expectedNextSystemNumber);
+
+                lastSystemNumber = {
+                    systemNumber: "24823497",
+                    testNumberKey: 3
+                };
+                expectedNextSystemNumber = {
+                    systemNumber: "24823498",
+                    testNumberKey: 3
+                };
+                expect(numberService.createNextSystemNumberObject(lastSystemNumber)).toEqual(expectedNextSystemNumber);
+            });
+        });
+    });
+
     describe("getLastTestNumber", () => {
         beforeEach(() => {
             jest.resetAllMocks();
@@ -292,6 +338,46 @@ describe("NumberService", () => {
             const service = new NumberService(new DynamoDBService());
             try {
                 await service.getLastTrailerId();
+            } catch (e) {
+                expect(e).toBeInstanceOf(HTTPResponse);
+                expect(e.statusCode).toEqual(418);
+            }
+        });
+    });
+
+    describe("getLastSystemNumber", () => {
+        beforeEach(() => {
+            jest.resetAllMocks();
+        });
+        it("returns expected value on successful DBService query", async () => {
+            const systemNumberObj = {
+                systemNumber: "10000005",
+                testNumberKey: 3
+            };
+            DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: systemNumberObj});
+            const service = new NumberService(new DynamoDBService());
+            const output = await service.getLastSystemNumber();
+            expect(systemNumberObj).toEqual(output);
+        });
+        it("returns default value on empty DB return", async () => {
+            const defaultSystemNumber = {
+                systemNumber: "10000000",
+                testNumberKey: 3
+            };
+            DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: null});
+            const service = new NumberService(new DynamoDBService());
+            const output = await service.getLastSystemNumber();
+            expect(defaultSystemNumber).toEqual(output);
+        });
+        it("throws expected errors if DBService request fails", async () => {
+            const error = new Error("I broke");
+            // @ts-ignore
+            error.statusCode = 418;
+
+            DynamoDBService.prototype.get = jest.fn().mockRejectedValue(error);
+            const service = new NumberService(new DynamoDBService());
+            try {
+                await service.getLastSystemNumber();
             } catch (e) {
                 expect(e).toBeInstanceOf(HTTPResponse);
                 expect(e.statusCode).toEqual(418);
@@ -530,6 +616,107 @@ describe("NumberService", () => {
                 const service = new NumberService(new DynamoDBService());
                 try {
                     await service.createTrailerId(6, awsError);
+                } catch (e) {
+                    expect(e).toBeInstanceOf(HTTPResponse);
+                    expect(e.statusCode).toEqual(400);
+                }
+            });
+        });
+    });
+
+    describe("createSystemNumber", () => {
+        context("happy path", () => {
+            it("returns next systemNumber based on current number in DB", async () => {
+                const lastSystemNumber: SystemNumber = {
+                    systemNumber: "10000000",
+                    testNumberKey: 3
+                };
+                const expectedNextSystemNumber: SystemNumber = {
+                    systemNumber: "10000001",
+                    testNumberKey: 3
+                };
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastSystemNumber});
+                DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue("");
+                const service = new NumberService(new DynamoDBService());
+                const output = await service.createSystemNumber(1, null);
+                expect(expectedNextSystemNumber).toEqual(output);
+            });
+
+            it("Calls DB services with correct params", async () => {
+                const lastSystemNumber: SystemNumber = {
+                    systemNumber: "10000023",
+                    testNumberKey: 3
+                };
+                const expectedNextSystemNumber: SystemNumber = {
+                    systemNumber: "10000024",
+                    testNumberKey: 3
+                };
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastSystemNumber});
+                const putSpy = jest.fn().mockResolvedValue("");
+                DynamoDBService.prototype.transactWrite = putSpy;
+                const service = new NumberService(new DynamoDBService());
+                await service.createSystemNumber(1, null);
+                expect(putSpy.mock.calls[0][0]).toEqual(expectedNextSystemNumber);
+            });
+        });
+        context("when DBClient.put throws a 400 \"Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]\" error", () => {
+            it("tries again", async () => {
+                const lastSystemNumber: SystemNumber = {
+                    systemNumber: "10000023",
+                    testNumberKey: 3
+                };
+
+                const error400 = new Error("Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]");
+                // @ts-ignore;
+                error400.statusCode = 400;
+
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastSystemNumber});
+                const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce("");
+                DynamoDBService.prototype.transactWrite = putSpy;
+
+                const service = new NumberService(new DynamoDBService());
+                await service.createSystemNumber(0, null);
+                expect(putSpy.mock.calls.length).toEqual(2);
+            });
+        });
+
+        context("when DBClient.put throws any other error", () => {
+            it("throws an HTTPResponse error", async () => {
+                const lastSystemNumber: SystemNumber = {
+                    systemNumber: "10000023",
+                    testNumberKey: 3
+                };
+
+                const error = new Error("Oh no!");
+                // @ts-ignore
+                error.statusCode = 418;
+
+                DynamoDBService.prototype.get = jest.fn().mockResolvedValue({Item: lastSystemNumber});
+                const transactSpy = jest.fn().mockRejectedValueOnce(error);
+                DynamoDBService.prototype.transactWrite = transactSpy;
+
+                const service = new NumberService(new DynamoDBService());
+                try {
+                    await service.createSystemNumber(1, null);
+                } catch (e) {
+                    expect(e).toBeInstanceOf(HTTPResponse);
+                    expect(e.statusCode).toEqual(418);
+                }
+            });
+        });
+
+        context("when the function retried more than 5 times", () => {
+            it("throws an HTTPResponse error", async () => {
+                const awsError: any = {
+                    code: "400",
+                    message: "Attempted more than 5 times",
+                    hostname: "someHostname",
+                    region: "eu-east1",
+                    requestId: "123454"
+                };
+                const service = new NumberService(new DynamoDBService());
+                try {
+                    await service.createSystemNumber(6, awsError);
                 } catch (e) {
                     expect(e).toBeInstanceOf(HTTPResponse);
                     expect(e.statusCode).toEqual(400);
