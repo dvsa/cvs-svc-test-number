@@ -11,5 +11,9 @@
     "trailerLetter": "C",
     "sequenceNumber": 530000,
     "testNumberKey": 2
+  },
+  {
+    "systemNumber": "10000000",
+    "testNumberKey": 3
   }
 ]

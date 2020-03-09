@@ -126,6 +126,14 @@ class Configuration {
     }
 
     /**
+     * Retrieves the system number initial value
+     * @returns any
+     */
+    public getSystemNumberInitialValue(): any {
+        return this.config.systemNumberInitialValue;
+    }
+
+    /**
      * Retrieves the test number initial value
      * @returns number
      */
