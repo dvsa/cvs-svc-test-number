@@ -113,7 +113,7 @@ describe("NumberService", () => {
                     sequenceNumber: "898",
                     testNumberKey: 1
                 };
-                const newTestNumber = testNumberService.createNextTestNumberObject(lastTestNumber);
+                const newTestNumber = numberService.createNextTestNumberObject(lastTestNumber);
                 // next number should be W23Y899 = [23 + 2 + 9 + 25 + 8 + 27 + 9] = 103 => 03;
                 expect(newTestNumber.testNumber.substring(7, 9)).toEqual("03");
             });
@@ -127,7 +127,7 @@ describe("NumberService", () => {
                     testNumberKey: 1
                 };
 
-                const newTestNumber = testNumberService.createNextTestNumberObject(lastTestNumber);
+                const newTestNumber = numberService.createNextTestNumberObject(lastTestNumber);
                 // next number should be W22Y899 = [23 + 2 + 6 + 25 + 8 + 27 + 9] = 100 => 00;
                 expect(newTestNumber.testNumber.substring(7, 9)).toEqual("00");
             });
