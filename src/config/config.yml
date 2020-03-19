@@ -9,9 +9,6 @@ dynamodb:
     params:
       region: localhost
       endpoint: http://localhost:8008
-      maxRetries: 1
-      httpOptions:
-        timeout: 1000
     table: cvs-local-test-number
     keys:
       - testNumber
@@ -19,15 +16,9 @@ dynamodb:
     params:
       region: localhost
       endpoint: http://localhost:8000
-      maxRetries: 1
-      httpOptions:
-        timeout: 1000
     table: cvs-local-global-test-number
   remote:
     params:
-      maxRetries: 1
-      httpOptions:
-        timeout: 1000
     table: cvs-${BRANCH}-test-number
 serverless:
   basePath: /${BRANCH}
