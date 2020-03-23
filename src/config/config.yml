@@ -47,13 +47,10 @@ testNumberinitialValue:
   id: W01
   certLetter: A
   sequenceNumber: "000"
-  testNumberKey: 1
 trailerIdInitialValue:
   trailerId: C530000
   trailerLetter: C
   sequenceNumber: 530000
-  testNumberKey: 2
 systemNumberInitialValue:
   systemNumber: "10000000"
-  testNumberKey: 3
 maxAttempts: 2
