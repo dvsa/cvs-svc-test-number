@@ -15,5 +15,9 @@
   {
     "systemNumber": "10000000",
     "testNumberKey": 3
+  },
+  {
+    "plateSerialNumber": "0",
+    "testNumberKey": 4
   }
 ]

@@ -1,5 +1,5 @@
 import {AWSError} from "aws-sdk"; // Only used as a type, so not wrapped by XRay
-import {SystemNumber, TestNumber, TrailerId} from "../models/NumberModel";
+import {PlateSerialNumber, SystemNumber, TestNumber, TrailerId} from "../models/NumberModel";
 import {HTTPResponse} from "../utils/HTTPResponse";
 import {DynamoDBService} from "./DynamoDBService";
 import {Configuration} from "../utils/Configuration";
@@ -21,7 +21,7 @@ export class NumberService {
      * @param attempt - the current number of attempts for generating a Test Number.
      * @param awsError - AWS error to be passed when the request fails otherwise null.
      */
-    public manageAttempts(attempts: number, awsError: AWSError | null) {
+    private manageAttempts(attempts: number, awsError: AWSError | null) {
         if (attempts > Configuration.getInstance().getMaxAttempts()) {
             if (awsError) {
                 throw new HTTPResponse(400, {
@@ -37,7 +37,7 @@ export class NumberService {
      * Throws an AWSError
      * @param error - the AWSError
      */
-    public formatAWSError(error: AWSError) {
+    private formatAWSError(error: AWSError) {
         return new HTTPResponse(error.statusCode, {
             error: `${error.code}: ${error.message}
                         At: ${error.hostname} - ${error.region}
@@ -50,31 +50,28 @@ export class NumberService {
      * @param attempt - the current number of attempts for generating a Test Number.
      * @param awsError - AWS error to be passed when the request fails otherwise null.
      */
-    public createTestNumber(attempts: number, awsError: AWSError | null): Promise<TestNumber> {
+    public async createTestNumber(attempts: number, awsError: AWSError | null): Promise<TestNumber> {
         this.manageAttempts(attempts, awsError);
-        return this.getLastTestNumber()
-            .then((lastTestNumber) => {
-                const nextTestNumberObject = this.createNextTestNumberObject(lastTestNumber);
-                const transactExpression = {
-                    ConditionExpression: "testNumber = :OldTestNumber",
-                    ExpressionAttributeValues: {
-                        ":OldTestNumber": lastTestNumber.testNumber
-                    }
-                };
-                return this.dbClient.transactWrite(nextTestNumberObject, transactExpression)
-                    .then(() => {
-                        console.log(`Test Number Generated successfully`);
-                        return nextTestNumberObject;
-                    })
-                    .catch((error: AWSError) => {
-                        console.error(error); // limit to 5 attempts
-                        if (error.statusCode === 400) {
-                            console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
-                            return this.createTestNumber(attempts + 1, error);
-                        }
-                        throw this.formatAWSError(error);
-                    });
-            });
+        try {
+            const lastTestNumber: TestNumber = await this.getLastTestNumber();
+            const nextTestNumberObject = this.createNextTestNumberObject(lastTestNumber);
+            const transactExpression = {
+                ConditionExpression: "testNumber = :OldTestNumber",
+                ExpressionAttributeValues: {
+                    ":OldTestNumber": lastTestNumber.testNumber
+                }
+            };
+            await this.dbClient.transactWrite(nextTestNumberObject, transactExpression);
+            console.log(`Test Number Generated successfully`);
+            return nextTestNumberObject;
+        } catch (error) {
+            console.error(error); // limit to 5 attempts
+            if (error.statusCode === 400) {
+                console.error(`Attempt number ${attempts} for testNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
+                return this.createTestNumber(attempts + 1, error);
+            }
+            throw this.formatAWSError(error);
+        }
     }
 
     /**
@@ -82,111 +79,146 @@ export class NumberService {
      * @param attempt - the current number of attempts for generating a Test Number.
      * @param awsError - AWS error to be passed when the request fails otherwise null.
      */
-    public createTrailerId(attempts: number, awsError: AWSError | null): Promise<TrailerId> {
+    public async createTrailerId(attempts: number, awsError: AWSError | null): Promise<TrailerId> {
         this.manageAttempts(attempts, awsError);
-        return this.getLastTrailerId()
-            .then((lastTrailerId) => {
-                const nextTrailerIdObject = this.createNextTrailerIdObject(lastTrailerId);
-                const transactExpression = {
-                    ConditionExpression: "trailerId = :oldTrailerId",
-                    ExpressionAttributeValues: {
-                        ":oldTrailerId": lastTrailerId.trailerId
-                    }
-                };
-                return this.dbClient.transactWrite(nextTrailerIdObject, transactExpression)
-                    .then(() => {
-                        console.log(`TrailerId Generated successfully`);
-                        return nextTrailerIdObject;
-                    })
-                    .catch((error: AWSError) => {
-                        console.error(error); // limit to 5 attempts
-                        if (error.statusCode === 400) {
-                            console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
-                            return this.createTrailerId(attempts + 1, error);
-                        }
-                        throw this.formatAWSError(error);
-                    });
-            });
+        try {
+            const lastTrailerId: TrailerId = await this.getLastTrailerId();
+            const nextTrailerIdObject = this.createNextTrailerIdObject(lastTrailerId);
+            const transactExpression = {
+                ConditionExpression: "trailerId = :oldTrailerId",
+                ExpressionAttributeValues: {
+                    ":oldTrailerId": lastTrailerId.trailerId
+                }
+            };
+            await this.dbClient.transactWrite(nextTrailerIdObject, transactExpression);
+            console.log(`TrailerId Generated successfully`);
+            return nextTrailerIdObject;
+        } catch (error) {
+            console.error(error); // limit to 5 attempts
+            if (error.statusCode === 400) {
+                console.error(`Attempt number ${attempts} for trailerId failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
+                return this.createTrailerId(attempts + 1, error);
+            }
+            throw this.formatAWSError(error);
+        }
     }
 
     /**
      * Creates a new system number in the database.
-     * @param attempt - the current number of attempts for generating a Test Number.
+     * @param attempt - the current number of attempts for generating a System Number.
      * @param awsError - AWS error to be passed when the request fails otherwise null.
      */
-    public createSystemNumber(attempts: number, awsError: AWSError | null): Promise<SystemNumber> {
+    public async createSystemNumber(attempts: number, awsError: AWSError | null): Promise<SystemNumber> {
         this.manageAttempts(attempts, awsError);
-        return this.getLastSystemNumber()
-            .then((lastSystemNumber) => {
-                const nextSystemNumberObject = this.createNextSystemNumberObject(lastSystemNumber);
-                const transactExpression = {
-                    ConditionExpression: "systemNumber = :oldSystemNumber",
-                    ExpressionAttributeValues: {
-                        ":oldSystemNumber": lastSystemNumber.systemNumber
-                    }
-                };
-                return this.dbClient.transactWrite(nextSystemNumberObject, transactExpression)
-                    .then(() => {
-                        console.log(`System Number Generated successfully`);
-                        return nextSystemNumberObject;
-                    })
-                    .catch((error: AWSError) => {
-                        console.error(error); // limit to 5 attempts
-                        if (error.statusCode === 400) {
-                            console.error(`Attempt number ${attempts} failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
-                            return this.createSystemNumber(attempts + 1, error);
-                        }
-                        throw this.formatAWSError(error);
-                    });
-            });
+        try {
+            const lastSystemNumber: SystemNumber = await this.getLastSystemNumber();
+            const nextSystemNumberObject = this.createNextSystemNumberObject(lastSystemNumber);
+            const transactExpression = {
+                ConditionExpression: "systemNumber = :oldSystemNumber",
+                ExpressionAttributeValues: {
+                    ":oldSystemNumber": lastSystemNumber.systemNumber
+                }
+            };
+            await this.dbClient.transactWrite(nextSystemNumberObject, transactExpression);
+            console.log(`System Number Generated successfully`);
+            return nextSystemNumberObject;
+        } catch (error) {
+            console.error(error); // limit to 5 attempts
+            if (error.statusCode === 400) {
+                console.error(`Attempt number ${attempts} for systemNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
+                return this.createSystemNumber(attempts + 1, error);
+            }
+            throw this.formatAWSError(error);
+        }
+    }
+
+    /**
+     * Creates a new plate serial number in the database.
+     * @param attempt - the current number of attempts for generating a Plate Serial Number.
+     * @param awsError - AWS error to be passed when the request fails otherwise null.
+     */
+    public async createPlateSerialNumber(attempts: number, awsError: AWSError | null): Promise<PlateSerialNumber> {
+        this.manageAttempts(attempts, awsError);
+        try {
+            const lastPlateSerialNumber: PlateSerialNumber = await this.getLastPlateSerialNumber();
+            const nextPlateSerialNumberObject = this.createNextPlateSerialNumberObject(lastPlateSerialNumber);
+            const transactExpression = {
+                ConditionExpression: "plateSerialNumber = :oldPlateSerialNumber",
+                ExpressionAttributeValues: {
+                    ":oldPlateSerialNumber": lastPlateSerialNumber.plateSerialNumber
+                }
+            };
+            await this.dbClient.transactWrite(nextPlateSerialNumberObject, transactExpression);
+            console.log(`Plate Serial Number Generated successfully`);
+            return nextPlateSerialNumberObject;
+        } catch (error) {
+            console.error(error); // limit to 5 attempts
+            if (error.statusCode === 400) {
+                console.error(`Attempt number ${attempts} for plateSerialNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`);
+                return this.createPlateSerialNumber(attempts + 1, error);
+            }
+            throw this.formatAWSError(error);
+        }
     }
 
     /**
      * Retrieves the last test number
      */
-    public getLastTestNumber(): Promise<TestNumber> {
-        return this.dbClient.get({testNumberKey: NUMBER_KEY.TEST_NUMBER})
-            .then((data: any) => {
-                if (!data.Item) {
-                    return Configuration.getInstance().getTestNumberInitialValue();
-                }
-                return data.Item;
-            })
-            .catch((error: AWSError) => {
-                throw this.formatAWSError(error);
-            });
+    public async getLastTestNumber(): Promise<TestNumber> {
+        try {
+            const data: any = await this.dbClient.get({testNumberKey: NUMBER_KEY.TEST_NUMBER});
+            if (!data.Item) {
+                return Configuration.getInstance().getTestNumberInitialValue();
+            }
+            return data.Item;
+        } catch (error) {
+            throw this.formatAWSError(error);
+        }
     }
 
     /**
      * Retrieves the last trailer id
      */
-    public getLastTrailerId(): Promise<TrailerId> {
-        return this.dbClient.get({testNumberKey: NUMBER_KEY.TRAILER_ID})
-            .then((data: any) => {
-                if (!data.Item) {
-                    return Configuration.getInstance().getTrailerIdInitialValue();
-                }
-                return data.Item;
-            })
-            .catch((error: AWSError) => {
-                throw this.formatAWSError(error);
-            });
+    public async getLastTrailerId(): Promise<TrailerId> {
+        try {
+            const data: any = await this.dbClient.get({testNumberKey: NUMBER_KEY.TRAILER_ID});
+            if (!data.Item) {
+                return Configuration.getInstance().getTrailerIdInitialValue();
+            }
+            return data.Item;
+        } catch (error) {
+            throw this.formatAWSError(error);
+        }
     }
 
     /**
      * Retrieves the last system number
      */
-    public getLastSystemNumber(): Promise<SystemNumber> {
-        return this.dbClient.get({testNumberKey: NUMBER_KEY.SYSTEM_NUMBER})
-            .then((data: any) => {
-                if (!data.Item) {
-                    return Configuration.getInstance().getSystemNumberInitialValue();
-                }
-                return data.Item;
-            })
-            .catch((error: AWSError) => {
-                throw this.formatAWSError(error);
-            });
+    public async getLastSystemNumber(): Promise<SystemNumber> {
+        try {
+            const data: any = await this.dbClient.get({testNumberKey: NUMBER_KEY.SYSTEM_NUMBER});
+            if (!data.Item) {
+                return Configuration.getInstance().getSystemNumberInitialValue();
+            }
+            return data.Item;
+        } catch (error) {
+            throw this.formatAWSError(error);
+        }
+    }
+
+    /**
+     * Retrieves the last plate serial number
+     */
+    public async getLastPlateSerialNumber(): Promise<PlateSerialNumber> {
+        try {
+            const data: any = await this.dbClient.get({testNumberKey: NUMBER_KEY.PLATE_SERIAL_NUMBER});
+            if (!data.Item) {
+                return Configuration.getInstance().getPlateSerialNumberInitialValue();
+            }
+            return data.Item;
+        } catch (error) {
+            throw this.formatAWSError(error);
+        }
     }
 
     /**
@@ -264,6 +296,19 @@ export class NumberService {
     }
 
     /**
+     * Calculates and creates the next plate serial number object based on the last plate serial number
+     * @param plateSerialNumberObj - last plateSerialNumber
+     */
+    public createNextPlateSerialNumberObject(plateSerialNumberObj: PlateSerialNumber): PlateSerialNumber {
+        const newPlateSerialNumber: number = parseInt(plateSerialNumberObj.plateSerialNumber, 10) + 1;
+        const newPlateSerialNumberObject: PlateSerialNumber = {
+            plateSerialNumber: newPlateSerialNumber.toString(),
+            testNumberKey: NUMBER_KEY.PLATE_SERIAL_NUMBER
+        };
+        return newPlateSerialNumberObject;
+    }
+
+    /**
      * Appends calculated checksum to the test number
      * @param testNumber - the test number
      */
@@ -287,5 +332,4 @@ export class NumberService {
         }
         return testNumber + checkSum.toString().padStart(2, "0");
     }
-
 }
