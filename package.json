@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "A microservice generating test numbers.",
   "main": "handler.js",
+  "engines": {
+    "node": "10.18.1",
+    "npm": "5.6.0"
+  },
   "scripts": {
     "start": "node_modules/serverless/bin/serverless offline start",
     "build": "node_modules/typescript/bin/tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
@@ -18,7 +22,7 @@
     "security-checks": "git secrets --scan && git log -p | scanrepo",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
     "coverage": "BRANCH=local jest --testMatch=\"**/*.*Test.ts\" --coverage --runInBand",
-    "audit-dep": "npm audit --json | audit-filter --nsp-config=.nsprc --audit=-",
+    "audit-dep": "npm audit --json | node_modules/.bin/audit-filter --nsp-config=.nsprc --audit=-",
     "tools-setup": "sls dynamodb migrate && BRANCH=local node_modules/gulp/bin/gulp.js start-serverless && sls dynamodb seed --seed=test-number"
   },
   "nyc": {
