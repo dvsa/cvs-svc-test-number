@@ -55,7 +55,7 @@
     "path-parser": "^4.2.0",
     "reflect-metadata": "^0.1.13",
     "ts-node-register": "^1.0.0",
-    "uuid": "^3.3.3"
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.34",
