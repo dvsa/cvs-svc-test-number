@@ -8,21 +8,22 @@
     "npm": "5.6.0"
   },
   "scripts": {
-    "start": "node_modules/serverless/bin/serverless offline start",
-    "build": "node_modules/typescript/bin/tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
+    "start": "serverless offline start",
+    "build": "tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
     "debug": "export SLS_DEBUG=* && BRANCH=local node --inspect ./node_modules/serverless/bin/serverless offline start",
-    "build:dev": "node_modules/typescript/bin/tsc && npm run build:copy",
+    "build:dev": "tsc && npm run build:copy",
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
-    "test": "jest --testMatch=\"**/*.unitTest.ts\"",
+    "test": " BRANCH=local jest --testMatch=\"**/*.unitTest.ts\"",
     "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand",
     "tslint": "tslint src/**/*.ts tests/**/*.ts",
-    "prepush": "BRANCH=local npm test && npm run tslint",
     "package": "mkdir ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME} && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "predeploy": "npm install && npm run prepush",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
     "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
-    "coverage": "BRANCH=local jest --testMatch=\"**/*.*Test.ts\" --coverage --runInBand",
-    "audit-dep": "npm audit --json | node_modules/.bin/audit-filter --nsp-config=.nsprc --audit=-",
+    "coverage": "npm t -- --coverage --runInBand",
+    "prepush": "npm run coverage && npm run build",
+    "audit:filter": "npm audit --json | node_modules/.bin/audit-filter --nsp-config=.nsprc --audit=-",
+    "audit-dep": "npm audit",
     "tools-setup": "sls dynamodb migrate && BRANCH=local node_modules/gulp/bin/gulp.js start-serverless && sls dynamodb seed --seed=test-number"
   },
   "nyc": {
@@ -70,11 +71,11 @@
     "babel-jest": "^24.8.0",
     "gulp": "^4.0.2",
     "husky": "^3.0.9",
-    "jest": "^24.9.0",
+    "jest": "^26.6.3",
     "jest-plugin-context": "^2.9.0",
     "jest-sonar-reporter": "^2.0.0",
     "lambda-tester": "^3.6.0",
-    "serverless": "^1.59.3",
+    "serverless": "^2.45.2",
     "serverless-dynamodb-local": "^0.2.38",
     "serverless-offline": "^5.12.1",
     "serverless-plugin-tracing": "^2.0.0",
@@ -84,7 +85,7 @@
     "ts-node": "^8.4.1",
     "tslint": "^5.20.0",
     "tslint-jsdoc-rules": "^0.2.0",
-    "typescript": "^3.7.3"
+    "typescript": "^3.9.7"
   },
   "jest": {
     "coverageDirectory": "./coverage",
@@ -99,7 +100,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run prepush && npm run security-checks",
+      "pre-commit": "npm run security-checks && npm audit && npm run tslint",
       "pre-push": "npm run prepush"
     }
   }
