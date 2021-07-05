@@ -14,6 +14,11 @@ functions:
     path: /system-number
     proxy: null
     function: generateSystemNumber
+- generatePlateSerialNumber:
+    method: POST
+    path: /plateSerialNo
+    proxy: null
+    function: generatePlateSerialNumber
 dynamodb:
   local:
     params:
@@ -53,4 +58,6 @@ trailerIdInitialValue:
   sequenceNumber: 530000
 systemNumberInitialValue:
   systemNumber: "10000000"
+plateSerialNumberInitialValue:
+  plateSerialNumber: "0"
 maxAttempts: 2

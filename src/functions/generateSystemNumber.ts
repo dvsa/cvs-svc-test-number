@@ -7,14 +7,13 @@ import {DynamoDBService} from "../services/DynamoDBService";
 const generateSystemNumber: Handler = async (event: any, context?: Context): Promise<APIGatewayProxyResult> => {
     const numberService = new NumberService(new DynamoDBService());
 
-    return numberService.createSystemNumber(1, null)
-        .then((systemNumber: SystemNumber) => {
-            return new HTTPResponse(200, systemNumber);
-        })
-        .catch((error: HTTPResponse) => {
-            console.log(error.body);
-            return error;
-        });
+    try {
+        const systemNumber: SystemNumber = await numberService.createSystemNumber(1, null);
+        return new HTTPResponse(200, systemNumber);
+    } catch (error) {
+        console.log(error.body);
+        return error;
+    }
 };
 
 export {generateSystemNumber};

@@ -134,6 +134,14 @@ class Configuration {
     }
 
     /**
+     * Retrieves the plate serial number initial value
+     * @returns any
+     */
+    public getPlateSerialNumberInitialValue(): any {
+        return this.config.plateSerialNumberInitialValue;
+    }
+
+    /**
      * Retrieves the test number initial value
      * @returns number
      */
