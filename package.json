@@ -4,7 +4,7 @@
   "description": "A microservice generating test numbers.",
   "main": "handler.js",
   "engines": {
-    "node": "10.18.1",
+    "node": "14.*",
     "npm": "5.6.0"
   },
   "scripts": {
@@ -16,6 +16,7 @@
     "test": " BRANCH=local jest --testMatch=\"**/*.unitTest.ts\"",
     "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand",
     "tslint": "tslint src/**/*.ts tests/**/*.ts",
+    "format": "prettier --write .",
     "package": "mkdir ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME} && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "predeploy": "npm install && npm run prepush",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
@@ -58,11 +59,13 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
     "@types/aws-lambda": "^8.10.34",
     "@types/jest": "^24.0.21",
     "@types/jest-plugin-context": "^2.9.2",
     "@types/joi": "^14.3.4",
-    "@types/lambda-tester": "^3.6.0",
+    "@types/lambda-tester": "^3.6.1",
     "@types/node": "^12.12.5",
     "@types/uuid": "^3.4.6",
     "audit-filter": "^0.5.0",
@@ -73,7 +76,8 @@
     "jest": "^26.6.3",
     "jest-plugin-context": "^2.9.0",
     "jest-sonar-reporter": "^2.0.0",
-    "lambda-tester": "^3.6.0",
+    "lambda-tester": "^4.0.1",
+    "prettier": "^2.3.2",
     "serverless": "^2.45.2",
     "serverless-dynamodb-local": "^0.2.38",
     "serverless-offline": "^5.12.1",
@@ -100,7 +104,7 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm run security-checks && npm run audit && npm run tslint",
+      "pre-commit": "npm run security-checks && npm run audit && npm run tslint && npm run format",
       "pre-push": "npm run prepush"
     }
   }
