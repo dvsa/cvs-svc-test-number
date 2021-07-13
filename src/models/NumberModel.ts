@@ -1,19 +1,19 @@
 export interface TestNumber {
-    testNumberKey: number;
-    testNumber: string;
-    id: string;
-    certLetter: string;
-    sequenceNumber: string;
+  testNumberKey: number;
+  testNumber: string;
+  id: string;
+  certLetter: string;
+  sequenceNumber: string;
 }
 
 export interface TrailerId {
-    trailerId: string;
-    trailerLetter: string;
-    sequenceNumber: number;
-    testNumberKey: number;
+  trailerId: string;
+  trailerLetter: string;
+  sequenceNumber: number;
+  testNumberKey: number;
 }
 
 export interface SystemNumber {
-    systemNumber: string;
-    testNumberKey: number;
+  systemNumber: string;
+  testNumberKey: number;
 }
