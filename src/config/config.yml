@@ -1,19 +1,19 @@
 functions:
-- generateTestNumber:
-    method: POST
-    path: /test-number
-    proxy: null
-    function: generateTestNumber
-- generateTrailerId:
-    method: POST
-    path: /trailerId
-    proxy: null
-    function: generateTrailerId
-- generateSystemNumber:
-    method: POST
-    path: /system-number
-    proxy: null
-    function: generateSystemNumber
+  - generateTestNumber:
+      method: POST
+      path: /test-number
+      proxy: null
+      function: generateTestNumber
+  - generateTrailerId:
+      method: POST
+      path: /trailerId
+      proxy: null
+      function: generateTrailerId
+  - generateSystemNumber:
+      method: POST
+      path: /system-number
+      proxy: null
+      function: generateSystemNumber
 dynamodb:
   local:
     params:

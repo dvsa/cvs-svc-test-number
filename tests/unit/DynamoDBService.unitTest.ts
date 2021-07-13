@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
-import {DynamoDBService} from "../../src/services/DynamoDBService";
+import { DynamoDBService } from "../../src/services/DynamoDBService";
 
-describe("DynamoDBService", () =>  {
+describe("DynamoDBService", () => {
   let branch: string | undefined = "";
   beforeAll(() => {
     branch = process.env.BRANCH;
@@ -14,11 +14,13 @@ describe("DynamoDBService", () =>  {
   });
   context("scan", () => {
     it("returns data on Successful Scan", async () => {
-      AWS.DynamoDB.DocumentClient.prototype.scan = jest.fn().mockImplementation(() => {
-        return {
-          promise: () => Promise.resolve("Success")
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.scan = jest
+        .fn()
+        .mockImplementation(() => {
+          return {
+            promise: () => Promise.resolve("Success"),
+          };
+        });
 
       const output = await new DynamoDBService().scan();
       expect(output).toEqual("Success");
@@ -26,11 +28,13 @@ describe("DynamoDBService", () =>  {
 
     it("returns error on failed query", async () => {
       const myError = new Error("It broke");
-      AWS.DynamoDB.DocumentClient.prototype.scan = jest.fn().mockImplementation(() => {
-        return {
-          promise: () => Promise.reject(myError)
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.scan = jest
+        .fn()
+        .mockImplementation(() => {
+          return {
+            promise: () => Promise.reject(myError),
+          };
+        });
       expect.assertions(1);
       try {
         await new DynamoDBService().scan();
@@ -38,121 +42,137 @@ describe("DynamoDBService", () =>  {
         expect(e.message).toEqual("It broke");
       }
     });
-  }) ;
+  });
 
   context("get", () => {
     it("returns data on Successful Query", async () => {
-      AWS.DynamoDB.DocumentClient.prototype.get = jest.fn().mockImplementation(() => {
-        return {
-          promise: () => Promise.resolve("Success")
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.get = jest
+        .fn()
+        .mockImplementation(() => {
+          return {
+            promise: () => Promise.resolve("Success"),
+          };
+        });
 
-      const output = await new DynamoDBService().get({key: "abc123"});
+      const output = await new DynamoDBService().get({ key: "abc123" });
       expect(output).toEqual("Success");
     });
 
     it("Constructs correct query (key only)", async () => {
       let params = {};
-      AWS.DynamoDB.DocumentClient.prototype.get = jest.fn().mockImplementation((args: any) => {
-        params = args;
-        return {
-          promise: () => Promise.resolve("Good")
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.get = jest
+        .fn()
+        .mockImplementation((args: any) => {
+          params = args;
+          return {
+            promise: () => Promise.resolve("Good"),
+          };
+        });
       const expectedParams = {
         TableName: "cvs-local-test-number",
         Key: {
-          key: "abc123"
+          key: "abc123",
         },
       };
       expect.assertions(1);
-      await new DynamoDBService().get({key: "abc123"});
+      await new DynamoDBService().get({ key: "abc123" });
       expect(params).toEqual(expectedParams);
     });
 
     it("Constructs correct query (key and attributes)", async () => {
       let params = {};
-      AWS.DynamoDB.DocumentClient.prototype.get = jest.fn().mockImplementation((args: any) => {
-        params = args;
-        return {
-          promise: () => Promise.resolve("Good")
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.get = jest
+        .fn()
+        .mockImplementation((args: any) => {
+          params = args;
+          return {
+            promise: () => Promise.resolve("Good"),
+          };
+        });
       const expectedParams = {
         TableName: "cvs-local-test-number",
         Key: {
-          key: "abc123"
+          key: "abc123",
         },
-        AttributesToGet: ["someAttribute"]
+        AttributesToGet: ["someAttribute"],
       };
       expect.assertions(1);
-      await new DynamoDBService().get({key: "abc123"}, ["someAttribute"]);
+      await new DynamoDBService().get({ key: "abc123" }, ["someAttribute"]);
       expect(params).toEqual(expectedParams);
     });
 
     it("returns error on failed query", async () => {
       const myError = new Error("It broke");
-      AWS.DynamoDB.DocumentClient.prototype.get = jest.fn().mockImplementation((args: any) => {
-        return {
-          promise: () => Promise.reject(myError)
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.get = jest
+        .fn()
+        .mockImplementation((args: any) => {
+          return {
+            promise: () => Promise.reject(myError),
+          };
+        });
       expect.assertions(1);
       try {
-        await new DynamoDBService().get({key: "abc123"});
+        await new DynamoDBService().get({ key: "abc123" });
       } catch (e) {
         expect(e.message).toEqual("It broke");
       }
     });
-  }) ;
+  });
 
   context("put", () => {
     context("on successful query", () => {
       it("returns expected data", async () => {
-        AWS.DynamoDB.DocumentClient.prototype.put = jest.fn().mockImplementation(() => {
-          return {
-            promise: () => Promise.resolve("Success")
-          };
-        });
+        AWS.DynamoDB.DocumentClient.prototype.put = jest
+          .fn()
+          .mockImplementation(() => {
+            return {
+              promise: () => Promise.resolve("Success"),
+            };
+          });
 
-        const output = await new DynamoDBService().put({testNumber: "abc123"});
+        const output = await new DynamoDBService().put({
+          testNumber: "abc123",
+        });
         expect(output).toEqual("Success");
       });
 
       it("constructs correct query", async () => {
         let params = {};
-        AWS.DynamoDB.DocumentClient.prototype.put = jest.fn().mockImplementation((args: any) => {
-          params = args;
-          return {
-            promise: () => Promise.resolve("Good")
-          };
-        });
+        AWS.DynamoDB.DocumentClient.prototype.put = jest
+          .fn()
+          .mockImplementation((args: any) => {
+            params = args;
+            return {
+              promise: () => Promise.resolve("Good"),
+            };
+          });
         const expectedParams = {
           TableName: "cvs-local-test-number",
-          Item: {testNumber: "abc123"},
+          Item: { testNumber: "abc123" },
           ReturnValues: "ALL_OLD",
           ConditionExpression: "testNumber <> :testNumberVal",
           ExpressionAttributeValues: {
-            ":testNumberVal": "abc123"
-          }
+            ":testNumberVal": "abc123",
+          },
         };
         expect.assertions(1);
-        await new DynamoDBService().put({testNumber: "abc123"});
+        await new DynamoDBService().put({ testNumber: "abc123" });
         expect(params).toEqual(expectedParams);
       });
     });
     context("on failing request", () => {
       it("returns error on failed query", async () => {
         const myError = new Error("It broke");
-        AWS.DynamoDB.DocumentClient.prototype.put = jest.fn().mockImplementation((args: any) => {
-          return {
-            promise: () => Promise.reject(myError)
-          };
-        });
+        AWS.DynamoDB.DocumentClient.prototype.put = jest
+          .fn()
+          .mockImplementation((args: any) => {
+            return {
+              promise: () => Promise.reject(myError),
+            };
+          });
         expect.assertions(1);
         try {
-          await new DynamoDBService().put({key: "abc123"});
+          await new DynamoDBService().put({ key: "abc123" });
         } catch (e) {
           expect(e.message).toEqual("It broke");
         }
@@ -163,45 +183,51 @@ describe("DynamoDBService", () =>  {
   context("delete", () => {
     context("on successful query", () => {
       it("returns expected data", async () => {
-        AWS.DynamoDB.DocumentClient.prototype.delete = jest.fn().mockImplementation(() => {
-          return {
-            promise: () => Promise.resolve("Success")
-          };
-        });
+        AWS.DynamoDB.DocumentClient.prototype.delete = jest
+          .fn()
+          .mockImplementation(() => {
+            return {
+              promise: () => Promise.resolve("Success"),
+            };
+          });
 
-        const output = await new DynamoDBService().delete({key: "abc123"});
+        const output = await new DynamoDBService().delete({ key: "abc123" });
         expect(output).toEqual("Success");
       });
 
       it("constructs correct query", async () => {
         let params = {};
-        AWS.DynamoDB.DocumentClient.prototype.delete = jest.fn().mockImplementation((args: any) => {
-          params = args;
-          return {
-            promise: () => Promise.resolve("Good")
-          };
-        });
+        AWS.DynamoDB.DocumentClient.prototype.delete = jest
+          .fn()
+          .mockImplementation((args: any) => {
+            params = args;
+            return {
+              promise: () => Promise.resolve("Good"),
+            };
+          });
         const expectedParams = {
           TableName: "cvs-local-test-number",
-          Key: {testNumber: "abc123"},
+          Key: { testNumber: "abc123" },
           ReturnValues: "ALL_OLD",
         };
         expect.assertions(1);
-        await new DynamoDBService().delete({testNumber: "abc123"});
+        await new DynamoDBService().delete({ testNumber: "abc123" });
         expect(params).toEqual(expectedParams);
       });
     });
     context("on failing request", () => {
       it("returns error on failed query", async () => {
         const myError = new Error("It broke");
-        AWS.DynamoDB.DocumentClient.prototype.delete = jest.fn().mockImplementation((args: any) => {
-          return {
-            promise: () => Promise.reject(myError)
-          };
-        });
+        AWS.DynamoDB.DocumentClient.prototype.delete = jest
+          .fn()
+          .mockImplementation((args: any) => {
+            return {
+              promise: () => Promise.reject(myError),
+            };
+          });
         expect.assertions(1);
         try {
-          await new DynamoDBService().delete({key: "abc123"});
+          await new DynamoDBService().delete({ key: "abc123" });
         } catch (e) {
           expect(e.message).toEqual("It broke");
         }
@@ -213,35 +239,39 @@ describe("DynamoDBService", () =>  {
     it("returns data on Successful Query", async () => {
       const getMock = jest.fn().mockImplementation(() => {
         return {
-          promise: () => Promise.resolve("Success")
+          promise: () => Promise.resolve("Success"),
         };
       });
       AWS.DynamoDB.DocumentClient.prototype.batchGet = getMock;
 
-      const output = await new DynamoDBService().batchGet([{key: "abc123"}]);
+      const output = await new DynamoDBService().batchGet([{ key: "abc123" }]);
       expect(output).toEqual(["Success"]);
       expect(getMock.mock.calls).toHaveLength(1);
     });
 
     it("Constructs correct query (1 key only)", async () => {
       let params = {};
-      AWS.DynamoDB.DocumentClient.prototype.batchGet = jest.fn().mockImplementation((args: any) => {
-        params = args;
-        return {
-          promise: () => Promise.resolve("Good")
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.batchGet = jest
+        .fn()
+        .mockImplementation((args: any) => {
+          params = args;
+          return {
+            promise: () => Promise.resolve("Good"),
+          };
+        });
       const expectedParams = {
         RequestItems: {
           "cvs-local-test-number": {
-            Keys: [{
-              key: "abc123"
-            }]
-          }
-        }
+            Keys: [
+              {
+                key: "abc123",
+              },
+            ],
+          },
+        },
       };
       expect.assertions(1);
-      await new DynamoDBService().batchGet([{key: "abc123"}]);
+      await new DynamoDBService().batchGet([{ key: "abc123" }]);
       expect(params).toEqual(expectedParams);
     });
 
@@ -250,19 +280,23 @@ describe("DynamoDBService", () =>  {
       const batchGetMock = jest.fn().mockImplementation((args: any) => {
         params = args;
         return {
-          promise: () => Promise.resolve("Good")
+          promise: () => Promise.resolve("Good"),
         };
       });
       AWS.DynamoDB.DocumentClient.prototype.batchGet = batchGetMock;
       const expectedParams = {
         RequestItems: {
           "cvs-local-test-number": {
-            Keys: [{key: "abc123"}, {key: "abc234"}, {key: "abc345"}]
-          }
-        }
+            Keys: [{ key: "abc123" }, { key: "abc234" }, { key: "abc345" }],
+          },
+        },
       };
       expect.assertions(2);
-      await new DynamoDBService().batchGet([{key: "abc123"}, {key: "abc234"}, {key: "abc345"}]);
+      await new DynamoDBService().batchGet([
+        { key: "abc123" },
+        { key: "abc234" },
+        { key: "abc345" },
+      ]);
       expect(params).toEqual(expectedParams);
       // Calls DB only once
       expect(batchGetMock.mock.calls).toHaveLength(1);
@@ -270,14 +304,14 @@ describe("DynamoDBService", () =>  {
     it("Batches large requests to keep within AWS  limits (<= 25 requests at a time)", async () => {
       const batchGetMock = jest.fn().mockImplementation((args: any) => {
         return {
-          promise: () => Promise.resolve("Good")
+          promise: () => Promise.resolve("Good"),
         };
       });
       AWS.DynamoDB.DocumentClient.prototype.batchGet = batchGetMock;
       const params: any = [];
       // 110 queries should get put into 2 batches, of 100 and 10
-      for (let i =  0; i < 110; i++) {
-        params.push({key: "abc123"});
+      for (let i = 0; i < 110; i++) {
+        params.push({ key: "abc123" });
       }
       expect.assertions(2);
       const result = await new DynamoDBService().batchGet(params);
@@ -288,57 +322,63 @@ describe("DynamoDBService", () =>  {
 
     it("returns error on failed query", async () => {
       const myError = new Error("It broke");
-      AWS.DynamoDB.DocumentClient.prototype.batchGet = jest.fn().mockImplementation((args: any) => {
-        return {
-          promise: () => Promise.reject(myError)
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.batchGet = jest
+        .fn()
+        .mockImplementation((args: any) => {
+          return {
+            promise: () => Promise.reject(myError),
+          };
+        });
       expect.assertions(1);
       try {
-        await new DynamoDBService().batchGet([{key: "abc123"}]);
+        await new DynamoDBService().batchGet([{ key: "abc123" }]);
       } catch (e) {
         expect(e.message).toEqual("It broke");
       }
     });
-  }) ;
+  });
 
   context("batchWrite", () => {
     it("returns data on Successful Query", async () => {
       const getMock = jest.fn().mockImplementation(() => {
         return {
-          promise: () => Promise.resolve("Success")
+          promise: () => Promise.resolve("Success"),
         };
       });
       AWS.DynamoDB.DocumentClient.prototype.batchWrite = getMock;
 
-      const output = await new DynamoDBService().batchPut([{testNumber: "abc123"}]);
+      const output = await new DynamoDBService().batchPut([
+        { testNumber: "abc123" },
+      ]);
       expect(output).toEqual(["Success"]);
       expect(getMock.mock.calls).toHaveLength(1);
     });
 
     it("Constructs correct query (1 key only)", async () => {
       let params = {};
-      AWS.DynamoDB.DocumentClient.prototype.batchWrite = jest.fn().mockImplementation((args: any) => {
-        params = args;
-        return {
-          promise: () => Promise.resolve("Good")
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.batchWrite = jest
+        .fn()
+        .mockImplementation((args: any) => {
+          params = args;
+          return {
+            promise: () => Promise.resolve("Good"),
+          };
+        });
       const expectedParams = {
         RequestItems: {
           "cvs-local-test-number": [
             {
               PutRequest: {
                 Item: {
-                  testNumber: "abc123"
-                }
-              }
-            }
-          ]
-        }
+                  testNumber: "abc123",
+                },
+              },
+            },
+          ],
+        },
       };
       expect.assertions(1);
-      await new DynamoDBService().batchPut([{testNumber: "abc123"}]);
+      await new DynamoDBService().batchPut([{ testNumber: "abc123" }]);
       expect(params).toEqual(expectedParams);
     });
 
@@ -347,7 +387,7 @@ describe("DynamoDBService", () =>  {
       const batchGetMock = jest.fn().mockImplementation((args: any) => {
         params = args;
         return {
-          promise: () => Promise.resolve("Good")
+          promise: () => Promise.resolve("Good"),
         };
       });
       AWS.DynamoDB.DocumentClient.prototype.batchWrite = batchGetMock;
@@ -357,22 +397,25 @@ describe("DynamoDBService", () =>  {
             {
               PutRequest: {
                 Item: {
-                  testNumber: "abc123"
-                }
-              }
+                  testNumber: "abc123",
+                },
+              },
             },
             {
               PutRequest: {
                 Item: {
-                  testNumber: "abc234"
-                }
-              }
-            }
-          ]
-        }
+                  testNumber: "abc234",
+                },
+              },
+            },
+          ],
+        },
       };
       expect.assertions(2);
-      await new DynamoDBService().batchPut([{testNumber: "abc123"}, {testNumber: "abc234"}]);
+      await new DynamoDBService().batchPut([
+        { testNumber: "abc123" },
+        { testNumber: "abc234" },
+      ]);
       expect(params).toEqual(expectedParams);
       // Calls DB only once
       expect(batchGetMock.mock.calls).toHaveLength(1);
@@ -380,14 +423,14 @@ describe("DynamoDBService", () =>  {
     it("Batches large requests to keep within AWS  limits (<= 25 requests at a time)", async () => {
       const batchGetMock = jest.fn().mockImplementation((args: any) => {
         return {
-          promise: () => Promise.resolve("Good")
+          promise: () => Promise.resolve("Good"),
         };
       });
       AWS.DynamoDB.DocumentClient.prototype.batchWrite = batchGetMock;
       const params: any = [];
       // 110 queries should get put into 2 batches, of 100 and 10
-      for (let i =  0; i < 55; i++) {
-        params.push({testNumber: "abc123"});
+      for (let i = 0; i < 55; i++) {
+        params.push({ testNumber: "abc123" });
       }
       expect.assertions(2);
       const result = await new DynamoDBService().batchPut(params);
@@ -398,57 +441,63 @@ describe("DynamoDBService", () =>  {
 
     it("returns error on failed query", async () => {
       const myError = new Error("It broke");
-      AWS.DynamoDB.DocumentClient.prototype.batchWrite = jest.fn().mockImplementation((args: any) => {
-        return {
-          promise: () => Promise.reject(myError)
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.batchWrite = jest
+        .fn()
+        .mockImplementation((args: any) => {
+          return {
+            promise: () => Promise.reject(myError),
+          };
+        });
       expect.assertions(1);
       try {
-        await new DynamoDBService().batchPut([{testNumber: "abc123"}]);
+        await new DynamoDBService().batchPut([{ testNumber: "abc123" }]);
       } catch (e) {
         expect(e.message).toEqual("It broke");
       }
     });
-  }) ;
+  });
 
   context("batchDelete", () => {
     it("returns data on Successful Query", async () => {
       const getMock = jest.fn().mockImplementation(() => {
         return {
-          promise: () => Promise.resolve("Success")
+          promise: () => Promise.resolve("Success"),
         };
       });
       AWS.DynamoDB.DocumentClient.prototype.batchWrite = getMock;
 
-      const output = await new DynamoDBService().batchDelete([{testNumber: "abc123"}]);
+      const output = await new DynamoDBService().batchDelete([
+        { testNumber: "abc123" },
+      ]);
       expect(output).toEqual(["Success"]);
       expect(getMock.mock.calls).toHaveLength(1);
     });
 
     it("Constructs correct query (1 key only)", async () => {
       let params = {};
-      AWS.DynamoDB.DocumentClient.prototype.batchWrite = jest.fn().mockImplementation((args: any) => {
-        params = args;
-        return {
-          promise: () => Promise.resolve("Good")
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.batchWrite = jest
+        .fn()
+        .mockImplementation((args: any) => {
+          params = args;
+          return {
+            promise: () => Promise.resolve("Good"),
+          };
+        });
       const expectedParams = {
         RequestItems: {
           "cvs-local-test-number": [
             {
               DeleteRequest: {
                 Key: {
-                  testNumber: "abc123"
-                }
-              }
-            }
-          ]
-        }
+                  testNumber: "abc123",
+                },
+              },
+            },
+          ],
+        },
       };
       expect.assertions(1);
-      await new DynamoDBService().batchDelete([{testNumber: "abc123"}]);
+      await new DynamoDBService().batchDelete([{ testNumber: "abc123" }]);
       expect(params).toEqual(expectedParams);
     });
 
@@ -457,7 +506,7 @@ describe("DynamoDBService", () =>  {
       const batchGetMock = jest.fn().mockImplementation((args: any) => {
         params = args;
         return {
-          promise: () => Promise.resolve("Good")
+          promise: () => Promise.resolve("Good"),
         };
       });
       AWS.DynamoDB.DocumentClient.prototype.batchWrite = batchGetMock;
@@ -467,22 +516,25 @@ describe("DynamoDBService", () =>  {
             {
               DeleteRequest: {
                 Key: {
-                  testNumber: "abc123"
-                }
-              }
+                  testNumber: "abc123",
+                },
+              },
             },
             {
               DeleteRequest: {
                 Key: {
-                  testNumber: "abc234"
-                }
-              }
-            }
-          ]
-        }
+                  testNumber: "abc234",
+                },
+              },
+            },
+          ],
+        },
       };
       expect.assertions(2);
-      await new DynamoDBService().batchDelete([{testNumber: "abc123"}, {testNumber: "abc234"}]);
+      await new DynamoDBService().batchDelete([
+        { testNumber: "abc123" },
+        { testNumber: "abc234" },
+      ]);
       expect(params).toEqual(expectedParams);
       // Calls DB only once
       expect(batchGetMock.mock.calls).toHaveLength(1);
@@ -490,14 +542,14 @@ describe("DynamoDBService", () =>  {
     it("Batches large requests to keep within AWS  limits (<= 25 requests at a time)", async () => {
       const batchGetMock = jest.fn().mockImplementation((args: any) => {
         return {
-          promise: () => Promise.resolve("Good")
+          promise: () => Promise.resolve("Good"),
         };
       });
       AWS.DynamoDB.DocumentClient.prototype.batchWrite = batchGetMock;
       const params: any = [];
       // 110 queries should get put into 2 batches, of 100 and 10
-      for (let i =  0; i < 55; i++) {
-        params.push({testNumber: "abc123"});
+      for (let i = 0; i < 55; i++) {
+        params.push({ testNumber: "abc123" });
       }
       expect.assertions(2);
       const result = await new DynamoDBService().batchDelete(params);
@@ -508,18 +560,19 @@ describe("DynamoDBService", () =>  {
 
     it("returns error on failed query", async () => {
       const myError = new Error("It broke");
-      AWS.DynamoDB.DocumentClient.prototype.batchWrite = jest.fn().mockImplementation((args: any) => {
-        return {
-          promise: () => Promise.reject(myError)
-        };
-      });
+      AWS.DynamoDB.DocumentClient.prototype.batchWrite = jest
+        .fn()
+        .mockImplementation((args: any) => {
+          return {
+            promise: () => Promise.reject(myError),
+          };
+        });
       expect.assertions(1);
       try {
-        await new DynamoDBService().batchDelete([{testNumber: "abc123"}]);
+        await new DynamoDBService().batchDelete([{ testNumber: "abc123" }]);
       } catch (e) {
         expect(e.message).toEqual("It broke");
       }
     });
-  }) ;
-
+  });
 });
