@@ -14,17 +14,18 @@
     "build:dev": "tsc && npm run build:copy",
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
     "test": " BRANCH=local jest --testMatch=\"**/*.unitTest.ts\"",
-    "test-i": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand",
+    "test-i": "npm run test:integration -- --runInBand --globalSetup='./scripts/setup.ts' --globalTeardown='./scripts/teardown.ts'",
+    "test:integration": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\"",
     "tslint": "tslint src/**/*.ts tests/**/*.ts",
     "format": "prettier --write .",
     "package": "mkdir ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME} && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "predeploy": "npm install && npm run prepush",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
-    "sonar-scanner": "npm run tslint && npm run coverage && sonar-scanner",
+    "sonar-scanner": "npm run coverage && sonar-scanner",
     "coverage": "npm t -- --coverage --runInBand",
     "prepush": "npm run coverage && npm run build",
     "audit": "npm audit",
-    "tools-setup": "sls dynamodb migrate && BRANCH=local node_modules/gulp/bin/gulp.js start-serverless && sls dynamodb seed --seed=test-number"
+    "tools-setup": "node_modules/.bin/sls dynamodb install"
   },
   "nyc": {
     "include": [
@@ -71,7 +72,6 @@
     "audit-filter": "^0.5.0",
     "aws-lambda-mock-context": "^3.2.1",
     "babel-jest": "^24.8.0",
-    "gulp": "^4.0.2",
     "husky": "^3.1.0",
     "jest": "^26.6.3",
     "jest-plugin-context": "^2.9.0",
