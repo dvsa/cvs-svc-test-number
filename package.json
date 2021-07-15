@@ -16,7 +16,7 @@
     "test": " BRANCH=local jest --testMatch=\"**/*.unitTest.ts\" --forceExit",
     "test-i": "npm run test:integration -- --runInBand --globalSetup='./scripts/setup.ts' --globalTeardown='./scripts/teardown.ts'",
     "test:integration": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\"",
-    "tslint": "tslint src/**/*.ts tests/**/*.ts",
+    "lint": "tslint src/**/*.ts tests/**/*.ts",
     "format": "prettier --write .",
     "package": "mkdir ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME} && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "predeploy": "npm install && npm run prepush",
@@ -104,7 +104,7 @@
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "npm run security-checks && npm run audit && npm run tslint && npm run format",
+      "pre-commit": "npm run security-checks && npm run audit && npm run lint && npm run format",
       "pre-push": "npm run prepush"
     }
   }
