@@ -66,7 +66,7 @@ npm run prepush && git log -p | scanrepo
 
 #### Security
 
-Please install and run the following securiy programs as part of your testing process:
+Please install and run the following security programs as part of your testing process:
 
 https://github.com/awslabs/git-secrets
 

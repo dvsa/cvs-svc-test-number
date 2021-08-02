@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "serverless offline start",
+    "start:localstack": "BRANCH=localstack SLS_DEBUG=* serverless offline start",
     "build": "tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
     "debug": "export SLS_DEBUG=* && BRANCH=local node --inspect ./node_modules/serverless/bin/serverless offline start",
     "build:dev": "tsc && npm run build:copy",

@@ -33,6 +33,14 @@ dynamodb:
       httpOptions:
         timeout: 30000
     table: cvs-local-global-test-number
+  localstack:
+    params:
+      region: eu-west-1
+      endpoint: http://${LOCALSTACK_HOSTNAME}:4566
+      maxRetries: 10
+      httpOptions:
+        timeout: 30000
+    table: cvs-localstack-test-number
   remote:
     params:
       maxRetries: 10
