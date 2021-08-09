@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  description: >-
+    This is the API spec for the test number generation. The purpose of this
+    microservice is to generate and retrieve the test number when a test is submitted.
+  version: 1.0.0
+  title: Test Number Microservice
+  termsOfService: ""
+  contact:
+    email: bpecete@deloittece.com
+  license:
+    name: Apache 2.0
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: testNumber
+    description: Endpoint used to retrieve a generated test number.
+    externalDocs:
+      description: Find out more
+      url: "https://wiki.i-env.net/display/HVT/Epic%3A+Capture+test+results"
+paths:
+  /test-number:
+    post:
+      summary: Generate a new test number
+      tags:
+        - testNumber
+      responses:
+        "201":
+          description: Generate the test number
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/testNumber"
+        "404":
+          description: Operation not supported
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://example.com/oauth/authorize"
+          tokenUrl: "https://example.com/oauth/token"
+          scopes:
+            read: Grants read access
+            write: Grants write access
+  schemas:
+    testNumber:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 3
+          maxLength: 3
+        certLetter:
+          type: string
+          minLength: 1
+          maxLength: 1
+        sequenceNumber:
+          type: string
+          minLength: 3
+          maxLength: 3
+        testNumber:
+          type: string
+security:
+  - ApiKeyAuth: []
+  - OAuth2:
+      - read
+      - write
+servers:
+  - url: "https://url/api/v1"
