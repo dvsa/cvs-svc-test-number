@@ -8,7 +8,7 @@
     "npm": "5.6.0"
   },
   "scripts": {
-    "start": "serverless offline start",
+    "start": "BRANCH=local serverless offline start",
     "build": "tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy",
     "debug": "export SLS_DEBUG=* && BRANCH=local node --inspect ./node_modules/serverless/bin/serverless offline start",
     "build:dev": "tsc && npm run build:copy",
@@ -24,7 +24,7 @@
     "security-checks": "git secrets --scan && git log -p | scanrepo",
     "sonar-scanner": "sonar-scanner",
     "prepush": "npm run test && npm run build && npm run test-i",
-    "audit": "npm audit",
+    "audit": "npm audit --prod",
     "tools-setup": "node_modules/.bin/sls dynamodb install"
   },
   "nyc": {
