@@ -799,6 +799,29 @@ describe("NumberService", () => {
           expect(e.statusCode).toEqual(418);
         }
       });
+
+      it("throws an unknown error", async () => {
+        const lastSystemNumber: SystemNumber = {
+          systemNumber: "10000023",
+          testNumberKey: 3,
+        };
+
+        const error = new Error("Oh no!");
+
+        DynamoDBService.prototype.get = jest
+          .fn()
+          .mockResolvedValue({ Item: lastSystemNumber });
+        const transactSpy = jest.fn().mockRejectedValueOnce(error);
+        DynamoDBService.prototype.transactWrite = transactSpy;
+
+        const service = new NumberService(new DynamoDBService());
+        try {
+          await service.createSystemNumber(1, null);
+        } catch (e) {
+          expect(e).toBeInstanceOf(HTTPResponse);
+          expect(e.statusCode).toEqual(500);
+        }
+      });
     });
 
     context("when the function retried more than 5 times", () => {

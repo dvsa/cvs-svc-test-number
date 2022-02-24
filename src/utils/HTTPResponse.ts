@@ -11,7 +11,7 @@ class HTTPResponse extends Error implements APIGatewayProxyResult {
    * @param body - the response body
    * @param headers - optional - the response headers
    */
-  constructor(statusCode: number, body: any, headers = {}) {
+  constructor(statusCode: number | undefined, body: any, headers = {}) {
     super();
 
     if (headers) {
@@ -23,7 +23,7 @@ class HTTPResponse extends Error implements APIGatewayProxyResult {
       this.headers["X-XSS-Protection"] = "1; mode=block";
     }
 
-    this.statusCode = statusCode;
+    this.statusCode = statusCode ? statusCode : 500;
     this.body = JSON.stringify(body);
   }
 }
