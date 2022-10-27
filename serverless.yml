@@ -1,17 +1,23 @@
 service: cvs-svc-test-number
-
+configValidationMode: warn
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs14.x
+  lambdaHashingVersion: 20201221
   stage: dev
-  tracing: true # enable tracing
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - "xray:PutTraceSegments"
-        - "xray:PutTelemetryRecords"
-      Resource:
-        - "*"
+  tracing:
+    apiGateway: true
+    lambda: true
+
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "xray:PutTraceSegments"
+            - "xray:PutTelemetryRecords"
+          Resource:
+            - "*"
 
 plugins:
   - serverless-dynamodb-local
@@ -30,11 +36,11 @@ resources:
       Properties:
         TableName: cvs-local-test-number
         AttributeDefinitions:
-        - AttributeName: testNumberKey
-          AttributeType: N
+          - AttributeName: testNumberKey
+            AttributeType: N
         KeySchema:
-        - AttributeName: testNumberKey
-          KeyType: HASH
+          - AttributeName: testNumberKey
+            KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
@@ -45,13 +51,13 @@ custom:
     start:
       port: 8008
       inMemory: true
-      migrate: false
-      seed: false
-      noStart: true
+      migrate: true
+      seed: true
+      noStart: false
     seed:
       test-number:
         sources:
-        - table: cvs-local-test-number
-          sources: [./tests/resources/test-number.json]
+          - table: cvs-local-test-number
+            sources: [./tests/resources/test-number.json]
     stages:
       - dev

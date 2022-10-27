@@ -1,24 +1,24 @@
 functions:
-- generateTestNumber:
-    method: POST
-    path: /test-number
-    proxy: null
-    function: generateTestNumber
-- generateTrailerId:
-    method: POST
-    path: /trailerId
-    proxy: null
-    function: generateTrailerId
-- generateSystemNumber:
-    method: POST
-    path: /system-number
-    proxy: null
-    function: generateSystemNumber
-- generatePlateSerialNumber:
-    method: POST
-    path: /plateSerialNo
-    proxy: null
-    function: generatePlateSerialNumber
+  - generateTestNumber:
+      method: POST
+      path: /test-number
+      proxy: null
+      function: generateTestNumber
+  - generateTrailerId:
+      method: POST
+      path: /trailerId
+      proxy: null
+      function: generateTrailerId
+  - generateSystemNumber:
+      method: POST
+      path: /system-number
+      proxy: null
+      function: generateSystemNumber
+  - generatePlateSerialNumber:
+      method: POST
+      path: /plateSerialNo
+      proxy: null
+      function: generatePlateSerialNumber
 dynamodb:
   local:
     params:
