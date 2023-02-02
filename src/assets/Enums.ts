@@ -3,6 +3,7 @@ export enum NUMBER_TYPE {
   TEST_NUMBER = "testNumber",
   SYSTEM_NUMBER = "systemNumber",
   PLATE_SERIAL_NUMBER = "plateSerialNumber",
+  Z_NUMBER = "ZNumber",
 }
 
 export enum NUMBER_KEY {
@@ -10,4 +11,5 @@ export enum NUMBER_KEY {
   TRAILER_ID = 2,
   SYSTEM_NUMBER = 3,
   PLATE_SERIAL_NUMBER = 4,
+  Z_NUMBER = 5,
 }

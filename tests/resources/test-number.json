@@ -19,5 +19,11 @@
   {
     "plateSerialNumber": "0",
     "testNumberKey": 4
+  },
+  {
+    "ZNumber": "500000Z",
+    "ZNumberLetter": "Z",
+    "sequenceNumber": 500000,
+    "testNumberKey": 5
   }
 ]

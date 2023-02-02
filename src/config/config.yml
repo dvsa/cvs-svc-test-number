@@ -19,6 +19,11 @@ functions:
       path: /plateSerialNo
       proxy: null
       function: generatePlateSerialNumber
+  - generateZNumber:
+      method: POST
+      path: /zNumber
+      proxy: null
+      function: generateZNumber
 dynamodb:
   local:
     params:
@@ -60,4 +65,8 @@ systemNumberInitialValue:
   systemNumber: "10000000"
 plateSerialNumberInitialValue:
   plateSerialNumber: "0"
+ZNumberInitialValue:
+  ZNumber: 500000Z
+  ZNumberLetter: Z
+  sequenceNumber: 500000
 maxAttempts: 2

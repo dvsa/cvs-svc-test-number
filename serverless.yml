@@ -28,6 +28,12 @@ plugins:
 functions:
   generateTestNumber:
     handler: src/handler.handler
+    events:
+      - http:
+          path: /zNumber
+          method: post
+          cors: false
+          private: false
 
 resources:
   Resources:

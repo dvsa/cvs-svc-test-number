@@ -4,6 +4,7 @@ import {
   SystemNumber,
   TestNumber,
   TrailerId,
+  ZNumber,
 } from "../models/NumberModel";
 import { HTTPResponse } from "../utils/HTTPResponse";
 import { DynamoDBService } from "./DynamoDBService";
@@ -203,6 +204,41 @@ export class NumberService {
   }
 
   /**
+   * Creates a new Znumber in the database.
+   * @param attempt - the current number of attempts for generating a ZNumber.
+   * @param awsError - AWS error to be passed when the request fails otherwise null.
+   */
+  public async createZNumber(
+    attempts: number,
+    awsError: AWSError | null
+  ): Promise<ZNumber> {
+    this.manageAttempts(attempts, awsError);
+    try {
+      const lastZNumber: ZNumber = await this.getLastZNumber();
+      console.log(lastZNumber);
+      const nextZNumberObject = this.createNextZNumberObject(lastZNumber);
+      const transactExpression = {
+        ConditionExpression: "ZNumber = :oldZNumber",
+        ExpressionAttributeValues: {
+          ":oldZNumber": lastZNumber.ZNumber,
+        },
+      };
+      await this.dbClient.transactWrite(nextZNumberObject, transactExpression);
+      console.log(`ZNumber Generated successfully`);
+      return nextZNumberObject;
+    } catch (error) {
+      console.error(error); // limit to 5 attempts
+      if (error.statusCode === 400) {
+        console.error(
+          `Attempt number ${attempts} for ZNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`
+        );
+        return this.createZNumber(attempts + 1, error);
+      }
+      throw this.formatAWSError(error);
+    }
+  }
+
+  /**
    * Retrieves the last test number
    */
   public async getLastTestNumber(): Promise<TestNumber> {
@@ -229,6 +265,24 @@ export class NumberService {
       });
       if (!data.Item) {
         return Configuration.getInstance().getTrailerIdInitialValue();
+      }
+      return data.Item;
+    } catch (error) {
+      throw this.formatAWSError(error);
+    }
+  }
+
+  /**
+   * Retrieves the last Z number
+   */
+  public async getLastZNumber(): Promise<ZNumber> {
+    try {
+      const data: any = await this.dbClient.get({
+        testNumberKey: NUMBER_KEY.Z_NUMBER,
+      });
+      if (!data.Item) {
+        console.log(Configuration.getInstance().getZNumberInitialValue());
+        return Configuration.getInstance().getZNumberInitialValue();
       }
       return data.Item;
     } catch (error) {
@@ -331,6 +385,23 @@ export class NumberService {
       testNumberKey: NUMBER_KEY.TRAILER_ID,
     };
     return newTrailerIdObject;
+  }
+
+  /**
+   * Calculates and creates the next ZNumber object based on the last ZNumber
+   * @param trailerIdObject - last ZNumber
+   */
+  public createNextZNumberObject(ZNumberObject: ZNumber): ZNumber {
+    const newSequenceNumber: number = ZNumberObject.sequenceNumber + 1;
+    const newZNumber =
+      newSequenceNumber.toString() + ZNumberObject.ZNumberLetter;
+    const newZNumberObject: ZNumber = {
+      ZNumber: newZNumber,
+      ZNumberLetter: ZNumberObject.ZNumberLetter,
+      sequenceNumber: newSequenceNumber,
+      testNumberKey: NUMBER_KEY.Z_NUMBER,
+    };
+    return newZNumberObject;
   }
 
   /**

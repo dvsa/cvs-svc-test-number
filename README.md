@@ -17,14 +17,12 @@ The project runs on node >10.x with typescript and serverless framework. For fur
 
 ### Prerequisites
 
-Please install and run the following security programs as part of your development process:
+Please install and run the following security program as part of your development process:
 
 - [git-secrets](https://github.com/awslabs/git-secrets)
   After installing, do a one-time set up with `git secrets --register-aws`. Run with `git secrets --scan`.
 
-- [repo-security-scanner](https://github.com/UKHomeOffice/repo-security-scanner)
-
-These will be run as part of your projects hooks so you don't accidentally introduce any new security vulnerabilities.
+This will be run as part of your projects hooks so you don't accidentally introduce any new security vulnerabilities.
 
 ## Architecture
 

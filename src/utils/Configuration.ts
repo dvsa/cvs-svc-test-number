@@ -132,6 +132,14 @@ class Configuration {
   }
 
   /**
+   * Retrieves the trailer id initial value
+   * @returns any
+   */
+  public getZNumberInitialValue(): any {
+    return this.config.ZNumberInitialValue;
+  }
+
+  /**
    * Retrieves the system number initial value
    * @returns any
    */
