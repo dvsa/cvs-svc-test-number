@@ -1,5 +1,6 @@
 import { NumberService } from "../../src/services/NumberService";
 import {
+  PlateSerialNumber,
   SystemNumber,
   TestNumber,
   TrailerId,
@@ -288,6 +289,60 @@ describe("NumberService", () => {
     });
   });
 
+  describe("createNextPlateSerialNumberObject", () => {
+    context("when trying to create a new plate serial number", () => {
+      it("should return proper nextPlateSerialNumber", () => {
+        let lastPlateSerialNumber: PlateSerialNumber = {
+          plateSerialNumber: "1",
+          testNumberKey: 4,
+        };
+        let expectedNextPlateSerialNumber: PlateSerialNumber = {
+          plateSerialNumber: "2",
+          testNumberKey: 4,
+        };
+        expect(
+          numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber)
+        ).toEqual(expectedNextPlateSerialNumber);
+
+        lastPlateSerialNumber = {
+          plateSerialNumber: "3",
+          testNumberKey: 4,
+        };
+        expectedNextPlateSerialNumber = {
+          plateSerialNumber: "4",
+          testNumberKey: 4,
+        };
+        expect(
+          numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber)
+        ).toEqual(expectedNextPlateSerialNumber);
+
+        lastPlateSerialNumber = {
+          plateSerialNumber: "10023454",
+          testNumberKey: 4,
+        };
+        expectedNextPlateSerialNumber = {
+          plateSerialNumber: "10023455",
+          testNumberKey: 4,
+        };
+        expect(
+          numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber)
+        ).toEqual(expectedNextPlateSerialNumber);
+
+        lastPlateSerialNumber = {
+          plateSerialNumber: "24823497",
+          testNumberKey: 4,
+        };
+        expectedNextPlateSerialNumber = {
+          plateSerialNumber: "24823498",
+          testNumberKey: 4,
+        };
+        expect(
+          numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber)
+        ).toEqual(expectedNextPlateSerialNumber);
+      });
+    });
+  });
+
   describe("getLastTestNumber", () => {
     beforeEach(() => {
       jest.resetAllMocks();
@@ -332,7 +387,7 @@ describe("NumberService", () => {
         await service.getLastTestNumber();
       } catch (e) {
         expect(e).toBeInstanceOf(HTTPResponse);
-        expect(e.statusCode).toEqual(418);
+        expect((e as HTTPResponse).statusCode).toEqual(418);
       }
     });
   });
@@ -379,7 +434,7 @@ describe("NumberService", () => {
         await service.getLastTrailerId();
       } catch (e) {
         expect(e).toBeInstanceOf(HTTPResponse);
-        expect(e.statusCode).toEqual(418);
+        expect((e as HTTPResponse).statusCode).toEqual(418);
       }
     });
   });
@@ -422,7 +477,50 @@ describe("NumberService", () => {
         await service.getLastSystemNumber();
       } catch (e) {
         expect(e).toBeInstanceOf(HTTPResponse);
-        expect(e.statusCode).toEqual(418);
+        expect((e as HTTPResponse).statusCode).toEqual(418);
+      }
+    });
+  });
+
+  describe("getLastPlateSerialNumber", () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+    });
+    it("returns expected value on successful DBService query", async () => {
+      const plateSerialNumberObj: PlateSerialNumber = {
+        plateSerialNumber: "12",
+        testNumberKey: 4,
+      };
+      DynamoDBService.prototype.get = jest
+        .fn()
+        .mockResolvedValue({ Item: plateSerialNumberObj });
+      const service = new NumberService(new DynamoDBService());
+      const output = await service.getLastPlateSerialNumber();
+      expect(plateSerialNumberObj).toEqual(output);
+    });
+    it("returns default value on empty DB return", async () => {
+      const defaultPlateSerialNumber = {
+        plateSerialNumber: "0",
+      };
+      DynamoDBService.prototype.get = jest
+        .fn()
+        .mockResolvedValue({ Item: null });
+      const service = new NumberService(new DynamoDBService());
+      const output = await service.getLastPlateSerialNumber();
+      expect(defaultPlateSerialNumber).toEqual(output);
+    });
+    it("throws expected errors if DBService request fails", async () => {
+      const error = new Error("I broke");
+      // @ts-ignore
+      error.statusCode = 418;
+
+      DynamoDBService.prototype.get = jest.fn().mockRejectedValue(error);
+      const service = new NumberService(new DynamoDBService());
+      try {
+        await service.getLastPlateSerialNumber();
+      } catch (e) {
+        expect(e).toBeInstanceOf(HTTPResponse);
+        expect((e as HTTPResponse).statusCode).toEqual(418);
       }
     });
   });
@@ -546,7 +644,7 @@ describe("NumberService", () => {
           await service.createTestNumber(1, null);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
-          expect(e.statusCode).toEqual(418);
+          expect((e as HTTPResponse).statusCode).toEqual(418);
         }
       });
     });
@@ -565,7 +663,7 @@ describe("NumberService", () => {
           await service.createTestNumber(6, awsError);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
-          expect(e.statusCode).toEqual(400);
+          expect((e as HTTPResponse).statusCode).toEqual(400);
         }
       });
     });
@@ -677,7 +775,7 @@ describe("NumberService", () => {
           await service.createTrailerId(1, null);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
-          expect(e.statusCode).toEqual(418);
+          expect((e as HTTPResponse).statusCode).toEqual(418);
         }
       });
     });
@@ -696,7 +794,7 @@ describe("NumberService", () => {
           await service.createTrailerId(6, awsError);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
-          expect(e.statusCode).toEqual(400);
+          expect((e as HTTPResponse).statusCode).toEqual(400);
         }
       });
     });
@@ -796,7 +894,7 @@ describe("NumberService", () => {
           await service.createSystemNumber(1, null);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
-          expect(e.statusCode).toEqual(418);
+          expect((e as HTTPResponse).statusCode).toEqual(418);
         }
       });
 
@@ -819,7 +917,7 @@ describe("NumberService", () => {
           await service.createSystemNumber(1, null);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
-          expect(e.statusCode).toEqual(500);
+          expect((e as HTTPResponse).statusCode).toEqual(500);
         }
       });
     });
@@ -838,7 +936,126 @@ describe("NumberService", () => {
           await service.createSystemNumber(6, awsError);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
-          expect(e.statusCode).toEqual(400);
+          expect((e as HTTPResponse).statusCode).toEqual(400);
+        }
+      });
+    });
+  });
+
+  describe("createPlateSerialNumber", () => {
+    context("happy path", () => {
+      it("returns next plateSerialNumber based on current number in DB", async () => {
+        const lastPlateSerialNumber: PlateSerialNumber = {
+          plateSerialNumber: "1",
+          testNumberKey: 4,
+        };
+        const expectedNextPlateSerialNumber: PlateSerialNumber = {
+          plateSerialNumber: "2",
+          testNumberKey: 4,
+        };
+        DynamoDBService.prototype.get = jest
+          .fn()
+          .mockResolvedValue({ Item: lastPlateSerialNumber });
+        DynamoDBService.prototype.transactWrite = jest
+          .fn()
+          .mockResolvedValue("");
+        const service = new NumberService(new DynamoDBService());
+        const output = await service.createPlateSerialNumber(1, null);
+        expect(expectedNextPlateSerialNumber).toEqual(output);
+      });
+
+      it("Calls DB services with correct params", async () => {
+        const lastPlateSerialNumber: PlateSerialNumber = {
+          plateSerialNumber: "23",
+          testNumberKey: 4,
+        };
+        const expectedNextPlateSerialNumber: PlateSerialNumber = {
+          plateSerialNumber: "24",
+          testNumberKey: 4,
+        };
+        DynamoDBService.prototype.get = jest
+          .fn()
+          .mockResolvedValue({ Item: lastPlateSerialNumber });
+        const putSpy = jest.fn().mockResolvedValue("");
+        DynamoDBService.prototype.transactWrite = putSpy;
+        const service = new NumberService(new DynamoDBService());
+        await service.createPlateSerialNumber(1, null);
+        expect(putSpy.mock.calls[0][0]).toEqual(expectedNextPlateSerialNumber);
+      });
+    });
+    context(
+      'when DBClient.put throws a 400 "Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]" error',
+      () => {
+        it("tries again", async () => {
+          const lastPlateSerialNumber: PlateSerialNumber = {
+            plateSerialNumber: "23",
+            testNumberKey: 4,
+          };
+
+          const error400 = new Error(
+            "Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]"
+          );
+          // @ts-ignore;
+          error400.statusCode = 400;
+
+          DynamoDBService.prototype.get = jest
+            .fn()
+            .mockResolvedValue({ Item: lastPlateSerialNumber });
+          const putSpy = jest
+            .fn()
+            .mockRejectedValueOnce(error400)
+            .mockResolvedValueOnce("");
+          DynamoDBService.prototype.transactWrite = putSpy;
+
+          const service = new NumberService(new DynamoDBService());
+          await service.createPlateSerialNumber(0, null);
+          expect(putSpy.mock.calls.length).toEqual(2);
+        });
+      }
+    );
+
+    context("when DBClient.put throws any other error", () => {
+      it("throws an HTTPResponse error", async () => {
+        const lastPlateSerialNumber: PlateSerialNumber = {
+          plateSerialNumber: "23",
+          testNumberKey: 4,
+        };
+
+        const error = new Error("Oh no!");
+        // @ts-ignore
+        error.statusCode = 418;
+
+        DynamoDBService.prototype.get = jest
+          .fn()
+          .mockResolvedValue({ Item: lastPlateSerialNumber });
+        const transactSpy = jest.fn().mockRejectedValueOnce(error);
+        DynamoDBService.prototype.transactWrite = transactSpy;
+
+        const service = new NumberService(new DynamoDBService());
+        try {
+          await service.createPlateSerialNumber(1, null);
+        } catch (e) {
+          expect(e).toBeInstanceOf(HTTPResponse);
+          expect((e as HTTPResponse).statusCode).toEqual(418);
+        }
+      });
+    });
+
+    context("when the function retried more than 5 times", () => {
+      it("throws an HTTPResponse error", async () => {
+        const awsError: any = {
+          code: "400",
+          message: "Attempted more than 5 times",
+          hostname: "someHostname",
+          region: "eu-east1",
+          requestId: "123454",
+        };
+        const service = new NumberService(new DynamoDBService());
+        try {
+          await service.createPlateSerialNumber(6, awsError);
+        } catch (e) {
+          expect(e).toBeInstanceOf(HTTPResponse);
+          expect((e as HTTPResponse).statusCode).toEqual(400);
         }
       });
     });

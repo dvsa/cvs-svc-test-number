@@ -17,7 +17,7 @@
     "test:unit": "BRANCH=local jest --testMatch=\"**/*.unitTest.ts\" --forceExit --runInBand",
     "test-i": "npm run test:integration -- --runInBand --globalSetup='./scripts/setup.ts' --globalTeardown='./scripts/teardown.ts'",
     "test:integration": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\"",
-    "lint": "tslint src/**/*.ts tests/**/*.ts",
+    "lint": "tslint src/**/*.ts tests/**/*.ts --fix",
     "format": "prettier --write .",
     "package": "mkdir ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME} && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "predeploy": "npm install && npm run prepush",

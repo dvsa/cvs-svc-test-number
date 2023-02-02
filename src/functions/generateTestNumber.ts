@@ -9,15 +9,17 @@ const generateTestNumber: Handler = async (
   context?: Context
 ): Promise<APIGatewayProxyResult> => {
   const numberService = new NumberService(new DynamoDBService());
-  return numberService
-    .createTestNumber(1, null)
-    .then((testNumber: TestNumber) => {
-      return new HTTPResponse(200, testNumber);
-    })
-    .catch((error: HTTPResponse) => {
-      console.log(error.body);
-      return error;
-    });
+
+  try {
+    const testNumber: TestNumber = await numberService.createTestNumber(
+      1,
+      null
+    );
+    return new HTTPResponse(200, testNumber);
+  } catch (error) {
+    console.log(error.body);
+    return error;
+  }
 };
 
 export { generateTestNumber };
