@@ -66,7 +66,7 @@ systemNumberInitialValue:
 plateSerialNumberInitialValue:
   plateSerialNumber: "0"
 ZNumberInitialValue:
-  ZNumber: 500000Z
+  ZNumber: 1000000Z
   ZNumberLetter: Z
-  sequenceNumber: 500000
+  sequenceNumber: 1000000
 maxAttempts: 2

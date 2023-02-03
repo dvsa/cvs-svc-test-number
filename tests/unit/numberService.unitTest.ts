@@ -516,9 +516,9 @@ describe("NumberService", () => {
     });
     it("returns expected value on successful DBService query", async () => {
       const zNumberObjet: ZNumber = {
-        ZNumber: "500000Z",
+        ZNumber: "1000000Z",
         ZNumberLetter: "Z",
-        sequenceNumber: 500000,
+        sequenceNumber: 1000000,
         testNumberKey: 5,
       };
       DynamoDBService.prototype.get = jest
@@ -530,9 +530,9 @@ describe("NumberService", () => {
     });
     it("returns default value on empty DB return", async () => {
       const defaultZNumber: Omit<ZNumber, "testNumberKey"> = {
-        ZNumber: "500000Z",
+        ZNumber: "1000000Z",
         ZNumberLetter: "Z",
-        sequenceNumber: 500000,
+        sequenceNumber: 1000000,
       };
       DynamoDBService.prototype.get = jest
         .fn()
@@ -922,15 +922,15 @@ describe("NumberService", () => {
     context("happy path", () => {
       it("returns next ZNumber based on current number in DB", async () => {
         const lastZNumber: ZNumber = {
-          ZNumber: "500000Z",
+          ZNumber: "1000000Z",
           ZNumberLetter: "Z",
-          sequenceNumber: 500000,
+          sequenceNumber: 1000000,
           testNumberKey: 5,
         };
         const expectedNextZNumber: ZNumber = {
-          ZNumber: "500001Z",
+          ZNumber: "1000001Z",
           ZNumberLetter: "Z",
-          sequenceNumber: 500001,
+          sequenceNumber: 1000001,
           testNumberKey: 5,
         };
         DynamoDBService.prototype.get = jest

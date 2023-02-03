@@ -25,9 +25,9 @@ describe("POST /ZNumber", () => {
     () => {
       it("should respond with HTTP 200 and a next valid ZNumber", () => {
         const nextZNumber: ZNumber = {
-          ZNumber: "500001Z",
+          ZNumber: "1000001Z",
           ZNumberLetter: "Z",
-          sequenceNumber: 500001,
+          sequenceNumber: 1000001,
           testNumberKey: 5,
         };
         expect.assertions(4);
