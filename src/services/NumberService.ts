@@ -215,7 +215,6 @@ export class NumberService {
     this.manageAttempts(attempts, awsError);
     try {
       const lastZNumber: ZNumber = await this.getLastZNumber();
-      console.log(lastZNumber);
       const nextZNumberObject = this.createNextZNumberObject(lastZNumber);
       const transactExpression = {
         ConditionExpression: "ZNumber = :oldZNumber",
