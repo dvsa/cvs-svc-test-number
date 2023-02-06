@@ -1,5 +1,7 @@
+import { NUMBER_KEY } from "../assets/Enums";
+
 interface NumberKey {
-  testNumberKey: number;
+  testNumberKey: NUMBER_KEY;
 }
 
 export interface TestNumber extends NumberKey {
@@ -21,4 +23,10 @@ export interface SystemNumber extends NumberKey {
 
 export interface PlateSerialNumber extends NumberKey {
   plateSerialNumber: string;
+}
+
+export interface ZNumber extends NumberKey {
+  zNumber: string;
+  sequenceNumber: number;
+  zNumberLetter: string;
 }

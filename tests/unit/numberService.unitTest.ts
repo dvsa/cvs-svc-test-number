@@ -4,6 +4,7 @@ import {
   SystemNumber,
   TestNumber,
   TrailerId,
+  ZNumber,
 } from "../../src/models/NumberModel";
 import { DynamoDBService } from "../../src/services/DynamoDBService";
 import { HTTPResponse } from "../../src/utils/HTTPResponse";
@@ -235,6 +236,76 @@ describe("NumberService", () => {
     });
   });
 
+  describe("createNextZNumberObject", () => {
+    context("when trying to create a new ZNumber", () => {
+      it("should return proper nextZNumber", () => {
+        let lastZNumber: ZNumber = {
+          zNumber: "500001Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 500001,
+          testNumberKey: 5,
+        };
+        let expectedLastZNumber: ZNumber = {
+          zNumber: "500002Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 500002,
+          testNumberKey: 5,
+        };
+        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(
+          expectedLastZNumber
+        );
+
+        lastZNumber = {
+          zNumber: "500004Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 500004,
+          testNumberKey: 5,
+        };
+        expectedLastZNumber = {
+          zNumber: "500005Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 500005,
+          testNumberKey: 5,
+        };
+        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(
+          expectedLastZNumber
+        );
+
+        lastZNumber = {
+          zNumber: "530456Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 530456,
+          testNumberKey: 5,
+        };
+        expectedLastZNumber = {
+          zNumber: "530457Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 530457,
+          testNumberKey: 5,
+        };
+        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(
+          expectedLastZNumber
+        );
+
+        lastZNumber = {
+          zNumber: "123456Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 123456,
+          testNumberKey: 5,
+        };
+        expectedLastZNumber = {
+          zNumber: "123457Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 123457,
+          testNumberKey: 5,
+        };
+        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(
+          expectedLastZNumber
+        );
+      });
+    });
+  });
+
   describe("createNextSystemNumberObject", () => {
     context("when trying to create a new system number", () => {
       it("should return proper nextSystemNumber", () => {
@@ -432,6 +503,53 @@ describe("NumberService", () => {
       const service = new NumberService(new DynamoDBService());
       try {
         await service.getLastTrailerId();
+      } catch (e) {
+        expect(e).toBeInstanceOf(HTTPResponse);
+        expect((e as HTTPResponse).statusCode).toEqual(418);
+      }
+    });
+  });
+
+  describe("getLastZNumber", () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+    });
+    it("returns expected value on successful DBService query", async () => {
+      const zNumberObjet: ZNumber = {
+        zNumber: "1000000Z",
+        zNumberLetter: "Z",
+        sequenceNumber: 1000000,
+        testNumberKey: 5,
+      };
+      DynamoDBService.prototype.get = jest
+        .fn()
+        .mockResolvedValue({ Item: zNumberObjet });
+      const service = new NumberService(new DynamoDBService());
+      const output = await service.getLastZNumber();
+      expect(zNumberObjet).toEqual(output);
+    });
+    it("returns default value on empty DB return", async () => {
+      const defaultZNumber: Omit<ZNumber, "testNumberKey"> = {
+        zNumber: "1000000Z",
+        zNumberLetter: "Z",
+        sequenceNumber: 1000000,
+      };
+      DynamoDBService.prototype.get = jest
+        .fn()
+        .mockResolvedValue({ Item: null });
+      const service = new NumberService(new DynamoDBService());
+      const output = await service.getLastZNumber();
+      expect(defaultZNumber).toEqual(output);
+    });
+    it("throws expected errors if DBService request fails", async () => {
+      const error = new Error("I broke");
+      // @ts-ignore
+      error.statusCode = 418;
+
+      DynamoDBService.prototype.get = jest.fn().mockRejectedValue(error);
+      const service = new NumberService(new DynamoDBService());
+      try {
+        await service.getLastZNumber();
       } catch (e) {
         expect(e).toBeInstanceOf(HTTPResponse);
         expect((e as HTTPResponse).statusCode).toEqual(418);
@@ -792,6 +910,137 @@ describe("NumberService", () => {
         const service = new NumberService(new DynamoDBService());
         try {
           await service.createTrailerId(6, awsError);
+        } catch (e) {
+          expect(e).toBeInstanceOf(HTTPResponse);
+          expect((e as HTTPResponse).statusCode).toEqual(400);
+        }
+      });
+    });
+  });
+
+  describe("createZNumber", () => {
+    context("happy path", () => {
+      it("returns next ZNumber based on current number in DB", async () => {
+        const lastZNumber: ZNumber = {
+          zNumber: "1000000Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 1000000,
+          testNumberKey: 5,
+        };
+        const expectedNextZNumber: ZNumber = {
+          zNumber: "1000001Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 1000001,
+          testNumberKey: 5,
+        };
+        DynamoDBService.prototype.get = jest
+          .fn()
+          .mockResolvedValue({ Item: lastZNumber });
+        DynamoDBService.prototype.transactWrite = jest
+          .fn()
+          .mockResolvedValue("");
+        const service = new NumberService(new DynamoDBService());
+        const output = await service.createZNumber(1, null);
+        expect(expectedNextZNumber).toEqual(output);
+      });
+
+      it("Calls DB services with correct params", async () => {
+        const lastZNumber: ZNumber = {
+          zNumber: "500001Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 500001,
+          testNumberKey: 5,
+        };
+        const expectedNextZNumber: ZNumber = {
+          zNumber: "500002Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 500002,
+          testNumberKey: 5,
+        };
+        DynamoDBService.prototype.get = jest
+          .fn()
+          .mockResolvedValue({ Item: lastZNumber });
+        const putSpy = jest.fn().mockResolvedValue("");
+        DynamoDBService.prototype.transactWrite = putSpy;
+        const service = new NumberService(new DynamoDBService());
+        await service.createZNumber(1, null);
+        expect(putSpy.mock.calls[0][0]).toEqual(expectedNextZNumber);
+      });
+    });
+    context(
+      'when DBClient.put throws a 400 "Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]" error',
+      () => {
+        it("tries again", async () => {
+          const lastZNumber: ZNumber = {
+            zNumber: "530001Z",
+            zNumberLetter: "Z",
+            sequenceNumber: 530001,
+            testNumberKey: 2,
+          };
+
+          const error400 = new Error(
+            "Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]"
+          );
+          // @ts-ignore;
+          error400.statusCode = 400;
+
+          DynamoDBService.prototype.get = jest
+            .fn()
+            .mockResolvedValue({ Item: lastZNumber });
+          const putSpy = jest
+            .fn()
+            .mockRejectedValueOnce(error400)
+            .mockResolvedValueOnce("");
+          DynamoDBService.prototype.transactWrite = putSpy;
+
+          const service = new NumberService(new DynamoDBService());
+          await service.createZNumber(0, null);
+          expect(putSpy.mock.calls.length).toEqual(2);
+        });
+      }
+    );
+
+    context("when DBClient.put throws any other error", () => {
+      it("throws an HTTPResponse error", async () => {
+        const lastZNumber: ZNumber = {
+          zNumber: "530001Z",
+          zNumberLetter: "Z",
+          sequenceNumber: 530001,
+          testNumberKey: 5,
+        };
+
+        const error = new Error("Oh no!");
+        // @ts-ignore
+        error.statusCode = 418;
+
+        DynamoDBService.prototype.get = jest
+          .fn()
+          .mockResolvedValue({ Item: lastZNumber });
+        const transactSpy = jest.fn().mockRejectedValueOnce(error);
+        DynamoDBService.prototype.transactWrite = transactSpy;
+
+        const service = new NumberService(new DynamoDBService());
+        try {
+          await service.createZNumber(1, null);
+        } catch (e) {
+          expect(e).toBeInstanceOf(HTTPResponse);
+          expect((e as HTTPResponse).statusCode).toEqual(418);
+        }
+      });
+    });
+
+    context("when the function retried more than 5 times", () => {
+      it("throws an HTTPResponse error", async () => {
+        const awsError: any = {
+          code: "400",
+          message: "Attempted more than 5 times",
+          hostname: "someHostname",
+          region: "eu-east1",
+          requestId: "123454",
+        };
+        const service = new NumberService(new DynamoDBService());
+        try {
+          await service.createZNumber(6, awsError);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
           expect((e as HTTPResponse).statusCode).toEqual(400);
