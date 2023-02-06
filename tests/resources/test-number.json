@@ -21,8 +21,8 @@
     "testNumberKey": 4
   },
   {
-    "ZNumber": "1000000Z",
-    "ZNumberLetter": "Z",
+    "zNumber": "1000000Z",
+    "zNumberLetter": "Z",
     "sequenceNumber": 1000000,
     "testNumberKey": 5
   }

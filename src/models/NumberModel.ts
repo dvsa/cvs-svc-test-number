@@ -26,7 +26,7 @@ export interface PlateSerialNumber extends NumberKey {
 }
 
 export interface ZNumber extends NumberKey {
-  ZNumber: string;
+  zNumber: string;
   sequenceNumber: number;
-  ZNumberLetter: string;
+  zNumberLetter: string;
 }

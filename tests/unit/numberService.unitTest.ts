@@ -240,14 +240,14 @@ describe("NumberService", () => {
     context("when trying to create a new ZNumber", () => {
       it("should return proper nextZNumber", () => {
         let lastZNumber: ZNumber = {
-          ZNumber: "500001Z",
-          ZNumberLetter: "Z",
+          zNumber: "500001Z",
+          zNumberLetter: "Z",
           sequenceNumber: 500001,
           testNumberKey: 5,
         };
         let expectedLastZNumber: ZNumber = {
-          ZNumber: "500002Z",
-          ZNumberLetter: "Z",
+          zNumber: "500002Z",
+          zNumberLetter: "Z",
           sequenceNumber: 500002,
           testNumberKey: 5,
         };
@@ -256,14 +256,14 @@ describe("NumberService", () => {
         );
 
         lastZNumber = {
-          ZNumber: "500004Z",
-          ZNumberLetter: "Z",
+          zNumber: "500004Z",
+          zNumberLetter: "Z",
           sequenceNumber: 500004,
           testNumberKey: 5,
         };
         expectedLastZNumber = {
-          ZNumber: "500005Z",
-          ZNumberLetter: "Z",
+          zNumber: "500005Z",
+          zNumberLetter: "Z",
           sequenceNumber: 500005,
           testNumberKey: 5,
         };
@@ -272,14 +272,14 @@ describe("NumberService", () => {
         );
 
         lastZNumber = {
-          ZNumber: "530456Z",
-          ZNumberLetter: "Z",
+          zNumber: "530456Z",
+          zNumberLetter: "Z",
           sequenceNumber: 530456,
           testNumberKey: 5,
         };
         expectedLastZNumber = {
-          ZNumber: "530457Z",
-          ZNumberLetter: "Z",
+          zNumber: "530457Z",
+          zNumberLetter: "Z",
           sequenceNumber: 530457,
           testNumberKey: 5,
         };
@@ -288,14 +288,14 @@ describe("NumberService", () => {
         );
 
         lastZNumber = {
-          ZNumber: "123456Z",
-          ZNumberLetter: "Z",
+          zNumber: "123456Z",
+          zNumberLetter: "Z",
           sequenceNumber: 123456,
           testNumberKey: 5,
         };
         expectedLastZNumber = {
-          ZNumber: "123457Z",
-          ZNumberLetter: "Z",
+          zNumber: "123457Z",
+          zNumberLetter: "Z",
           sequenceNumber: 123457,
           testNumberKey: 5,
         };
@@ -516,8 +516,8 @@ describe("NumberService", () => {
     });
     it("returns expected value on successful DBService query", async () => {
       const zNumberObjet: ZNumber = {
-        ZNumber: "1000000Z",
-        ZNumberLetter: "Z",
+        zNumber: "1000000Z",
+        zNumberLetter: "Z",
         sequenceNumber: 1000000,
         testNumberKey: 5,
       };
@@ -530,8 +530,8 @@ describe("NumberService", () => {
     });
     it("returns default value on empty DB return", async () => {
       const defaultZNumber: Omit<ZNumber, "testNumberKey"> = {
-        ZNumber: "1000000Z",
-        ZNumberLetter: "Z",
+        zNumber: "1000000Z",
+        zNumberLetter: "Z",
         sequenceNumber: 1000000,
       };
       DynamoDBService.prototype.get = jest
@@ -922,14 +922,14 @@ describe("NumberService", () => {
     context("happy path", () => {
       it("returns next ZNumber based on current number in DB", async () => {
         const lastZNumber: ZNumber = {
-          ZNumber: "1000000Z",
-          ZNumberLetter: "Z",
+          zNumber: "1000000Z",
+          zNumberLetter: "Z",
           sequenceNumber: 1000000,
           testNumberKey: 5,
         };
         const expectedNextZNumber: ZNumber = {
-          ZNumber: "1000001Z",
-          ZNumberLetter: "Z",
+          zNumber: "1000001Z",
+          zNumberLetter: "Z",
           sequenceNumber: 1000001,
           testNumberKey: 5,
         };
@@ -946,14 +946,14 @@ describe("NumberService", () => {
 
       it("Calls DB services with correct params", async () => {
         const lastZNumber: ZNumber = {
-          ZNumber: "500001Z",
-          ZNumberLetter: "Z",
+          zNumber: "500001Z",
+          zNumberLetter: "Z",
           sequenceNumber: 500001,
           testNumberKey: 5,
         };
         const expectedNextZNumber: ZNumber = {
-          ZNumber: "500002Z",
-          ZNumberLetter: "Z",
+          zNumber: "500002Z",
+          zNumberLetter: "Z",
           sequenceNumber: 500002,
           testNumberKey: 5,
         };
@@ -972,8 +972,8 @@ describe("NumberService", () => {
       () => {
         it("tries again", async () => {
           const lastZNumber: ZNumber = {
-            ZNumber: "530001Z",
-            ZNumberLetter: "Z",
+            zNumber: "530001Z",
+            zNumberLetter: "Z",
             sequenceNumber: 530001,
             testNumberKey: 2,
           };
@@ -1003,8 +1003,8 @@ describe("NumberService", () => {
     context("when DBClient.put throws any other error", () => {
       it("throws an HTTPResponse error", async () => {
         const lastZNumber: ZNumber = {
-          ZNumber: "530001Z",
-          ZNumberLetter: "Z",
+          zNumber: "530001Z",
+          zNumberLetter: "Z",
           sequenceNumber: 530001,
           testNumberKey: 5,
         };

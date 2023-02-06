@@ -217,9 +217,9 @@ export class NumberService {
       const lastZNumber: ZNumber = await this.getLastZNumber();
       const nextZNumberObject = this.createNextZNumberObject(lastZNumber);
       const transactExpression = {
-        ConditionExpression: "ZNumber = :oldZNumber",
+        ConditionExpression: "zNumber = :oldZNumber",
         ExpressionAttributeValues: {
-          ":oldZNumber": lastZNumber.ZNumber,
+          ":oldZNumber": lastZNumber.zNumber,
         },
       };
       await this.dbClient.transactWrite(nextZNumberObject, transactExpression);
@@ -393,10 +393,10 @@ export class NumberService {
   public createNextZNumberObject(ZNumberObject: ZNumber): ZNumber {
     const newSequenceNumber: number = ZNumberObject.sequenceNumber + 1;
     const newZNumber =
-      newSequenceNumber.toString() + ZNumberObject.ZNumberLetter;
+      newSequenceNumber.toString() + ZNumberObject.zNumberLetter;
     const newZNumberObject: ZNumber = {
-      ZNumber: newZNumber,
-      ZNumberLetter: ZNumberObject.ZNumberLetter,
+      zNumber: newZNumber,
+      zNumberLetter: ZNumberObject.zNumberLetter,
       sequenceNumber: newSequenceNumber,
       testNumberKey: NUMBER_KEY.Z_NUMBER,
     };

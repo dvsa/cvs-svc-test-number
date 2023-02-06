@@ -3,7 +3,7 @@ import lambdaTester from "lambda-tester";
 import { emptyDatabase, populateDatabase } from "../util/dbOperations";
 import { generateZNumber } from "../../src/functions/generateZNumber";
 
-describe("POST /ZNumber", () => {
+describe("POST /z-number", () => {
   const lambda = lambdaTester(generateZNumber);
 
   beforeAll(async () => {
@@ -25,8 +25,8 @@ describe("POST /ZNumber", () => {
     () => {
       it("should respond with HTTP 200 and a next valid ZNumber", () => {
         const nextZNumber: ZNumber = {
-          ZNumber: "1000001Z",
-          ZNumberLetter: "Z",
+          zNumber: "1000001Z",
+          zNumberLetter: "Z",
           sequenceNumber: 1000001,
           testNumberKey: 5,
         };
