@@ -132,7 +132,15 @@ class Configuration {
   }
 
   /**
-   * Retrieves the trailer id initial value
+   * Retrieves the t number initial value
+   * @returns any
+   */
+  public getTNumberInitialValue(): any {
+    return this.config.TNumberInitialValue;
+  }
+
+  /**
+   * Retrieves the z number initial value
    * @returns any
    */
   public getZNumberInitialValue(): any {

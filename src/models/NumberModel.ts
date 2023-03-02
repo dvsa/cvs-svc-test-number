@@ -30,3 +30,9 @@ export interface ZNumber extends NumberKey {
   sequenceNumber: number;
   zNumberLetter: string;
 }
+
+export interface TNumber extends NumberKey {
+  tNumber: string;
+  sequenceNumber: number;
+  tNumberLetter: string;
+}

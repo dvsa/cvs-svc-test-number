@@ -24,6 +24,11 @@ functions:
       path: /z-number
       proxy: null
       function: generateZNumber
+  - generateTNumber:
+      method: POST
+      path: /t-number
+      proxy: null
+      function: generateTNumber
 dynamodb:
   local:
     params:
@@ -69,4 +74,8 @@ ZNumberInitialValue:
   zNumber: 1000000Z
   zNumberLetter: Z
   sequenceNumber: 1000000
+TNumberInitialValue:
+  tNumber: 020000T
+  tNumberLetter: T
+  sequenceNumber: 20000
 maxAttempts: 2
