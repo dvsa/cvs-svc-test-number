@@ -446,7 +446,9 @@ export class NumberService {
   public createNextTNumberObject(TNumberObject: TNumber): TNumber {
     const newSequenceNumber: number = TNumberObject.sequenceNumber + 1;
     const newTNumber =
-      newSequenceNumber.toLocaleString('en', {minimumIntegerDigits: 6}).replace(/,/g, '') + TNumberObject.tNumberLetter;
+      newSequenceNumber
+        .toLocaleString("en", { minimumIntegerDigits: 6 })
+        .replace(/,/g, "") + TNumberObject.tNumberLetter;
     const newTNumberObject: TNumber = {
       tNumber: newTNumber,
       tNumberLetter: TNumberObject.tNumberLetter,

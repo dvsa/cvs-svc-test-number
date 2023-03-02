@@ -13,5 +13,5 @@ export enum NUMBER_KEY {
   SYSTEM_NUMBER = 3,
   PLATE_SERIAL_NUMBER = 4,
   Z_NUMBER = 5,
-  T_NUMBER = 6
+  T_NUMBER = 6,
 }
