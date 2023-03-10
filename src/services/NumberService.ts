@@ -10,6 +10,7 @@ import { HTTPResponse } from "../utils/HTTPResponse";
 import { DynamoDBService } from "./DynamoDBService";
 import { Configuration } from "../utils/Configuration";
 import { NUMBER_KEY } from "../assets/Enums";
+import polly from "polly-js";
 
 export class NumberService {
   public readonly dbClient: DynamoDBService;
@@ -135,33 +136,57 @@ export class NumberService {
     attempts: number,
     awsError: AWSError | null
   ): Promise<SystemNumber> {
-    this.manageAttempts(attempts, awsError);
-    try {
-      const lastSystemNumber: SystemNumber = await this.getLastSystemNumber();
-      const nextSystemNumberObject =
-        this.createNextSystemNumberObject(lastSystemNumber);
-      const transactExpression = {
-        ConditionExpression: "systemNumber = :oldSystemNumber",
-        ExpressionAttributeValues: {
-          ":oldSystemNumber": lastSystemNumber.systemNumber,
-        },
-      };
-      await this.dbClient.transactWrite(
-        nextSystemNumberObject,
-        transactExpression
-      );
-      console.log(`System Number Generated successfully`);
-      return nextSystemNumberObject;
-    } catch (error) {
-      console.error(error); // limit to 5 attempts
-      if (error.statusCode === 400) {
-        console.error(
-          `Attempt number ${attempts} for systemNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`
-        );
-        return this.createSystemNumber(attempts + 1, error);
-      }
-      throw this.formatAWSError(error);
-    }
+
+    const that = this;
+
+    return polly()
+      .waitAndRetry(Configuration.getInstance().getMaxAttempts() + 1)
+      .executeForPromise(async () => {
+        const lastSystemNumber: SystemNumber = await that.getLastSystemNumber();
+        const nextSystemNumberObject = that.createNextSystemNumberObject(lastSystemNumber);
+        const transactExpression = {
+          ConditionExpression: "systemNumber = :oldSystemNumber",
+          ExpressionAttributeValues: {
+            ":oldSystemNumber": lastSystemNumber.systemNumber,
+          },
+        };
+        await that.dbClient.putConditional(nextSystemNumberObject, transactExpression.ConditionExpression, transactExpression.ExpressionAttributeValues);
+        console.log(`System Number Generated successfully`);
+        return nextSystemNumberObject;
+      })
+      .then(function(result: SystemNumber) {
+        return result;
+      }, function(err) {
+        throw that.formatAWSError(err);
+      });
+
+    // this.manageAttempts(attempts, awsError);
+    // try {
+    //   const lastSystemNumber: SystemNumber = await this.getLastSystemNumber();
+    //   const nextSystemNumberObject =
+    //     this.createNextSystemNumberObject(lastSystemNumber);
+    //   const transactExpression = {
+    //     ConditionExpression: "systemNumber = :oldSystemNumber",
+    //     ExpressionAttributeValues: {
+    //       ":oldSystemNumber": lastSystemNumber.systemNumber,
+    //     },
+    //   };
+    //   await this.dbClient.transactWrite(
+    //     nextSystemNumberObject,
+    //     transactExpression
+    //   );
+    //   console.log(`System Number Generated successfully`);
+    //   return nextSystemNumberObject;
+    // } catch (error) {
+    //   console.error(error); // limit to 5 attempts
+    //   if (error.statusCode === 400) {
+    //     console.error(
+    //       `Attempt number ${attempts} for systemNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`
+    //     );
+    //     return this.createSystemNumber(attempts + 1, error);
+    //   }
+    //   throw this.formatAWSError(error);
+    // }
   }
 
   /**
@@ -212,29 +237,53 @@ export class NumberService {
     attempts: number,
     awsError: AWSError | null
   ): Promise<ZNumber> {
-    this.manageAttempts(attempts, awsError);
-    try {
-      const lastZNumber: ZNumber = await this.getLastZNumber();
-      const nextZNumberObject = this.createNextZNumberObject(lastZNumber);
-      const transactExpression = {
-        ConditionExpression: "zNumber = :oldZNumber",
-        ExpressionAttributeValues: {
-          ":oldZNumber": lastZNumber.zNumber,
-        },
-      };
-      await this.dbClient.transactWrite(nextZNumberObject, transactExpression);
-      console.log(`ZNumber Generated successfully`);
-      return nextZNumberObject;
-    } catch (error) {
-      console.error(error); // limit to 5 attempts
-      if (error.statusCode === 400) {
-        console.error(
-          `Attempt number ${attempts} for ZNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`
-        );
-        return this.createZNumber(attempts + 1, error);
-      }
-      throw this.formatAWSError(error);
-    }
+
+    const that = this;
+
+    return polly()
+      .waitAndRetry(Configuration.getInstance().getMaxAttempts() + 1)
+      .executeForPromise(async () => {
+        const lastZNumber: ZNumber = await this.getLastZNumber();
+        const nextZNumberObject = this.createNextZNumberObject(lastZNumber);
+        const transactExpression = {
+          ConditionExpression: "zNumber = :oldZNumber",
+          ExpressionAttributeValues: {
+            ":oldZNumber": lastZNumber.zNumber,
+          },
+        };
+        await that.dbClient.putConditional(nextZNumberObject, transactExpression.ConditionExpression, transactExpression.ExpressionAttributeValues );
+        console.log(`ZNumber Generated successfully`);
+        return nextZNumberObject;
+      })
+      .then(function(result: ZNumber) {
+        return result;
+      }, function(err) {
+        throw that.formatAWSError(err);
+      });
+
+    // this.manageAttempts(attempts, awsError);
+    // try {
+    //   const lastZNumber: ZNumber = await this.getLastZNumber();
+    //   const nextZNumberObject = this.createNextZNumberObject(lastZNumber);
+    //   const transactExpression = {
+    //     ConditionExpression: "zNumber = :oldZNumber",
+    //     ExpressionAttributeValues: {
+    //       ":oldZNumber": lastZNumber.zNumber,
+    //     },
+    //   };
+    //   await this.dbClient.transactWrite(nextZNumberObject, transactExpression);
+    //   console.log(`ZNumber Generated successfully`);
+    //   return nextZNumberObject;
+    // } catch (error) {
+    //   console.error(error); // limit to 5 attempts
+    //   if (error.statusCode === 400) {
+    //     console.error(
+    //       `Attempt number ${attempts} for ZNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`
+    //     );
+    //     return this.createZNumber(attempts + 1, error);
+    //   }
+    //   throw this.formatAWSError(error);
+    // }
   }
 
   /**

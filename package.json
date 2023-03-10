@@ -55,6 +55,7 @@
     "joi": "^14.3.1",
     "node-yaml": "^3.2.0",
     "path-parser": "^4.2.0",
+    "polly-js": "^1.8.3",
     "reflect-metadata": "^0.1.13",
     "ts-node-register": "^1.0.0",
     "uuid": "^3.3.3"

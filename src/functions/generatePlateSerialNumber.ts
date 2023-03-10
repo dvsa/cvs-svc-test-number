@@ -13,6 +13,8 @@ const generatePlateSerialNumber: Handler = async (
   try {
     const plateSerialNumber: PlateSerialNumber =
       await numberService.createPlateSerialNumber(1, null);
+
+    console.log('Generated Plate Serial Number: ', plateSerialNumber);
     return new HTTPResponse(200, plateSerialNumber);
   } catch (error) {
     console.log(error.body);

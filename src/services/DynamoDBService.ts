@@ -83,6 +83,22 @@ export class DynamoDBService {
     return DynamoDBService.client.put(query).promise();
   }
 
+  public putConditional(
+    item: any,
+    conditionExpression: string,
+    expressionAttributeValues: any,
+  ): Promise<PromiseResult<DocumentClient.PutItemOutput, AWS.AWSError>> {
+    const query: DocumentClient.PutItemInput = {
+      TableName: this.tableName,
+      Item: item,
+      ReturnValues: "ALL_OLD",
+      ConditionExpression: conditionExpression,
+      ExpressionAttributeValues: expressionAttributeValues,
+    };
+
+    return DynamoDBService.client.put(query).promise();
+  }
+
   /**
    * Deletes the item with the given key and returns the item deleted
    * @param key - the key of the item you wish to delete
@@ -204,7 +220,7 @@ export class DynamoDBService {
 
   /**
    * Performs a write transaction on the specified table.
-   * @param item - the item to be inserted or updated during the transaciton.
+   * @param item - the item to be inserted or updated during the transaction.
    * @param oldItem - the current item that already exists in the database.
    */
   public transactWrite(
