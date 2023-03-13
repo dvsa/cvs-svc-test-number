@@ -250,24 +250,30 @@ export class NumberService {
     this.manageAttempts(attempts, awsError);
     try {
       const lastTNumber: TNumber = await this.getLastTNumber();
+
       const nextTNumberObject = this.createNextTNumberObject(lastTNumber);
+
       const transactExpression = {
         ConditionExpression: "tNumber = :oldTNumber",
-        ExpressionAttributeValues: {
-          ":oldTNumber": lastTNumber.tNumber,
-        },
+        ExpressionAttributeValues: { ":oldTNumber": lastTNumber.tNumber }
       };
+      
       await this.dbClient.transactWrite(nextTNumberObject, transactExpression);
+
       console.log(`TNumber Generated successfully`);
+
       return nextTNumberObject;
     } catch (error) {
       console.error(error); // limit to 5 attempts
+
       if (error.statusCode === 400) {
         console.error(
           `Attempt number ${attempts} for TNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`
         );
+
         return this.createTNumber(attempts + 1, error);
       }
+
       throw this.formatAWSError(error);
     }
   }
@@ -311,13 +317,13 @@ export class NumberService {
    */
   public async getLastTNumber(): Promise<TNumber> {
     try {
-      const data: any = await this.dbClient.get({
-        testNumberKey: NUMBER_KEY.T_NUMBER,
-      });
+      const data: any = await this.dbClient.get({ testNumberKey: NUMBER_KEY.T_NUMBER });
+
       if (!data.Item) {
         console.log(Configuration.getInstance().getTNumberInitialValue());
         return Configuration.getInstance().getTNumberInitialValue();
       }
+      
       return data.Item;
     } catch (error) {
       throw this.formatAWSError(error);

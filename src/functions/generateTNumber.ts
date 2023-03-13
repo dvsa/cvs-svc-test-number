@@ -11,10 +11,8 @@ const generateTNumber: Handler = async (
   const numberService = new NumberService(new DynamoDBService());
 
   try {
-    const generatedTNumber: TNumber = await numberService.createTNumber(
-      1,
-      null
-    );
+    const generatedTNumber: TNumber = await numberService.createTNumber(1, null);
+    
     return new HTTPResponse(200, generatedTNumber);
   } catch (error) {
     console.log(error.body);
