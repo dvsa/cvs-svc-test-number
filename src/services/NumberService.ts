@@ -3,6 +3,7 @@ import {
   PlateSerialNumber,
   SystemNumber,
   TestNumber,
+  TNumber,
   TrailerId,
   ZNumber,
 } from "../models/NumberModel";
@@ -238,6 +239,46 @@ export class NumberService {
   }
 
   /**
+   * Creates a new Tnumber in the database.
+   * @param attempt - the current number of attempts for generating a TNumber.
+   * @param awsError - AWS error to be passed when the request fails otherwise null.
+   */
+  public async createTNumber(
+    attempts: number,
+    awsError: AWSError | null
+  ): Promise<TNumber> {
+    this.manageAttempts(attempts, awsError);
+    try {
+      const lastTNumber: TNumber = await this.getLastTNumber();
+
+      const nextTNumberObject = this.createNextTNumberObject(lastTNumber);
+
+      const transactExpression = {
+        ConditionExpression: "tNumber = :oldTNumber",
+        ExpressionAttributeValues: { ":oldTNumber": lastTNumber.tNumber }
+      };
+      
+      await this.dbClient.transactWrite(nextTNumberObject, transactExpression);
+
+      console.log(`TNumber Generated successfully`);
+
+      return nextTNumberObject;
+    } catch (error) {
+      console.error(error); // limit to 5 attempts
+
+      if (error.statusCode === 400) {
+        console.error(
+          `Attempt number ${attempts} for TNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`
+        );
+
+        return this.createTNumber(attempts + 1, error);
+      }
+
+      throw this.formatAWSError(error);
+    }
+  }
+
+  /**
    * Retrieves the last test number
    */
   public async getLastTestNumber(): Promise<TestNumber> {
@@ -265,6 +306,24 @@ export class NumberService {
       if (!data.Item) {
         return Configuration.getInstance().getTrailerIdInitialValue();
       }
+      return data.Item;
+    } catch (error) {
+      throw this.formatAWSError(error);
+    }
+  }
+
+  /**
+   * Retrieves the last T number
+   */
+  public async getLastTNumber(): Promise<TNumber> {
+    try {
+      const data: any = await this.dbClient.get({ testNumberKey: NUMBER_KEY.T_NUMBER });
+
+      if (!data.Item) {
+        console.log(Configuration.getInstance().getTNumberInitialValue());
+        return Configuration.getInstance().getTNumberInitialValue();
+      }
+      
       return data.Item;
     } catch (error) {
       throw this.formatAWSError(error);
@@ -387,8 +446,27 @@ export class NumberService {
   }
 
   /**
+   * Calculates and creates the next TNumber object based on the last TNumber
+   * @param TNumberObject - last TNumber
+   */
+  public createNextTNumberObject(TNumberObject: TNumber): TNumber {
+    const newSequenceNumber: number = TNumberObject.sequenceNumber + 1;
+    const newTNumber =
+      newSequenceNumber
+        .toLocaleString("en", { minimumIntegerDigits: 6 })
+        .replace(/,/g, "") + TNumberObject.tNumberLetter;
+    const newTNumberObject: TNumber = {
+      tNumber: newTNumber,
+      tNumberLetter: TNumberObject.tNumberLetter,
+      sequenceNumber: newSequenceNumber,
+      testNumberKey: NUMBER_KEY.T_NUMBER,
+    };
+    return newTNumberObject;
+  }
+
+  /**
    * Calculates and creates the next ZNumber object based on the last ZNumber
-   * @param trailerIdObject - last ZNumber
+   * @param ZNumberObject - last ZNumber
    */
   public createNextZNumberObject(ZNumberObject: ZNumber): ZNumber {
     const newSequenceNumber: number = ZNumberObject.sequenceNumber + 1;

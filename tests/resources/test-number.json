@@ -25,5 +25,11 @@
     "zNumberLetter": "Z",
     "sequenceNumber": 1000000,
     "testNumberKey": 5
+  },
+  {
+    "tNumber": "020000T",
+    "tNumberLetter": "T",
+    "sequenceNumber": 20000,
+    "testNumberKey": 6
   }
 ]
