@@ -4,6 +4,7 @@ export enum NUMBER_TYPE {
   SYSTEM_NUMBER = "systemNumber",
   PLATE_SERIAL_NUMBER = "plateSerialNumber",
   Z_NUMBER = "ZNumber",
+  T_NUMBER = "TNumber",
 }
 
 export enum NUMBER_KEY {
@@ -12,4 +13,5 @@ export enum NUMBER_KEY {
   SYSTEM_NUMBER = 3,
   PLATE_SERIAL_NUMBER = 4,
   Z_NUMBER = 5,
+  T_NUMBER = 6,
 }

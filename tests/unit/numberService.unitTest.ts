@@ -5,6 +5,7 @@ import {
   TestNumber,
   TrailerId,
   ZNumber,
+  TNumber,
 } from "../../src/models/NumberModel";
 import { DynamoDBService } from "../../src/services/DynamoDBService";
 import { HTTPResponse } from "../../src/utils/HTTPResponse";
@@ -301,6 +302,92 @@ describe("NumberService", () => {
         };
         expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(
           expectedLastZNumber
+        );
+      });
+    });
+  });
+
+  describe("createNextTNumberObject", () => {
+    context("when trying to create a new TNumber", () => {
+      it("should return proper nextTNumber with correct formatting", () => {
+        let lastTNumber: TNumber = {
+          tNumber: "100001T",
+          tNumberLetter: "T",
+          sequenceNumber: 100001,
+          testNumberKey: 6,
+        };
+        let expectedLastTNumber: TNumber = {
+          tNumber: "100002T",
+          tNumberLetter: "T",
+          sequenceNumber: 100002,
+          testNumberKey: 6,
+        };
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
+          expectedLastTNumber
+        );
+
+        lastTNumber = {
+          tNumber: "500004T",
+          tNumberLetter: "T",
+          sequenceNumber: 500004,
+          testNumberKey: 6,
+        };
+        expectedLastTNumber = {
+          tNumber: "500005T",
+          tNumberLetter: "T",
+          sequenceNumber: 500005,
+          testNumberKey: 6,
+        };
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
+          expectedLastTNumber
+        );
+
+        lastTNumber = {
+          tNumber: "090000T",
+          tNumberLetter: "T",
+          sequenceNumber: 90000,
+          testNumberKey: 6,
+        };
+        expectedLastTNumber = {
+          tNumber: "090001T",
+          tNumberLetter: "T",
+          sequenceNumber: 90001,
+          testNumberKey: 6,
+        };
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
+          expectedLastTNumber
+        );
+
+        lastTNumber = {
+          tNumber: "000009T",
+          tNumberLetter: "T",
+          sequenceNumber: 9,
+          testNumberKey: 6,
+        };
+        expectedLastTNumber = {
+          tNumber: "000010T",
+          tNumberLetter: "T",
+          sequenceNumber: 10,
+          testNumberKey: 6,
+        };
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
+          expectedLastTNumber
+        );
+
+        lastTNumber = {
+          tNumber: "999999T",
+          tNumberLetter: "T",
+          sequenceNumber: 999999,
+          testNumberKey: 6,
+        };
+        expectedLastTNumber = {
+          tNumber: "1000000T",
+          tNumberLetter: "T",
+          sequenceNumber: 1000000,
+          testNumberKey: 6,
+        };
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
+          expectedLastTNumber
         );
       });
     });

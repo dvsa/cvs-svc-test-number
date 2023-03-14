@@ -14,12 +14,13 @@ describe("The configuration service", () => {
       process.env.BRANCH = "local";
       const configService = Configuration.getInstance();
       const functions = configService.getFunctions();
-      expect(functions.length).toEqual(5);
+      expect(functions.length).toEqual(6);
       expect(functions[0].name).toEqual("generateTestNumber");
       expect(functions[1].name).toEqual("generateTrailerId");
       expect(functions[2].name).toEqual("generateSystemNumber");
       expect(functions[3].name).toEqual("generatePlateSerialNumber");
       expect(functions[4].name).toEqual("generateZNumber");
+      expect(functions[5].name).toEqual("generateTNumber");
 
       const DBConfig = configService.getDynamoDBConfig();
       expect(DBConfig).toEqual(configService.getConfig().dynamodb.local);
@@ -29,12 +30,13 @@ describe("The configuration service", () => {
       process.env.BRANCH = "local-global";
       const configService = Configuration.getInstance();
       const functions = configService.getFunctions();
-      expect(functions.length).toEqual(5);
+      expect(functions.length).toEqual(6);
       expect(functions[0].name).toEqual("generateTestNumber");
       expect(functions[1].name).toEqual("generateTrailerId");
       expect(functions[2].name).toEqual("generateSystemNumber");
       expect(functions[3].name).toEqual("generatePlateSerialNumber");
       expect(functions[4].name).toEqual("generateZNumber");
+      expect(functions[5].name).toEqual("generateTNumber");
 
       const DBConfig = configService.getDynamoDBConfig();
       expect(DBConfig).toEqual(
@@ -46,12 +48,13 @@ describe("The configuration service", () => {
       process.env.BRANCH = "CVSB-XXX";
       const configService = Configuration.getInstance();
       const functions = configService.getFunctions();
-      expect(functions.length).toEqual(5);
+      expect(functions.length).toEqual(6);
       expect(functions[0].name).toEqual("generateTestNumber");
       expect(functions[1].name).toEqual("generateTrailerId");
       expect(functions[2].name).toEqual("generateSystemNumber");
       expect(functions[3].name).toEqual("generatePlateSerialNumber");
       expect(functions[4].name).toEqual("generateZNumber");
+      expect(functions[5].name).toEqual("generateTNumber");
 
       const DBConfig = configService.getDynamoDBConfig();
       expect(DBConfig).toEqual(configService.getConfig().dynamodb.remote);
