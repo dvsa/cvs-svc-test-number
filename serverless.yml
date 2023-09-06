@@ -4,7 +4,6 @@ provider:
   name: aws
   runtime: nodejs18.x
   lambdaHashingVersion: 20201221
-  stage: dev
   tracing:
     apiGateway: true
     lambda: true
@@ -46,7 +45,7 @@ resources:
           WriteCapacityUnits: 1
 custom:
   serverless-offline:
-    port: 3008
+    httpPort: 3008
   dynamodb:
     start:
       port: 8008
@@ -62,3 +61,4 @@ custom:
             sources: [./tests/resources/test-number.json]
     stages:
       - dev
+      - test
