@@ -1,12 +1,23 @@
-import { Handler } from "aws-lambda";
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable security/detect-non-literal-require */
+/* eslint-disable security/detect-object-injection */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Handler } from 'aws-lambda';
 // @ts-ignore
-import * as yml from "node-yaml";
+import * as yml from 'node-yaml';
 
 enum HTTPMethods {
-  GET = "GET",
-  POST = "POST",
-  PUT = "PUT",
-  DELETE = "DELETE",
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
 }
 
 interface IFunctionEvent {
@@ -18,6 +29,7 @@ interface IFunctionEvent {
 
 class Configuration {
   private static instance: Configuration;
+
   private readonly config: any;
 
   constructor(configPath: string) {
@@ -32,13 +44,13 @@ class Configuration {
       matches.forEach((match: string) => {
         envRegex.lastIndex = 0;
         const captureGroups: RegExpExecArray = envRegex.exec(
-          match
-        ) as RegExpExecArray;
+          match,
+        );
 
         // Insert the environment variable if available. If not, insert placeholder. If no placeholder, leave it as is.
         stringifiedConfig = stringifiedConfig.replace(
           match,
-          process.env[captureGroups[1]] || captureGroups[2] || captureGroups[1]
+          process.env[captureGroups[1]] || captureGroups[2] || captureGroups[1],
         );
       });
     }
@@ -52,7 +64,7 @@ class Configuration {
    */
   public static getInstance(): Configuration {
     if (!this.instance) {
-      this.instance = new Configuration("../config/config.yml");
+      this.instance = new Configuration('../config/config.yml');
     }
 
     return Configuration.instance;
@@ -72,13 +84,13 @@ class Configuration {
    */
   public getFunctions(): IFunctionEvent[] {
     if (!this.config.functions) {
-      throw new Error("Functions were not defined in the config file.");
+      throw new Error('Functions were not defined in the config file.');
     }
 
     return this.config.functions.map((fn: Handler) => {
       const [name, params]: any = Object.entries(fn)[0];
       const path: string = params.proxy
-        ? params.path.replace("{+proxy}", params.proxy)
+        ? params.path.replace('{+proxy}', params.proxy)
         : params.path;
 
       return {
@@ -96,20 +108,20 @@ class Configuration {
    */
   public getDynamoDBConfig(): any {
     if (!this.config.dynamodb) {
-      throw new Error("DynamoDB config is not defined in the config file.");
+      throw new Error('DynamoDB config is not defined in the config file.');
     }
 
     // Not defining BRANCH will default to remote
     let env;
     switch (process.env.BRANCH) {
-      case "local":
-        env = "local";
+      case 'local':
+        env = 'local';
         break;
-      case "local-global":
-        env = "local-global";
+      case 'local-global':
+        env = 'local-global';
         break;
       default:
-        env = "remote";
+        env = 'remote';
     }
 
     return this.config.dynamodb[env];

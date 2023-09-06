@@ -2,7 +2,7 @@ service: cvs-svc-test-number
 configValidationMode: warn
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
   lambdaHashingVersion: 20201221
   stage: dev
   tracing:
@@ -54,6 +54,7 @@ custom:
       migrate: true
       seed: true
       noStart: false
+      host: 127.0.0.1
     seed:
       test-number:
         sources:

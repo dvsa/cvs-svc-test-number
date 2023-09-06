@@ -33,7 +33,7 @@ dynamodb:
   local:
     params:
       region: localhost
-      endpoint: http://localhost:8008
+      endpoint: http://127.0.0.1:8008
       maxRetries: 10
       httpOptions:
         timeout: 30000
@@ -43,7 +43,7 @@ dynamodb:
   local-global:
     params:
       region: localhost
-      endpoint: http://localhost:8000
+      endpoint: http://127.0.0.1:8000
       maxRetries: 10
       httpOptions:
         timeout: 30000
