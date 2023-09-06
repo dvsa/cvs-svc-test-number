@@ -8,10 +8,7 @@ import { HTTPResponse } from '../utils/HTTPResponse';
 import { TNumber } from '../models/NumberModel';
 import { DynamoDBService } from '../services/DynamoDBService';
 
-const generateTNumber: Handler = async (
-  _event: any,
-  _context?: Context,
-): Promise<APIGatewayProxyResult> => {
+const generateTNumber: Handler = async (_event: any, _context?: Context): Promise<APIGatewayProxyResult> => {
   const numberService = new NumberService(new DynamoDBService());
 
   try {

@@ -23,26 +23,21 @@ describe('POST /trailerId', () => {
     await populateDatabase();
   });
 
-  context(
-    'when a new trailerId is requested when only the seed data is present',
-    () => {
-      it('should respond with HTTP 200 and a next valid trailerId', () => {
-        const nextTrailerId: TrailerId = {
-          trailerId: 'C530001',
-          trailerLetter: 'C',
-          sequenceNumber: 530001,
-          testNumberKey: 2,
-        };
-        expect.assertions(4);
-        return lambda.expectResolve((response: any) => {
-          expect(response.headers['Access-Control-Allow-Origin']).toBe('*');
-          expect(response.headers['Access-Control-Allow-Credentials']).toBe(
-            true,
-          );
-          expect(response.statusCode).toBe(200);
-          expect(nextTrailerId).toEqual(JSON.parse(response.body));
-        });
+  context('when a new trailerId is requested when only the seed data is present', () => {
+    it('should respond with HTTP 200 and a next valid trailerId', () => {
+      const nextTrailerId: TrailerId = {
+        trailerId: 'C530001',
+        trailerLetter: 'C',
+        sequenceNumber: 530001,
+        testNumberKey: 2,
+      };
+      expect.assertions(4);
+      return lambda.expectResolve((response: any) => {
+        expect(response.headers['Access-Control-Allow-Origin']).toBe('*');
+        expect(response.headers['Access-Control-Allow-Credentials']).toBe(true);
+        expect(response.statusCode).toBe(200);
+        expect(nextTrailerId).toEqual(JSON.parse(response.body));
       });
-    },
-  );
+    });
+  });
 });

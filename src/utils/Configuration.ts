@@ -43,9 +43,7 @@ class Configuration {
     if (matches) {
       matches.forEach((match: string) => {
         envRegex.lastIndex = 0;
-        const captureGroups: RegExpExecArray = envRegex.exec(
-          match,
-        );
+        const captureGroups: RegExpExecArray = envRegex.exec(match);
 
         // Insert the environment variable if available. If not, insert placeholder. If no placeholder, leave it as is.
         stringifiedConfig = stringifiedConfig.replace(
@@ -89,9 +87,7 @@ class Configuration {
 
     return this.config.functions.map((fn: Handler) => {
       const [name, params]: any = Object.entries(fn)[0];
-      const path: string = params.proxy
-        ? params.path.replace('{+proxy}', params.proxy)
-        : params.path;
+      const path: string = params.proxy ? params.path.replace('{+proxy}', params.proxy) : params.path;
 
       return {
         name,

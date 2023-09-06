@@ -6,7 +6,7 @@ module.exports = {
   moduleFileExtensions: ['js', 'ts'],
   testResultsProcessor: 'jest-sonar-reporter',
   transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.tsx?$': 'ts-jest',
   },
-  testMatch: ['**/*.*Test.ts']
+  testMatch: ['**/*.*Test.ts'],
 };

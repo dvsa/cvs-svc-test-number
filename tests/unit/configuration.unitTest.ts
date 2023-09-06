@@ -42,9 +42,7 @@ describe('The configuration service', () => {
       expect(functions[5].name).toBe('generateTNumber');
 
       const DBConfig = configService.getDynamoDBConfig();
-      expect(DBConfig).toEqual(
-        configService.getConfig().dynamodb['local-global'],
-      );
+      expect(DBConfig).toEqual(configService.getConfig().dynamodb['local-global']);
     });
 
     it('should return remote versions of the config by default', () => {
@@ -70,9 +68,7 @@ describe('The configuration service', () => {
       try {
         config.getFunctions();
       } catch (e) {
-        expect(e.message).toBe(
-          'Functions were not defined in the config file.',
-        );
+        expect(e.message).toBe('Functions were not defined in the config file.');
       }
     });
 
@@ -81,9 +77,7 @@ describe('The configuration service', () => {
       try {
         config.getDynamoDBConfig();
       } catch (e) {
-        expect(e.message).toBe(
-          'DynamoDB config is not defined in the config file.',
-        );
+        expect(e.message).toBe('DynamoDB config is not defined in the config file.');
       }
     });
   });

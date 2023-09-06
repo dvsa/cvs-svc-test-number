@@ -8,17 +8,11 @@ import { HTTPResponse } from '../utils/HTTPResponse';
 import { TestNumber } from '../models/NumberModel';
 import { DynamoDBService } from '../services/DynamoDBService';
 
-const generateTestNumber: Handler = async (
-  _event: any,
-  _context?: Context,
-): Promise<APIGatewayProxyResult> => {
+const generateTestNumber: Handler = async (_event: any, _context?: Context): Promise<APIGatewayProxyResult> => {
   const numberService = new NumberService(new DynamoDBService());
 
   try {
-    const testNumber: TestNumber = await numberService.createTestNumber(
-      1,
-      null,
-    );
+    const testNumber: TestNumber = await numberService.createTestNumber(1, null);
     return new HTTPResponse(200, testNumber);
   } catch (error) {
     console.log(error.body);

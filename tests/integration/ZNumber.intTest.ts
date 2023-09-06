@@ -23,26 +23,21 @@ describe('POST /z-number', () => {
     await populateDatabase();
   });
 
-  context(
-    'when a new ZNumber is requested when only the seed data is present',
-    () => {
-      it('should respond with HTTP 200 and a next valid ZNumber', () => {
-        const nextZNumber: ZNumber = {
-          zNumber: '1000001Z',
-          zNumberLetter: 'Z',
-          sequenceNumber: 1000001,
-          testNumberKey: 5,
-        };
-        expect.assertions(4);
-        return lambda.expectResolve((response: any) => {
-          expect(response.headers['Access-Control-Allow-Origin']).toBe('*');
-          expect(response.headers['Access-Control-Allow-Credentials']).toBe(
-            true,
-          );
-          expect(response.statusCode).toBe(200);
-          expect(nextZNumber).toEqual(JSON.parse(response.body));
-        });
+  context('when a new ZNumber is requested when only the seed data is present', () => {
+    it('should respond with HTTP 200 and a next valid ZNumber', () => {
+      const nextZNumber: ZNumber = {
+        zNumber: '1000001Z',
+        zNumberLetter: 'Z',
+        sequenceNumber: 1000001,
+        testNumberKey: 5,
+      };
+      expect.assertions(4);
+      return lambda.expectResolve((response: any) => {
+        expect(response.headers['Access-Control-Allow-Origin']).toBe('*');
+        expect(response.headers['Access-Control-Allow-Credentials']).toBe(true);
+        expect(response.statusCode).toBe(200);
+        expect(nextZNumber).toEqual(JSON.parse(response.body));
       });
-    },
-  );
+    });
+  });
 });

@@ -2,14 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { AWSError } from 'aws-sdk'; // Only used as a type, so not wrapped by XRay
-import {
-  PlateSerialNumber,
-  SystemNumber,
-  TestNumber,
-  TNumber,
-  TrailerId,
-  ZNumber,
-} from '../models/NumberModel';
+import { PlateSerialNumber, SystemNumber, TestNumber, TNumber, TrailerId, ZNumber } from '../models/NumberModel';
 import { HTTPResponse } from '../utils/HTTPResponse';
 import { DynamoDBService } from './DynamoDBService';
 import { Configuration } from '../utils/Configuration';
@@ -60,10 +53,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a Test Number.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createTestNumber(
-    attempts: number,
-    awsError: AWSError | null,
-  ): Promise<TestNumber> {
+  public async createTestNumber(attempts: number, awsError: AWSError | null): Promise<TestNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastTestNumber: TestNumber = await this.getLastTestNumber();
@@ -74,10 +64,7 @@ export class NumberService {
           ':OldTestNumber': lastTestNumber.testNumber,
         },
       };
-      await this.dbClient.transactWrite(
-        nextTestNumberObject,
-        transactExpression,
-      );
+      await this.dbClient.transactWrite(nextTestNumberObject, transactExpression);
       console.log('Test Number Generated successfully');
       return nextTestNumberObject;
     } catch (error) {
@@ -97,10 +84,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a Test Number.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createTrailerId(
-    attempts: number,
-    awsError: AWSError | null,
-  ): Promise<TrailerId> {
+  public async createTrailerId(attempts: number, awsError: AWSError | null): Promise<TrailerId> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastTrailerId: TrailerId = await this.getLastTrailerId();
@@ -111,10 +95,7 @@ export class NumberService {
           ':oldTrailerId': lastTrailerId.trailerId,
         },
       };
-      await this.dbClient.transactWrite(
-        nextTrailerIdObject,
-        transactExpression,
-      );
+      await this.dbClient.transactWrite(nextTrailerIdObject, transactExpression);
       console.log('TrailerId Generated successfully');
       return nextTrailerIdObject;
     } catch (error) {
@@ -134,10 +115,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a System Number.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createSystemNumber(
-    attempts: number,
-    awsError: AWSError | null,
-  ): Promise<SystemNumber> {
+  public async createSystemNumber(attempts: number, awsError: AWSError | null): Promise<SystemNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastSystemNumber: SystemNumber = await this.getLastSystemNumber();
@@ -148,10 +126,7 @@ export class NumberService {
           ':oldSystemNumber': lastSystemNumber.systemNumber,
         },
       };
-      await this.dbClient.transactWrite(
-        nextSystemNumberObject,
-        transactExpression,
-      );
+      await this.dbClient.transactWrite(nextSystemNumberObject, transactExpression);
       console.log('System Number Generated successfully');
       return nextSystemNumberObject;
     } catch (error) {
@@ -171,10 +146,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a Plate Serial Number.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createPlateSerialNumber(
-    attempts: number,
-    awsError: AWSError | null,
-  ): Promise<PlateSerialNumber> {
+  public async createPlateSerialNumber(attempts: number, awsError: AWSError | null): Promise<PlateSerialNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastPlateSerialNumber: PlateSerialNumber = await this.getLastPlateSerialNumber();
@@ -185,10 +157,7 @@ export class NumberService {
           ':oldPlateSerialNumber': lastPlateSerialNumber.plateSerialNumber,
         },
       };
-      await this.dbClient.transactWrite(
-        nextPlateSerialNumberObject,
-        transactExpression,
-      );
+      await this.dbClient.transactWrite(nextPlateSerialNumberObject, transactExpression);
       console.log('Plate Serial Number Generated successfully');
       return nextPlateSerialNumberObject;
     } catch (error) {
@@ -208,10 +177,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a ZNumber.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createZNumber(
-    attempts: number,
-    awsError: AWSError | null,
-  ): Promise<ZNumber> {
+  public async createZNumber(attempts: number, awsError: AWSError | null): Promise<ZNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastZNumber: ZNumber = await this.getLastZNumber();
@@ -242,10 +208,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a TNumber.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createTNumber(
-    attempts: number,
-    awsError: AWSError | null,
-  ): Promise<TNumber> {
+  public async createTNumber(attempts: number, awsError: AWSError | null): Promise<TNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastTNumber: TNumber = await this.getLastTNumber();
@@ -316,7 +279,9 @@ export class NumberService {
    */
   public async getLastTNumber(): Promise<TNumber> {
     try {
-      const data: any = await this.dbClient.get({ testNumberKey: NUMBER_KEY.T_NUMBER });
+      const data: any = await this.dbClient.get({
+        testNumberKey: NUMBER_KEY.T_NUMBER,
+      });
 
       if (!data.Item) {
         console.log(Configuration.getInstance().getTNumberInitialValue());
@@ -401,17 +366,13 @@ export class NumberService {
           cvsIdNumber = '01';
           cvsIdLetter = String.fromCharCode(cvsIdLetter.charCodeAt(0) + 1);
         } else {
-          cvsIdNumber = (parseInt(cvsIdNumber, 10) + 1)
-            .toString()
-            .padStart(2, '0');
+          cvsIdNumber = (parseInt(cvsIdNumber, 10) + 1).toString().padStart(2, '0');
         }
       } else {
         certLetter = String.fromCharCode(certLetter.charCodeAt(0) + 1);
       }
     } else {
-      sequenceNumber = (parseInt(sequenceNumber, 10) + 1)
-        .toString()
-        .padStart(3, '0');
+      sequenceNumber = (parseInt(sequenceNumber, 10) + 1).toString().padStart(3, '0');
     }
 
     let newTestNumber = cvsIdLetter + cvsIdNumber + certLetter + sequenceNumber;
@@ -450,9 +411,9 @@ export class NumberService {
    */
   public createNextTNumberObject(TNumberObject: TNumber): TNumber {
     const newSequenceNumber: number = TNumberObject.sequenceNumber + 1;
-    const newTNumber = newSequenceNumber
-      .toLocaleString('en', { minimumIntegerDigits: 6 })
-      .replace(/,/g, '') + TNumberObject.tNumberLetter;
+    const newTNumber =
+      newSequenceNumber.toLocaleString('en', { minimumIntegerDigits: 6 }).replace(/,/g, '') +
+      TNumberObject.tNumberLetter;
     const newTNumberObject: TNumber = {
       tNumber: newTNumber,
       tNumberLetter: TNumberObject.tNumberLetter,
@@ -482,9 +443,7 @@ export class NumberService {
    * Calculates and creates the next system number object based on the last system number
    * @param systemNumberObject - last systemNumber
    */
-  public createNextSystemNumberObject(
-    systemNumberObj: SystemNumber,
-  ): SystemNumber {
+  public createNextSystemNumberObject(systemNumberObj: SystemNumber): SystemNumber {
     const newSystemNumber: number = parseInt(systemNumberObj.systemNumber, 10) + 1;
     const newSystemNumberObject: SystemNumber = {
       systemNumber: newSystemNumber.toString(),
@@ -497,9 +456,7 @@ export class NumberService {
    * Calculates and creates the next plate serial number object based on the last plate serial number
    * @param plateSerialNumberObj - last plateSerialNumber
    */
-  public createNextPlateSerialNumberObject(
-    plateSerialNumberObj: PlateSerialNumber,
-  ): PlateSerialNumber {
+  public createNextPlateSerialNumberObject(plateSerialNumberObj: PlateSerialNumber): PlateSerialNumber {
     const newPlateSerialNumber: number = parseInt(plateSerialNumberObj.plateSerialNumber, 10) + 1;
     const newPlateSerialNumberObject: PlateSerialNumber = {
       plateSerialNumber: newPlateSerialNumber.toString(),
@@ -518,13 +475,14 @@ export class NumberService {
     const firstLetterAlphabeticalIndex = testNumber.charCodeAt(0) - 64;
     const secondLetterAlphabeticalIndex = testNumber.charCodeAt(3) - 64;
 
-    let checkSum = firstLetterAlphabeticalIndex
-      + parseInt(testNumberWithoutLetters.charAt(0), 10)
-      + parseInt(testNumberWithoutLetters.charAt(1), 10) * 3
-      + secondLetterAlphabeticalIndex
-      + parseInt(testNumberWithoutLetters.charAt(2), 10)
-      + parseInt(testNumberWithoutLetters.charAt(3), 10) * 3
-      + parseInt(testNumberWithoutLetters.charAt(4), 10);
+    let checkSum =
+      firstLetterAlphabeticalIndex +
+      parseInt(testNumberWithoutLetters.charAt(0), 10) +
+      parseInt(testNumberWithoutLetters.charAt(1), 10) * 3 +
+      secondLetterAlphabeticalIndex +
+      parseInt(testNumberWithoutLetters.charAt(2), 10) +
+      parseInt(testNumberWithoutLetters.charAt(3), 10) * 3 +
+      parseInt(testNumberWithoutLetters.charAt(4), 10);
 
     if (checkSum > 99) {
       checkSum %= 100;

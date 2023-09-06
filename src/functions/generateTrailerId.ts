@@ -6,10 +6,7 @@ import { HTTPResponse } from '../utils/HTTPResponse';
 import { TrailerId } from '../models/NumberModel';
 import { DynamoDBService } from '../services/DynamoDBService';
 
-const generateTrailerId: Handler = async (
-  _event: any,
-  _context?: Context,
-): Promise<APIGatewayProxyResult> => {
+const generateTrailerId: Handler = async (_event: any, _context?: Context): Promise<APIGatewayProxyResult> => {
   const numberService = new NumberService(new DynamoDBService());
 
   try {

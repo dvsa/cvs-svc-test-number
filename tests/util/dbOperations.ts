@@ -21,9 +21,7 @@ export const populateDatabase = async () => {
 
 export const emptyDatabase = async () => {
   const dynamoDbService = new DynamoDBService();
-  const batches = _.cloneDeep(numbers).map((numberObj) => [
-    { testNumberKey: numberObj.testNumberKey },
-  ]);
+  const batches = _.cloneDeep(numbers).map((numberObj) => [{ testNumberKey: numberObj.testNumberKey }]);
   for (const batch of batches) {
     await dynamoDbService.batchDelete(batch);
   }

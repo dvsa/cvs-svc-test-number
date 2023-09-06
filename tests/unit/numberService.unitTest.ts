@@ -5,14 +5,7 @@
 /* eslint-disable jest/no-conditional-expect */
 import { AWSError } from 'aws-sdk';
 import { NumberService } from '../../src/services/NumberService';
-import {
-  PlateSerialNumber,
-  SystemNumber,
-  TestNumber,
-  TrailerId,
-  ZNumber,
-  TNumber,
-} from '../../src/models/NumberModel';
+import { PlateSerialNumber, SystemNumber, TestNumber, TrailerId, ZNumber, TNumber } from '../../src/models/NumberModel';
 import { DynamoDBService } from '../../src/services/DynamoDBService';
 import { HTTPResponse } from '../../src/utils/HTTPResponse';
 
@@ -41,9 +34,7 @@ describe('NumberService', () => {
           sequenceNumber: '002',
           testNumberKey: 1,
         };
-        expect(
-          numberService.createNextTestNumberObject(lastTestNumber),
-        ).toEqual(expectedNextTestNumber);
+        expect(numberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
 
         lastTestNumber = {
           testNumber: 'W01A99982',
@@ -59,9 +50,7 @@ describe('NumberService', () => {
           sequenceNumber: '001',
           testNumberKey: 1,
         };
-        expect(
-          numberService.createNextTestNumberObject(lastTestNumber),
-        ).toEqual(expectedNextTestNumber);
+        expect(numberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
 
         lastTestNumber = {
           testNumber: 'W01Z99907',
@@ -77,9 +66,7 @@ describe('NumberService', () => {
           sequenceNumber: '001',
           testNumberKey: 1,
         };
-        expect(
-          numberService.createNextTestNumberObject(lastTestNumber),
-        ).toEqual(expectedNextTestNumber);
+        expect(numberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
 
         lastTestNumber = {
           testNumber: 'W99Z99941',
@@ -95,9 +82,7 @@ describe('NumberService', () => {
           sequenceNumber: '001',
           testNumberKey: 1,
         };
-        expect(
-          numberService.createNextTestNumberObject(lastTestNumber),
-        ).toEqual(expectedNextTestNumber);
+        expect(numberService.createNextTestNumberObject(lastTestNumber)).toEqual(expectedNextTestNumber);
       });
 
       it('Should have correct CheckSum numbers (10 < checksum < 100)', () => {
@@ -183,9 +168,7 @@ describe('NumberService', () => {
           sequenceNumber: 530002,
           testNumberKey: 2,
         };
-        expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(
-          expectedNextTrailerId,
-        );
+        expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(expectedNextTrailerId);
 
         lastTrailerId = {
           trailerId: 'C530004',
@@ -199,9 +182,7 @@ describe('NumberService', () => {
           sequenceNumber: 530005,
           testNumberKey: 2,
         };
-        expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(
-          expectedNextTrailerId,
-        );
+        expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(expectedNextTrailerId);
 
         lastTrailerId = {
           trailerId: 'C530456',
@@ -215,9 +196,7 @@ describe('NumberService', () => {
           sequenceNumber: 530457,
           testNumberKey: 2,
         };
-        expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(
-          expectedNextTrailerId,
-        );
+        expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(expectedNextTrailerId);
 
         lastTrailerId = {
           trailerId: 'C123456',
@@ -231,9 +210,7 @@ describe('NumberService', () => {
           sequenceNumber: 123457,
           testNumberKey: 2,
         };
-        expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(
-          expectedNextTrailerId,
-        );
+        expect(numberService.createNextTrailerIdObject(lastTrailerId)).toEqual(expectedNextTrailerId);
       });
     });
   });
@@ -253,9 +230,7 @@ describe('NumberService', () => {
           sequenceNumber: 500002,
           testNumberKey: 5,
         };
-        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(
-          expectedLastZNumber,
-        );
+        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(expectedLastZNumber);
 
         lastZNumber = {
           zNumber: '500004Z',
@@ -269,9 +244,7 @@ describe('NumberService', () => {
           sequenceNumber: 500005,
           testNumberKey: 5,
         };
-        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(
-          expectedLastZNumber,
-        );
+        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(expectedLastZNumber);
 
         lastZNumber = {
           zNumber: '530456Z',
@@ -285,9 +258,7 @@ describe('NumberService', () => {
           sequenceNumber: 530457,
           testNumberKey: 5,
         };
-        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(
-          expectedLastZNumber,
-        );
+        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(expectedLastZNumber);
 
         lastZNumber = {
           zNumber: '123456Z',
@@ -301,9 +272,7 @@ describe('NumberService', () => {
           sequenceNumber: 123457,
           testNumberKey: 5,
         };
-        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(
-          expectedLastZNumber,
-        );
+        expect(numberService.createNextZNumberObject(lastZNumber)).toEqual(expectedLastZNumber);
       });
     });
   });
@@ -323,9 +292,7 @@ describe('NumberService', () => {
           sequenceNumber: 100002,
           testNumberKey: 6,
         };
-        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
-          expectedLastTNumber,
-        );
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(expectedLastTNumber);
 
         lastTNumber = {
           tNumber: '500004T',
@@ -339,9 +306,7 @@ describe('NumberService', () => {
           sequenceNumber: 500005,
           testNumberKey: 6,
         };
-        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
-          expectedLastTNumber,
-        );
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(expectedLastTNumber);
 
         lastTNumber = {
           tNumber: '090000T',
@@ -355,9 +320,7 @@ describe('NumberService', () => {
           sequenceNumber: 90001,
           testNumberKey: 6,
         };
-        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
-          expectedLastTNumber,
-        );
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(expectedLastTNumber);
 
         lastTNumber = {
           tNumber: '000009T',
@@ -371,9 +334,7 @@ describe('NumberService', () => {
           sequenceNumber: 10,
           testNumberKey: 6,
         };
-        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
-          expectedLastTNumber,
-        );
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(expectedLastTNumber);
 
         lastTNumber = {
           tNumber: '999999T',
@@ -387,9 +348,7 @@ describe('NumberService', () => {
           sequenceNumber: 1000000,
           testNumberKey: 6,
         };
-        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(
-          expectedLastTNumber,
-        );
+        expect(numberService.createNextTNumberObject(lastTNumber)).toEqual(expectedLastTNumber);
       });
     });
   });
@@ -405,9 +364,7 @@ describe('NumberService', () => {
           systemNumber: '10000002',
           testNumberKey: 3,
         };
-        expect(
-          numberService.createNextSystemNumberObject(lastSystemNumber),
-        ).toEqual(expectedNextSystemNumber);
+        expect(numberService.createNextSystemNumberObject(lastSystemNumber)).toEqual(expectedNextSystemNumber);
 
         lastSystemNumber = {
           systemNumber: '10000003',
@@ -417,9 +374,7 @@ describe('NumberService', () => {
           systemNumber: '10000004',
           testNumberKey: 3,
         };
-        expect(
-          numberService.createNextSystemNumberObject(lastSystemNumber),
-        ).toEqual(expectedNextSystemNumber);
+        expect(numberService.createNextSystemNumberObject(lastSystemNumber)).toEqual(expectedNextSystemNumber);
 
         lastSystemNumber = {
           systemNumber: '10023454',
@@ -429,9 +384,7 @@ describe('NumberService', () => {
           systemNumber: '10023455',
           testNumberKey: 3,
         };
-        expect(
-          numberService.createNextSystemNumberObject(lastSystemNumber),
-        ).toEqual(expectedNextSystemNumber);
+        expect(numberService.createNextSystemNumberObject(lastSystemNumber)).toEqual(expectedNextSystemNumber);
 
         lastSystemNumber = {
           systemNumber: '24823497',
@@ -441,9 +394,7 @@ describe('NumberService', () => {
           systemNumber: '24823498',
           testNumberKey: 3,
         };
-        expect(
-          numberService.createNextSystemNumberObject(lastSystemNumber),
-        ).toEqual(expectedNextSystemNumber);
+        expect(numberService.createNextSystemNumberObject(lastSystemNumber)).toEqual(expectedNextSystemNumber);
       });
     });
   });
@@ -459,9 +410,9 @@ describe('NumberService', () => {
           plateSerialNumber: '2',
           testNumberKey: 4,
         };
-        expect(
-          numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber),
-        ).toEqual(expectedNextPlateSerialNumber);
+        expect(numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber)).toEqual(
+          expectedNextPlateSerialNumber,
+        );
 
         lastPlateSerialNumber = {
           plateSerialNumber: '3',
@@ -471,9 +422,9 @@ describe('NumberService', () => {
           plateSerialNumber: '4',
           testNumberKey: 4,
         };
-        expect(
-          numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber),
-        ).toEqual(expectedNextPlateSerialNumber);
+        expect(numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber)).toEqual(
+          expectedNextPlateSerialNumber,
+        );
 
         lastPlateSerialNumber = {
           plateSerialNumber: '10023454',
@@ -483,9 +434,9 @@ describe('NumberService', () => {
           plateSerialNumber: '10023455',
           testNumberKey: 4,
         };
-        expect(
-          numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber),
-        ).toEqual(expectedNextPlateSerialNumber);
+        expect(numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber)).toEqual(
+          expectedNextPlateSerialNumber,
+        );
 
         lastPlateSerialNumber = {
           plateSerialNumber: '24823497',
@@ -495,9 +446,9 @@ describe('NumberService', () => {
           plateSerialNumber: '24823498',
           testNumberKey: 4,
         };
-        expect(
-          numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber),
-        ).toEqual(expectedNextPlateSerialNumber);
+        expect(numberService.createNextPlateSerialNumberObject(lastPlateSerialNumber)).toEqual(
+          expectedNextPlateSerialNumber,
+        );
       });
     });
   });
@@ -514,9 +465,7 @@ describe('NumberService', () => {
         sequenceNumber: '000',
         testNumberKey: 1,
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: aTestNumber });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: aTestNumber });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastTestNumber();
       expect(aTestNumber).toEqual(output);
@@ -528,9 +477,7 @@ describe('NumberService', () => {
         certLetter: 'A',
         sequenceNumber: '000',
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: null });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: null });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastTestNumber();
       expect(defaultTestNumber).toEqual(output);
@@ -562,9 +509,7 @@ describe('NumberService', () => {
         sequenceNumber: 530000,
         testNumberKey: 2,
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: trailerIdObj });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: trailerIdObj });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastTrailerId();
       expect(trailerIdObj).toEqual(output);
@@ -575,9 +520,7 @@ describe('NumberService', () => {
         trailerLetter: 'C',
         sequenceNumber: 530000,
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: null });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: null });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastTrailerId();
       expect(defaultTrailerId).toEqual(output);
@@ -609,9 +552,7 @@ describe('NumberService', () => {
         sequenceNumber: 1000000,
         testNumberKey: 5,
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: zNumberObjet });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: zNumberObjet });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastZNumber();
       expect(zNumberObjet).toEqual(output);
@@ -622,9 +563,7 @@ describe('NumberService', () => {
         zNumberLetter: 'Z',
         sequenceNumber: 1000000,
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: null });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: null });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastZNumber();
       expect(defaultZNumber).toEqual(output);
@@ -654,9 +593,7 @@ describe('NumberService', () => {
         systemNumber: '10000005',
         testNumberKey: 3,
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: systemNumberObj });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: systemNumberObj });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastSystemNumber();
       expect(systemNumberObj).toEqual(output);
@@ -665,9 +602,7 @@ describe('NumberService', () => {
       const defaultSystemNumber = {
         systemNumber: '10000000',
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: null });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: null });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastSystemNumber();
       expect(defaultSystemNumber).toEqual(output);
@@ -697,9 +632,7 @@ describe('NumberService', () => {
         plateSerialNumber: '12',
         testNumberKey: 4,
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: plateSerialNumberObj });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: plateSerialNumberObj });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastPlateSerialNumber();
       expect(plateSerialNumberObj).toEqual(output);
@@ -708,9 +641,7 @@ describe('NumberService', () => {
       const defaultPlateSerialNumber = {
         plateSerialNumber: '0',
       };
-      DynamoDBService.prototype.get = jest
-        .fn()
-        .mockResolvedValue({ Item: null });
+      DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: null });
       const service = new NumberService(new DynamoDBService());
       const output = await service.getLastPlateSerialNumber();
       expect(defaultPlateSerialNumber).toEqual(output);
@@ -748,12 +679,8 @@ describe('NumberService', () => {
           sequenceNumber: '002',
           testNumberKey: 1,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastTestNumber });
-        DynamoDBService.prototype.transactWrite = jest
-          .fn()
-          .mockResolvedValue('');
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTestNumber });
+        DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue('');
         const service = new NumberService(new DynamoDBService());
         const output = await service.createTestNumber(1, null);
         expect(expectedNextTestNumber).toEqual(output);
@@ -774,9 +701,7 @@ describe('NumberService', () => {
           sequenceNumber: '002',
           testNumberKey: 1,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastTestNumber });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTestNumber });
         const putSpy = jest.fn().mockResolvedValue('');
         DynamoDBService.prototype.transactWrite = putSpy;
         const service = new NumberService(new DynamoDBService());
@@ -802,13 +727,8 @@ describe('NumberService', () => {
           // @ts-ignore;
           error400.statusCode = 400;
 
-          DynamoDBService.prototype.get = jest
-            .fn()
-            .mockResolvedValue({ Item: lastTestNumber });
-          const putSpy = jest
-            .fn()
-            .mockRejectedValueOnce(error400)
-            .mockResolvedValueOnce('');
+          DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTestNumber });
+          const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
           DynamoDBService.prototype.transactWrite = putSpy;
 
           const service = new NumberService(new DynamoDBService());
@@ -832,9 +752,7 @@ describe('NumberService', () => {
         // @ts-ignore
         error.statusCode = 418;
 
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastTestNumber });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTestNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
         DynamoDBService.prototype.transactWrite = transactSpy;
 
@@ -883,12 +801,8 @@ describe('NumberService', () => {
           sequenceNumber: 530001,
           testNumberKey: 2,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastTrailerId });
-        DynamoDBService.prototype.transactWrite = jest
-          .fn()
-          .mockResolvedValue('');
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTrailerId });
+        DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue('');
         const service = new NumberService(new DynamoDBService());
         const output = await service.createTrailerId(1, null);
         expect(expectedNextTrailerId).toEqual(output);
@@ -907,9 +821,7 @@ describe('NumberService', () => {
           sequenceNumber: 530002,
           testNumberKey: 2,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastTrailerId });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTrailerId });
         const putSpy = jest.fn().mockResolvedValue('');
         DynamoDBService.prototype.transactWrite = putSpy;
         const service = new NumberService(new DynamoDBService());
@@ -934,13 +846,8 @@ describe('NumberService', () => {
           // @ts-ignore;
           error400.statusCode = 400;
 
-          DynamoDBService.prototype.get = jest
-            .fn()
-            .mockResolvedValue({ Item: lastTrailerId });
-          const putSpy = jest
-            .fn()
-            .mockRejectedValueOnce(error400)
-            .mockResolvedValueOnce('');
+          DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTrailerId });
+          const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
           DynamoDBService.prototype.transactWrite = putSpy;
 
           const service = new NumberService(new DynamoDBService());
@@ -963,9 +870,7 @@ describe('NumberService', () => {
         // @ts-ignore
         error.statusCode = 418;
 
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastTrailerId });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTrailerId });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
         DynamoDBService.prototype.transactWrite = transactSpy;
 
@@ -1014,12 +919,8 @@ describe('NumberService', () => {
           sequenceNumber: 1000001,
           testNumberKey: 5,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastZNumber });
-        DynamoDBService.prototype.transactWrite = jest
-          .fn()
-          .mockResolvedValue('');
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastZNumber });
+        DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue('');
         const service = new NumberService(new DynamoDBService());
         const output = await service.createZNumber(1, null);
         expect(expectedNextZNumber).toEqual(output);
@@ -1038,9 +939,7 @@ describe('NumberService', () => {
           sequenceNumber: 500002,
           testNumberKey: 5,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastZNumber });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastZNumber });
         const putSpy = jest.fn().mockResolvedValue('');
         DynamoDBService.prototype.transactWrite = putSpy;
         const service = new NumberService(new DynamoDBService());
@@ -1065,13 +964,8 @@ describe('NumberService', () => {
           // @ts-ignore;
           error400.statusCode = 400;
 
-          DynamoDBService.prototype.get = jest
-            .fn()
-            .mockResolvedValue({ Item: lastZNumber });
-          const putSpy = jest
-            .fn()
-            .mockRejectedValueOnce(error400)
-            .mockResolvedValueOnce('');
+          DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastZNumber });
+          const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
           DynamoDBService.prototype.transactWrite = putSpy;
 
           const service = new NumberService(new DynamoDBService());
@@ -1094,9 +988,7 @@ describe('NumberService', () => {
         // @ts-ignore
         error.statusCode = 418;
 
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastZNumber });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastZNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
         DynamoDBService.prototype.transactWrite = transactSpy;
 
@@ -1141,12 +1033,8 @@ describe('NumberService', () => {
           systemNumber: '10000001',
           testNumberKey: 3,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastSystemNumber });
-        DynamoDBService.prototype.transactWrite = jest
-          .fn()
-          .mockResolvedValue('');
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastSystemNumber });
+        DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue('');
         const service = new NumberService(new DynamoDBService());
         const output = await service.createSystemNumber(1, null);
         expect(expectedNextSystemNumber).toEqual(output);
@@ -1161,9 +1049,7 @@ describe('NumberService', () => {
           systemNumber: '10000024',
           testNumberKey: 3,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastSystemNumber });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastSystemNumber });
         const putSpy = jest.fn().mockResolvedValue('');
         DynamoDBService.prototype.transactWrite = putSpy;
         const service = new NumberService(new DynamoDBService());
@@ -1186,13 +1072,8 @@ describe('NumberService', () => {
           // @ts-ignore;
           error400.statusCode = 400;
 
-          DynamoDBService.prototype.get = jest
-            .fn()
-            .mockResolvedValue({ Item: lastSystemNumber });
-          const putSpy = jest
-            .fn()
-            .mockRejectedValueOnce(error400)
-            .mockResolvedValueOnce('');
+          DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastSystemNumber });
+          const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
           DynamoDBService.prototype.transactWrite = putSpy;
 
           const service = new NumberService(new DynamoDBService());
@@ -1213,9 +1094,7 @@ describe('NumberService', () => {
         // @ts-ignore
         error.statusCode = 418;
 
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastSystemNumber });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastSystemNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
         DynamoDBService.prototype.transactWrite = transactSpy;
 
@@ -1236,9 +1115,7 @@ describe('NumberService', () => {
 
         const error = new Error('Oh no!');
 
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastSystemNumber });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastSystemNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
         DynamoDBService.prototype.transactWrite = transactSpy;
 
@@ -1283,12 +1160,8 @@ describe('NumberService', () => {
           plateSerialNumber: '2',
           testNumberKey: 4,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastPlateSerialNumber });
-        DynamoDBService.prototype.transactWrite = jest
-          .fn()
-          .mockResolvedValue('');
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastPlateSerialNumber });
+        DynamoDBService.prototype.transactWrite = jest.fn().mockResolvedValue('');
         const service = new NumberService(new DynamoDBService());
         const output = await service.createPlateSerialNumber(1, null);
         expect(expectedNextPlateSerialNumber).toEqual(output);
@@ -1303,9 +1176,7 @@ describe('NumberService', () => {
           plateSerialNumber: '24',
           testNumberKey: 4,
         };
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastPlateSerialNumber });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastPlateSerialNumber });
         const putSpy = jest.fn().mockResolvedValue('');
         DynamoDBService.prototype.transactWrite = putSpy;
         const service = new NumberService(new DynamoDBService());
@@ -1328,13 +1199,8 @@ describe('NumberService', () => {
           // @ts-ignore;
           error400.statusCode = 400;
 
-          DynamoDBService.prototype.get = jest
-            .fn()
-            .mockResolvedValue({ Item: lastPlateSerialNumber });
-          const putSpy = jest
-            .fn()
-            .mockRejectedValueOnce(error400)
-            .mockResolvedValueOnce('');
+          DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastPlateSerialNumber });
+          const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
           DynamoDBService.prototype.transactWrite = putSpy;
 
           const service = new NumberService(new DynamoDBService());
@@ -1355,9 +1221,7 @@ describe('NumberService', () => {
         // @ts-ignore
         error.statusCode = 418;
 
-        DynamoDBService.prototype.get = jest
-          .fn()
-          .mockResolvedValue({ Item: lastPlateSerialNumber });
+        DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastPlateSerialNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
         DynamoDBService.prototype.transactWrite = transactSpy;
 

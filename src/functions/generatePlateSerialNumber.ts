@@ -8,10 +8,7 @@ import { HTTPResponse } from '../utils/HTTPResponse';
 import { PlateSerialNumber } from '../models/NumberModel';
 import { DynamoDBService } from '../services/DynamoDBService';
 
-const generatePlateSerialNumber: Handler = async (
-  _event: any,
-  _context?: Context,
-): Promise<APIGatewayProxyResult> => {
+const generatePlateSerialNumber: Handler = async (_event: any, _context?: Context): Promise<APIGatewayProxyResult> => {
   const numberService = new NumberService(new DynamoDBService());
 
   try {

@@ -5,18 +5,18 @@ info:
     microservice is to generate and retrieve the test number when a test is submitted.
   version: 1.0.0
   title: Test Number Microservice
-  termsOfService: ""
+  termsOfService: ''
   contact:
     email: bpecete@deloittece.com
   license:
     name: Apache 2.0
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
   - name: testNumber
     description: Endpoint used to retrieve a generated test number.
     externalDocs:
       description: Find out more
-      url: "https://wiki.i-env.net/display/HVT/Epic%3A+Capture+test+results"
+      url: 'https://wiki.i-env.net/display/HVT/Epic%3A+Capture+test+results'
 paths:
   /test-number:
     post:
@@ -24,13 +24,13 @@ paths:
       tags:
         - testNumber
       responses:
-        "201":
+        '201':
           description: Generate the test number
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/testNumber"
-        "404":
+                $ref: '#/components/schemas/testNumber'
+        '404':
           description: Operation not supported
 components:
   securitySchemes:
@@ -38,8 +38,8 @@ components:
       type: oauth2
       flows:
         authorizationCode:
-          authorizationUrl: "https://example.com/oauth/authorize"
-          tokenUrl: "https://example.com/oauth/token"
+          authorizationUrl: 'https://example.com/oauth/authorize'
+          tokenUrl: 'https://example.com/oauth/token'
           scopes:
             read: Grants read access
             write: Grants write access
@@ -67,4 +67,4 @@ security:
       - read
       - write
 servers:
-  - url: "https://url/api/v1"
+  - url: 'https://url/api/v1'
