@@ -41,4 +41,4 @@ coverage/**
 
 #reports
 .reports/**
-reports/**
+reports
