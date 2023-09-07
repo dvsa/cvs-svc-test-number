@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable import/no-import-module-exports */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -14,7 +15,7 @@ const DYNAMO_LOCAL_ERROR_THREAD = 'Exception in thread "main"';
 
 // eslint-disable-next-line arrow-body-style
 const setupServer = (process: any) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     process.stdout.setEncoding('utf-8').on('data', (stream: any) => {
       console.log(stream);
       if (stream.includes(SERVER_OK)) {
@@ -25,8 +26,9 @@ const setupServer = (process: any) => {
     process.stderr.setEncoding('utf-8').on('data', (stream: any) => {
       if (stream.includes(DYNAMO_LOCAL_ERROR_THREAD)) {
         throw new Error('Internal Java process crashed');
+      } else if (stream.includes(SERVER_OK)) {
+        resolve(process);
       }
-      reject(stream);
     });
 
     process.on('exit', (code: any, signal: any) => {
