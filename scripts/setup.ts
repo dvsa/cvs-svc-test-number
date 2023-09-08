@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { spawn } from 'child_process';
+import { reject } from 'lodash';
 
 // We hook to serverless offline when firing its process
 const SERVER_OK = 'Offline [HTTP] listening on http://localhost:3008';
@@ -26,9 +27,8 @@ const setupServer = (process: any) => {
     process.stderr.setEncoding('utf-8').on('data', (stream: any) => {
       if (stream.includes(DYNAMO_LOCAL_ERROR_THREAD)) {
         throw new Error('Internal Java process crashed');
-      } else if (stream.includes(SERVER_OK)) {
-        resolve(process);
       }
+      reject(stream);
     });
 
     process.on('exit', (code: any, signal: any) => {

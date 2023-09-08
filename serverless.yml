@@ -1,5 +1,11 @@
 service: cvs-svc-test-number
 configValidationMode: warn
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+  - serverless-plugin-typescript
+  - serverless-plugin-tracing
+
 provider:
   name: aws
   runtime: nodejs18.x
@@ -7,7 +13,6 @@ provider:
   tracing:
     apiGateway: true
     lambda: true
-
   iam:
     role:
       statements:
@@ -17,12 +22,6 @@ provider:
             - 'xray:PutTelemetryRecords'
           Resource:
             - '*'
-
-plugins:
-  - serverless-dynamodb-local
-  - serverless-offline
-  - serverless-plugin-typescript
-  - serverless-plugin-tracing
 
 functions:
   generateTestNumber:
