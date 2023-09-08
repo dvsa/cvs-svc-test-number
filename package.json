@@ -15,7 +15,7 @@
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
     "test": "npm run test:unit -- --coverage",
     "test:unit": "BRANCH=local jest --testMatch=\"**/*.unitTest.ts\" --forceExit --runInBand",
-    "test-i": "WS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1 npm run test:integration -- --globalSetup='./scripts/setup.ts' --globalTeardown='./scripts/teardown.ts'",
+    "test-i": "AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1 npm run test:integration -- --globalSetup='./scripts/setup.ts' --globalTeardown='./scripts/teardown.ts'",
     "test:integration": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\" --runInBand",
     "lint:analyse": "eslint . --ext js,ts --fix",
     "lint:report": "npm run lint:analyse -- -f json -o reports/eslint/eslint-report.json",
