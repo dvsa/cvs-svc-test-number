@@ -26,9 +26,11 @@
     "security-checks": "git secrets --scan",
     "sonar-scanner": "sonar-scanner",
     "prepush": "npm run test && npm run build && npm run test-i",
+    "precommit": "npm run security-checks && npm run audit && npm run lint && npm run format",
     "audit": "npm audit --prod",
     "tools-setup": "sls dynamodb install",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "commit-msg": "commitlint --edit $1"
   },
   "nyc": {
     "include": [
