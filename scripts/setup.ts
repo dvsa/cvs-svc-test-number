@@ -5,7 +5,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { spawn } from 'child_process';
-import { reject } from 'lodash';
 
 // We hook to serverless offline when firing its process
 const SERVER_OK = 'Offline [HTTP] listening on http://localhost:3008';
@@ -16,7 +15,7 @@ const DYNAMO_LOCAL_ERROR_THREAD = 'Exception in thread "main"';
 
 // eslint-disable-next-line arrow-body-style
 const setupServer = (process: any) => {
-  return new Promise((resolve, _reject) => {
+  return new Promise((resolve, reject) => {
     process.stdout.setEncoding('utf-8').on('data', (stream: any) => {
       console.log(stream);
       if (stream.includes(SERVER_OK)) {

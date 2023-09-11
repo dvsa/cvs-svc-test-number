@@ -44,7 +44,7 @@ resources:
           WriteCapacityUnits: 1
 custom:
   serverless-offline:
-    httpPort: 3008
+    port: 3008
   dynamodb:
     start:
       port: 8008
