@@ -1,4 +1,4 @@
-import { NUMBER_KEY } from "../assets/Enums";
+import { NUMBER_KEY } from '../assets/Enums';
 
 interface NumberKey {
   testNumberKey: NUMBER_KEY;

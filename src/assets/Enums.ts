@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 export enum NUMBER_TYPE {
-  TRAILER_ID = "trailerId",
-  TEST_NUMBER = "testNumber",
-  SYSTEM_NUMBER = "systemNumber",
-  PLATE_SERIAL_NUMBER = "plateSerialNumber",
-  Z_NUMBER = "ZNumber",
-  T_NUMBER = "TNumber",
+  TRAILER_ID = 'trailerId',
+  TEST_NUMBER = 'testNumber',
+  SYSTEM_NUMBER = 'systemNumber',
+  PLATE_SERIAL_NUMBER = 'plateSerialNumber',
+  Z_NUMBER = 'ZNumber',
+  T_NUMBER = 'TNumber',
 }
 
 export enum NUMBER_KEY {

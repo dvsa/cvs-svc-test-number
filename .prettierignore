@@ -3,3 +3,7 @@
 .reports
 coverage
 node_modules
+.serverless
+.artifact
+.webpack
+.reports

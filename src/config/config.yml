@@ -33,7 +33,7 @@ dynamodb:
   local:
     params:
       region: localhost
-      endpoint: http://localhost:8008
+      endpoint: http://127.0.0.1:8008
       maxRetries: 10
       httpOptions:
         timeout: 30000
@@ -43,7 +43,7 @@ dynamodb:
   local-global:
     params:
       region: localhost
-      endpoint: http://localhost:8000
+      endpoint: http://127.0.0.1:8000
       maxRetries: 10
       httpOptions:
         timeout: 30000
@@ -61,15 +61,15 @@ testNumberinitialValue:
   testNumber: W01A000
   id: W01
   certLetter: A
-  sequenceNumber: "000"
+  sequenceNumber: '000'
 trailerIdInitialValue:
   trailerId: C530000
   trailerLetter: C
   sequenceNumber: 530000
 systemNumberInitialValue:
-  systemNumber: "10000000"
+  systemNumber: '10000000'
 plateSerialNumberInitialValue:
-  plateSerialNumber: "0"
+  plateSerialNumber: '0'
 ZNumberInitialValue:
   zNumber: 1000000Z
   zNumberLetter: Z
