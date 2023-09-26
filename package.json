@@ -29,7 +29,6 @@
     "precommit": "npm run security-checks && npm run audit && npm run lint && npm run format",
     "audit": "npm audit --prod",
     "tools-setup": "sls dynamodb install",
-    "postinstall": "patch-package",
     "commit-msg": "commitlint --edit $1"
   },
   "nyc": {
@@ -62,6 +61,7 @@
     "node-yaml": "4.0.1",
     "path-parser": "^4.2.0",
     "reflect-metadata": "^0.1.13",
+    "serverless-dynamodb": "^0.2.43",
     "ts-node-register": "^1.0.0",
     "uuid": "^9.0.0"
   },
@@ -88,7 +88,6 @@
     "patch-package": "^8.0.0",
     "prettier": "^2.3.2",
     "serverless": "^2.45.2",
-    "serverless-dynamodb-local": "^0.2.40",
     "serverless-offline": "^5.12.1",
     "serverless-plugin-tracing": "^2.0.0",
     "serverless-plugin-typescript": "^2.1.4",

@@ -1,7 +1,7 @@
 service: cvs-svc-test-number
 configValidationMode: warn
 plugins:
-  - serverless-dynamodb-local
+  - serverless-dynamodb
   - serverless-offline
   - serverless-plugin-typescript
   - serverless-plugin-tracing
