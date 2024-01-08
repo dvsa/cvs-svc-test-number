@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-throw-literal */
 import { AWSError } from 'aws-sdk'; // Only used as a type, so not wrapped by XRay
-import { PlateSerialNumber, SystemNumber, TestNumber, TNumber, TrailerId, ZNumber } from '../models/NumberModel';
+import {
+  PlateSerialNumber, SystemNumber, TestNumber, TNumber, TrailerId, ZNumber,
+} from '../models/NumberModel';
 import { HTTPResponse } from '../utils/HTTPResponse';
 import { DynamoDBService } from './DynamoDBService';
 import { Configuration } from '../utils/Configuration';
@@ -50,7 +53,7 @@ export class NumberService {
 
   /**
    * Creates a new test number in the database.
-   * @param attempt - the current number of attempts for generating a Test Number.
+   * @param attempts
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
   public async createTestNumber(attempts: number, awsError: AWSError | null): Promise<TestNumber> {
@@ -245,13 +248,13 @@ export class NumberService {
    */
   public async getLastTestNumber(): Promise<TestNumber> {
     try {
-      const data: any = await this.dbClient.get({
+      const data = await this.dbClient.get({
         testNumberKey: NUMBER_KEY.TEST_NUMBER,
       });
       if (!data.Item) {
         return Configuration.getInstance().getTestNumberInitialValue();
       }
-      return data.Item;
+      return data.Item as TestNumber;
     } catch (error) {
       throw this.formatAWSError(error as AWSError);
     }
@@ -262,13 +265,13 @@ export class NumberService {
    */
   public async getLastTrailerId(): Promise<TrailerId> {
     try {
-      const data: any = await this.dbClient.get({
+      const data = await this.dbClient.get({
         testNumberKey: NUMBER_KEY.TRAILER_ID,
       });
       if (!data.Item) {
         return Configuration.getInstance().getTrailerIdInitialValue();
       }
-      return data.Item;
+      return data.Item as TrailerId;
     } catch (error) {
       throw this.formatAWSError(error as AWSError);
     }
@@ -279,7 +282,7 @@ export class NumberService {
    */
   public async getLastTNumber(): Promise<TNumber> {
     try {
-      const data: any = await this.dbClient.get({
+      const data = await this.dbClient.get({
         testNumberKey: NUMBER_KEY.T_NUMBER,
       });
 
@@ -288,7 +291,7 @@ export class NumberService {
         return Configuration.getInstance().getTNumberInitialValue();
       }
 
-      return data.Item;
+      return data.Item as TNumber;
     } catch (error) {
       throw this.formatAWSError(error as AWSError);
     }
@@ -299,14 +302,14 @@ export class NumberService {
    */
   public async getLastZNumber(): Promise<ZNumber> {
     try {
-      const data: any = await this.dbClient.get({
+      const data = await this.dbClient.get({
         testNumberKey: NUMBER_KEY.Z_NUMBER,
       });
       if (!data.Item) {
         console.log(Configuration.getInstance().getZNumberInitialValue());
         return Configuration.getInstance().getZNumberInitialValue();
       }
-      return data.Item;
+      return data.Item as ZNumber;
     } catch (error) {
       throw this.formatAWSError(error as AWSError);
     }
@@ -317,13 +320,13 @@ export class NumberService {
    */
   public async getLastSystemNumber(): Promise<SystemNumber> {
     try {
-      const data: any = await this.dbClient.get({
+      const data = await this.dbClient.get({
         testNumberKey: NUMBER_KEY.SYSTEM_NUMBER,
       });
       if (!data.Item) {
         return Configuration.getInstance().getSystemNumberInitialValue();
       }
-      return data.Item;
+      return data.Item as SystemNumber;
     } catch (error) {
       throw this.formatAWSError(error as AWSError);
     }
@@ -334,13 +337,13 @@ export class NumberService {
    */
   public async getLastPlateSerialNumber(): Promise<PlateSerialNumber> {
     try {
-      const data: any = await this.dbClient.get({
+      const data = await this.dbClient.get({
         testNumberKey: NUMBER_KEY.PLATE_SERIAL_NUMBER,
       });
       if (!data.Item) {
         return Configuration.getInstance().getPlateSerialNumberInitialValue();
       }
-      return data.Item;
+      return data.Item as PlateSerialNumber;
     } catch (error) {
       throw this.formatAWSError(error as AWSError);
     }
@@ -411,9 +414,8 @@ export class NumberService {
    */
   public createNextTNumberObject(TNumberObject: TNumber): TNumber {
     const newSequenceNumber: number = TNumberObject.sequenceNumber + 1;
-    const newTNumber =
-      newSequenceNumber.toLocaleString('en', { minimumIntegerDigits: 6 }).replace(/,/g, '') +
-      TNumberObject.tNumberLetter;
+    const newTNumber = newSequenceNumber.toLocaleString('en', { minimumIntegerDigits: 6 }).replace(/,/g, '')
+      + TNumberObject.tNumberLetter;
     const newTNumberObject: TNumber = {
       tNumber: newTNumber,
       tNumberLetter: TNumberObject.tNumberLetter,
@@ -475,14 +477,13 @@ export class NumberService {
     const firstLetterAlphabeticalIndex = testNumber.charCodeAt(0) - 64;
     const secondLetterAlphabeticalIndex = testNumber.charCodeAt(3) - 64;
 
-    let checkSum =
-      firstLetterAlphabeticalIndex +
-      parseInt(testNumberWithoutLetters.charAt(0), 10) +
-      parseInt(testNumberWithoutLetters.charAt(1), 10) * 3 +
-      secondLetterAlphabeticalIndex +
-      parseInt(testNumberWithoutLetters.charAt(2), 10) +
-      parseInt(testNumberWithoutLetters.charAt(3), 10) * 3 +
-      parseInt(testNumberWithoutLetters.charAt(4), 10);
+    let checkSum = firstLetterAlphabeticalIndex
+      + parseInt(testNumberWithoutLetters.charAt(0), 10)
+      + parseInt(testNumberWithoutLetters.charAt(1), 10) * 3
+      + secondLetterAlphabeticalIndex
+      + parseInt(testNumberWithoutLetters.charAt(2), 10)
+      + parseInt(testNumberWithoutLetters.charAt(3), 10) * 3
+      + parseInt(testNumberWithoutLetters.charAt(4), 10);
 
     if (checkSum > 99) {
       checkSum %= 100;
