@@ -11,8 +11,8 @@ provider:
   runtime: nodejs18.x
   lambdaHashingVersion: 20201221
   environment:
-    BRANCH: ${env:BRANCH}
-    AWS_XRAY_CONTEXT_MISSING: ${env:AWS_XRAY_CONTEXT_MISSING}
+    BRANCH: ${env:BRANCH, 'local'}
+    AWS_XRAY_CONTEXT_MISSING: ${env:AWS_XRAY_CONTEXT_MISSING, 'LOG_ERROR'}
   tracing:
     apiGateway: true
     lambda: true

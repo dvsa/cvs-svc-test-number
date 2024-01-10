@@ -28,7 +28,7 @@
     "prepush": "npm run test && npm run build && npm run test-i",
     "precommit": "npm run security-checks && npm run audit && npm run lint && npm run format",
     "audit": "npm audit --prod",
-    "tools-setup": "BRANCH=local AWS_XRAY_CONTEXT_MISSING=LOG_ERROR sls dynamodb install",
+    "tools-setup": "sls dynamodb install",
     "commit-msg": "commitlint --edit $1"
   },
   "nyc": {
