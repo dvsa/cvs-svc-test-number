@@ -146,18 +146,17 @@ export class DynamoDBService {
       itemBatches.push(itemList.splice(0, 25));
     }
 
-    const promiseBatch: Array<Promise<PromiseResult<DocumentClient.BatchWriteItemOutput, AWS.AWSError>>> =
-      itemBatches.map((batch: any[]) => {
-        const query: DocumentClient.BatchWriteItemInput = {
-          RequestItems: {
-            [this.tableName]: batch.map((item: any) => ({
-              PutRequest: { Item: item },
-            })),
-          },
-        };
+    const promiseBatch: Array<Promise<PromiseResult<DocumentClient.BatchWriteItemOutput, AWS.AWSError>>> = itemBatches.map((batch: any[]) => {
+      const query: DocumentClient.BatchWriteItemInput = {
+        RequestItems: {
+          [this.tableName]: batch.map((item: any) => ({
+            PutRequest: { Item: item },
+          })),
+        },
+      };
 
-        return DynamoDBService.client.batchWrite(query).promise();
-      });
+      return DynamoDBService.client.batchWrite(query).promise();
+    });
 
     return Promise.all(promiseBatch);
   }
@@ -177,18 +176,17 @@ export class DynamoDBService {
       keyBatches.push(keyList.splice(0, 25));
     }
 
-    const promiseBatch: Array<Promise<PromiseResult<DocumentClient.BatchWriteItemOutput, AWS.AWSError>>> =
-      keyBatches.map((batch: any[]) => {
-        const query: DocumentClient.BatchWriteItemInput = {
-          RequestItems: {
-            [this.tableName]: batch.map((item: any) => ({
-              DeleteRequest: { Key: item },
-            })),
-          },
-        };
+    const promiseBatch: Array<Promise<PromiseResult<DocumentClient.BatchWriteItemOutput, AWS.AWSError>>> = keyBatches.map((batch: any[]) => {
+      const query: DocumentClient.BatchWriteItemInput = {
+        RequestItems: {
+          [this.tableName]: batch.map((item: any) => ({
+            DeleteRequest: { Key: item },
+          })),
+        },
+      };
 
-        return DynamoDBService.client.batchWrite(query).promise();
-      });
+      return DynamoDBService.client.batchWrite(query).promise();
+    });
 
     return Promise.all(promiseBatch);
   }

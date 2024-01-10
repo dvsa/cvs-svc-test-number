@@ -5,7 +5,9 @@
 /* eslint-disable jest/no-conditional-expect */
 import { AWSError } from 'aws-sdk';
 import { NumberService } from '../../src/services/NumberService';
-import { PlateSerialNumber, SystemNumber, TestNumber, TrailerId, ZNumber, TNumber } from '../../src/models/NumberModel';
+import {
+  PlateSerialNumber, SystemNumber, TestNumber, TrailerId, ZNumber, TNumber,
+} from '../../src/models/NumberModel';
 import { DynamoDBService } from '../../src/services/DynamoDBService';
 import { HTTPResponse } from '../../src/utils/HTTPResponse';
 

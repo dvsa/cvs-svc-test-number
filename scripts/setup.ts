@@ -1,58 +1,56 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable import/no-import-module-exports */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { spawn } from 'child_process';
+// eslint-disable-next-line import/no-import-module-exports
+import http from 'http';
 
-// We hook to serverless offline when firing its process
-const SERVER_OK = 'Offline [HTTP] listening on http://localhost:3008';
-// Serverless fires a local dynamo-db instance which is killed once the parent process is terminated
-// the current serverless script checks whether a local instance is running but does not error when binding fails
-// we force throwing an error so we always start from a clean slate if java.io.IOException: Failed to bind to 0.0.0.0/0.0.0.0:8006
-const DYNAMO_LOCAL_ERROR_THREAD = 'Exception in thread "main"';
+const serverPort = 3008; // Replace with your server port
+const timeout = 60000; // Timeout in milliseconds, adjust as needed
 
-// eslint-disable-next-line arrow-body-style
-const setupServer = (process: any) => {
-  return new Promise((resolve, reject) => {
-    process.stdout.setEncoding('utf-8').on('data', (stream: any) => {
-      console.log(stream);
-      if (stream.includes(SERVER_OK)) {
-        resolve(process);
-      }
-    });
-
-    process.stderr.setEncoding('utf-8').on('data', (stream: any) => {
-      if (stream.includes(DYNAMO_LOCAL_ERROR_THREAD)) {
-        throw new Error('Internal Java process crashed');
-      }
-      reject(stream);
-    });
-
-    process.on('exit', (code: any, signal: any) => {
-      if (code !== 137) {
-        console.info(`process terminated with code: ${code} and signal: ${signal}`);
-      }
-    });
+const checkServer = (): Promise<void> => new Promise((resolve, reject) => {
+  const request = http.get(`http://localhost:${serverPort}/`, (res) => {
+    if (res.statusCode) {
+      resolve();
+    } else {
+      reject(new Error('Server responded, but no status code.'));
+    }
   });
+
+  request.on('error', (err) => {
+    reject(new Error(`Server did not respond. Err: ${err.message}`));
+  });
+
+  request.end();
+});
+
+const pollServer = async () => {
+  const startDate = new Date();
+  const startTime = Date.now();
+
+  console.log('Starting poll of server', startDate);
+
+  // eslint-disable-next-line consistent-return
+  const poll = async (): Promise<void> => {
+    try {
+      await checkServer();
+      console.log('Server is ready');
+    } catch (error) {
+      const elapsedTime = Date.now() - startTime;
+
+      if (elapsedTime < timeout) {
+        await new Promise((resolve) => { setTimeout(resolve, 1000); }); // Wait for 1 second
+        return poll();
+      }
+      throw new Error(`SLS server did not respond within ${timeout / 1000} seconds`);
+    }
+  };
+
+  await poll();
 };
 
-const server = spawn('npm', ['run', 'start'], {});
-
 module.exports = async () => {
-  console.log('\nSetting up Integration tests...\n\n');
   try {
-    const instance = await setupServer(server);
-    // @ts-ignore
-    const { pid } = instance;
-    console.info(`
-    start script running ✅ ...
-    on pid: ${pid}
-    `);
-  } catch (e) {
+    await pollServer();
+  } catch (err) {
     console.error('Something wrong happened:\n');
-    console.error(e);
+    console.error(err);
     process.exit(1);
   }
 };

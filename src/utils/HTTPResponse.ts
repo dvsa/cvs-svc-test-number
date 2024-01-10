@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { APIGatewayProxyResult } from 'aws-lambda';
 
-class HTTPResponse extends Error implements APIGatewayProxyResult {
+class HTTPResponse implements APIGatewayProxyResult {
   public readonly statusCode: number;
 
   public readonly body: any;
@@ -16,8 +16,6 @@ class HTTPResponse extends Error implements APIGatewayProxyResult {
    * @param headers - optional - the response headers
    */
   constructor(statusCode: number | undefined, body: any, headers = {}) {
-    super();
-
     if (headers) {
       this.headers = headers;
       this.headers['Access-Control-Allow-Origin'] = '*';
