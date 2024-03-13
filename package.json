@@ -1,7 +1,7 @@
 {
   "name": "cvs-svc-test-number",
   "version": "1.0.0",
-  "description": "A microservice generating test numbers.",
+  "description": "A microservice generating test numbers",
   "main": "handler.js",
   "engines": {
     "node": "18.*",
