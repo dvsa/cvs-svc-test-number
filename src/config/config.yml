@@ -63,19 +63,19 @@ testNumberinitialValue:
   certLetter: A
   sequenceNumber: '000'
 trailerIdInitialValue:
-  trailerId: C530000
+  trailerId: C4000000
   trailerLetter: C
-  sequenceNumber: 530000
+  sequenceNumber: 4000000
 systemNumberInitialValue:
-  systemNumber: '10000000'
+  systemNumber: '4000000'
 plateSerialNumberInitialValue:
   plateSerialNumber: '0'
 ZNumberInitialValue:
-  zNumber: 1000000Z
+  zNumber: 4000000Z
   zNumberLetter: Z
-  sequenceNumber: 1000000
+  sequenceNumber: 4000000
 TNumberInitialValue:
-  tNumber: 020000T
+  tNumber: 4000000T
   tNumberLetter: T
-  sequenceNumber: 20000
+  sequenceNumber: 4000000
 maxAttempts: 2
