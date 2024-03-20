@@ -639,7 +639,7 @@ describe('NumberService', () => {
     });
     it('returns default value on empty DB return', async () => {
       const defaultPlateSerialNumber = {
-        plateSerialNumber: '4000000',
+        plateSerialNumber: '0',
       };
       DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: null });
       const service = new NumberService(new DynamoDBService());
