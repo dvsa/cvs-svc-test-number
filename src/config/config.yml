@@ -69,7 +69,7 @@ trailerIdInitialValue:
 systemNumberInitialValue:
   systemNumber: '4000000'
 plateSerialNumberInitialValue:
-  plateSerialNumber: '4000000'
+  plateSerialNumber: '0'
 ZNumberInitialValue:
   zNumber: 4000000Z
   zNumberLetter: Z
