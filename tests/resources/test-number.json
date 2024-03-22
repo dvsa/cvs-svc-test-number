@@ -7,9 +7,9 @@
     "testNumberKey": 1
   },
   {
-    "trailerId": "C530000",
+    "trailerId": "C4000000",
     "trailerLetter": "C",
-    "sequenceNumber": 530000,
+    "sequenceNumber": 4000000,
     "testNumberKey": 2
   },
   {
@@ -21,15 +21,15 @@
     "testNumberKey": 4
   },
   {
-    "zNumber": "1000000Z",
+    "zNumber": "4000000Z",
     "zNumberLetter": "Z",
-    "sequenceNumber": 1000000,
+    "sequenceNumber": 4000000,
     "testNumberKey": 5
   },
   {
-    "tNumber": "020000T",
+    "tNumber": "4000000T",
     "tNumberLetter": "T",
-    "sequenceNumber": 20000,
+    "sequenceNumber": 4000000,
     "testNumberKey": 6
   }
 ]
