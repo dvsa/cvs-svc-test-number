@@ -26,7 +26,7 @@ describe('POST /system-number', () => {
   context('when a new system number is requested when only the seed data is present', () => {
     it('should respond with HTTP 200 and a next valid system-number', () => {
       const nextSystemNumber: SystemNumber = {
-        systemNumber: '10000001',
+        systemNumber: '4000001',
         testNumberKey: 3,
       };
       expect.assertions(4);

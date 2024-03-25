@@ -26,9 +26,9 @@ describe('POST /t-number', () => {
   context('when a new TNumber is requested when only the seed data is present', () => {
     it('should respond with HTTP 200 and a next valid TNumber', () => {
       const nextTNumber: TNumber = {
-        tNumber: '020001T',
+        tNumber: '4000001T',
         tNumberLetter: 'T',
-        sequenceNumber: 20001,
+        sequenceNumber: 4000001,
         testNumberKey: 6,
       };
       expect.assertions(4);

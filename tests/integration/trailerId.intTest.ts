@@ -26,9 +26,9 @@ describe('POST /trailerId', () => {
   context('when a new trailerId is requested when only the seed data is present', () => {
     it('should respond with HTTP 200 and a next valid trailerId', () => {
       const nextTrailerId: TrailerId = {
-        trailerId: 'C530001',
+        trailerId: 'C4000001',
         trailerLetter: 'C',
-        sequenceNumber: 530001,
+        sequenceNumber: 4000001,
         testNumberKey: 2,
       };
       expect.assertions(4);

@@ -26,9 +26,9 @@ describe('POST /z-number', () => {
   context('when a new ZNumber is requested when only the seed data is present', () => {
     it('should respond with HTTP 200 and a next valid ZNumber', () => {
       const nextZNumber: ZNumber = {
-        zNumber: '1000001Z',
+        zNumber: '4000001Z',
         zNumberLetter: 'Z',
-        sequenceNumber: 1000001,
+        sequenceNumber: 4000001,
         testNumberKey: 5,
       };
       expect.assertions(4);
