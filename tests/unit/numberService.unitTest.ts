@@ -516,9 +516,9 @@ describe('NumberService', () => {
     });
     it('returns default value on empty DB return', async () => {
       const defaultTrailerId = {
-        trailerId: 'C530000',
+        trailerId: 'C4000000',
         trailerLetter: 'C',
-        sequenceNumber: 530000,
+        sequenceNumber: 4000000,
       };
       DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: null });
       const service = new NumberService(new DynamoDBService());
@@ -559,9 +559,9 @@ describe('NumberService', () => {
     });
     it('returns default value on empty DB return', async () => {
       const defaultZNumber: Omit<ZNumber, 'testNumberKey'> = {
-        zNumber: '1000000Z',
+        zNumber: '4000000Z',
         zNumberLetter: 'Z',
-        sequenceNumber: 1000000,
+        sequenceNumber: 4000000,
       };
       DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: null });
       const service = new NumberService(new DynamoDBService());
@@ -600,7 +600,7 @@ describe('NumberService', () => {
     });
     it('returns default value on empty DB return', async () => {
       const defaultSystemNumber = {
-        systemNumber: '10000000',
+        systemNumber: '4000000',
       };
       DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: null });
       const service = new NumberService(new DynamoDBService());
