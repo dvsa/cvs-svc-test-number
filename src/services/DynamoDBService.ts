@@ -11,7 +11,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
-  DynamoDBClient, DynamoDBClientConfig, PutRequest,
+  DynamoDBClient, PutRequest,
 } from '@aws-sdk/client-dynamodb';
 import { KeyNodeChildren } from '@aws-sdk/lib-dynamodb/dist-types/commands/utils';
 import * as AWSXRay from 'aws-xray-sdk';
@@ -22,8 +22,6 @@ import { Configuration } from '../utils/Configuration';
 export class DynamoDBService {
   private static client: DynamoDBDocumentClient;
 
-  private static dynamoDbClient: DynamoDBClient;
-
   private readonly tableName: string;
 
   /**
@@ -33,10 +31,11 @@ export class DynamoDBService {
     const config: any = Configuration.getInstance().getDynamoDBConfig();
     this.tableName = config.table;
 
-    if (!DynamoDBService.dynamoDbClient) {
+    if (!DynamoDBService.client) {
       console.log('config for DynamoDB Client: ', config.params);
-      DynamoDBService.dynamoDbClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({ ...config.params as DynamoDBClientConfig }));
-      DynamoDBService.client = DynamoDBDocumentClient.from(DynamoDBService.dynamoDbClient);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      const client = AWSXRay.captureAWSv3Client(new DynamoDBClient(config.params));
+      DynamoDBService.client = DynamoDBDocumentClient.from(client);
     }
   }
 
@@ -219,6 +218,6 @@ export class DynamoDBService {
         },
       ],
     };
-    return DynamoDBService.dynamoDbClient.send(new TransactWriteCommand(query));
+    return DynamoDBService.client.send(new TransactWriteCommand(query));
   }
 }
