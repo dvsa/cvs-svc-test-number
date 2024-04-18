@@ -33,8 +33,17 @@ export class DynamoDBService {
 
     if (!DynamoDBService.client) {
       console.log('config for DynamoDB Client: ', config.params);
+      let client;
+
+      if (process.env._X_AMZN_TRACE_ID) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      const client = AWSXRay.captureAWSv3Client(new DynamoDBClient(config.params));
+        client = AWSXRay.captureAWSv3Client(new DynamoDBClient(config.params));
+      } else {
+        console.log('Serverless Offline detected; skipping AWS X-Ray setup');
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        client = new DynamoDBClient(config.params);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       DynamoDBService.client = DynamoDBDocumentClient.from(client);
     }
   }
