@@ -23,7 +23,7 @@ describe('POST /plateSerialNo', () => {
     await populateDatabase();
   });
 
-  context('when a new plate serial number is requested when only the seed data is present', () => {
+  describe('when a new plate serial number is requested when only the seed data is present', () => {
     it('should respond with HTTP 200 and a next valid plateSerialNumber', () => {
       const nextPlateSerialNo: PlateSerialNumber = {
         plateSerialNumber: '1',

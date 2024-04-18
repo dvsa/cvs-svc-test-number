@@ -7,16 +7,15 @@
 /* eslint-disable no-underscore-dangle */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
-  BatchGetCommand, BatchGetCommandInput, BatchGetCommandOutput, DeleteCommand, DeleteCommandInput, DeleteCommandOutput, DynamoDBDocumentClient, GetCommand, GetCommandInput, GetCommandOutput, PutCommand, PutCommandInput, PutCommandOutput, ScanCommand, ScanCommandOutput,
+  BatchGetCommand, BatchGetCommandInput, BatchGetCommandOutput, BatchWriteCommand, BatchWriteCommandInput, BatchWriteCommandOutput, DeleteCommand, DeleteCommandInput, DeleteCommandOutput, DynamoDBDocumentClient, GetCommand, GetCommandInput, GetCommandOutput, PutCommand, PutCommandInput, PutCommandOutput, ScanCommand, ScanCommandOutput, TransactWriteCommand, TransactWriteCommandInput, TransactWriteCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
-  BatchWriteItemCommand, BatchWriteItemCommandInput, BatchWriteItemCommandOutput, DynamoDBClient, DynamoDBClientConfig, PutRequest, TransactWriteItemsCommand, TransactWriteItemsCommandInput, TransactWriteItemsCommandOutput,
+  DynamoDBClient, DynamoDBClientConfig, PutRequest,
 } from '@aws-sdk/client-dynamodb';
 import { KeyNodeChildren } from '@aws-sdk/lib-dynamodb/dist-types/commands/utils';
+import * as AWSXRay from 'aws-xray-sdk';
 import { Configuration } from '../utils/Configuration';
-
-const AWSXRay = require('aws-xray-sdk');
 /* tslint:disable */
 /* tslint:enable */
 
@@ -144,15 +143,15 @@ export class DynamoDBService {
    * @param items - items to add or update
    * @returns Promise<PromiseResult<DocumentClient.BatchWriteItemOutput, AWS.AWSError>[]>
    */
-  public batchPut(items: any[]): Promise<Array<BatchWriteItemCommandOutput>> {
+  public batchPut(items: any[]): Promise<Array<BatchWriteCommandOutput>> {
     const itemList: PutRequest[] = items.slice();
     const itemBatches: Array<PutRequest[]> = [];
 
     while (itemList.length > 0) {
       itemBatches.push(itemList.splice(0, 25));
     }
-    const promiseBatch: Array<Promise<BatchWriteItemCommandOutput>> = itemBatches.map((batch: any[]) => {
-      const query: BatchWriteItemCommandInput = {
+    const promiseBatch: Array<Promise<BatchWriteCommandOutput>> = itemBatches.map((batch: any[]) => {
+      const query: BatchWriteCommandInput = {
         RequestItems: {
           [this.tableName]: batch.map((item: any) => ({
             PutRequest: { Item: item },
@@ -160,7 +159,7 @@ export class DynamoDBService {
         },
       };
 
-      return DynamoDBService.dynamoDbClient.send(new BatchWriteItemCommand(query));
+      return DynamoDBService.client.send(new BatchWriteCommand(query));
     });
 
     return Promise.all(promiseBatch);
@@ -173,7 +172,7 @@ export class DynamoDBService {
    */
   public batchDelete(
     keys: Array<Record<string, any> | undefined>,
-  ): Promise<Array<BatchWriteItemCommandOutput>> {
+  ): Promise<Array<BatchWriteCommandOutput>> {
     const keyList: Array<Record<string, any> | undefined> = keys.slice();
     const keyBatches: Array<Array<Record<string, any> | undefined>> = [];
 
@@ -181,8 +180,8 @@ export class DynamoDBService {
       keyBatches.push(keyList.splice(0, 25));
     }
 
-    const promiseBatch: Array<Promise<BatchWriteItemCommandOutput>> = keyBatches.map((batch: any[]) => {
-      const query: BatchWriteItemCommandInput = {
+    const promiseBatch: Array<Promise<BatchWriteCommandOutput>> = keyBatches.map((batch: any[]) => {
+      const query: BatchWriteCommandInput = {
         RequestItems: {
           [this.tableName]: batch.map((item: any) => ({
             DeleteRequest: { Key: item },
@@ -190,7 +189,7 @@ export class DynamoDBService {
         },
       };
 
-      return DynamoDBService.dynamoDbClient.send(new BatchWriteItemCommand(query));
+      return DynamoDBService.client.send(new BatchWriteCommand(query));
     });
 
     return Promise.all(promiseBatch);
@@ -207,8 +206,8 @@ export class DynamoDBService {
       ConditionExpression: string;
       ExpressionAttributeValues: any;
     },
-  ): Promise<TransactWriteItemsCommandOutput> {
-    const query: TransactWriteItemsCommandInput = {
+  ): Promise<TransactWriteCommandOutput> {
+    const query: TransactWriteCommandInput = {
       TransactItems: [
         {
           Put: {
@@ -220,6 +219,6 @@ export class DynamoDBService {
         },
       ],
     };
-    return DynamoDBService.dynamoDbClient.send(new TransactWriteItemsCommand(query));
+    return DynamoDBService.dynamoDbClient.send(new TransactWriteCommand(query));
   }
 }

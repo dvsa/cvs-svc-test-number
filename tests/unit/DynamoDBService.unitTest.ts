@@ -12,6 +12,7 @@ import { mockClient } from 'aws-sdk-client-mock';
 import {
   BatchGetCommand,
   BatchGetCommandOutput,
+  BatchWriteCommand,
   DeleteCommand,
   DynamoDBDocumentClient, GetCommand, PutCommand, ScanCommand,
 } from '@aws-sdk/lib-dynamodb';
@@ -394,7 +395,7 @@ describe('DynamoDBService', () => {
     });
 
     it('returns error on failed query', async () => {
-      dynamodbMock.on(BatchWriteItemCommand).rejects('It broke');
+      dynamodbMock.on(BatchWriteCommand).rejects('It broke');
       expect.assertions(1);
       try {
         await new DynamoDBService().batchPut([{ testNumber: 'abc123' }]);
@@ -491,7 +492,7 @@ describe('DynamoDBService', () => {
     });
 
     it('returns error on failed query', async () => {
-      dynamodbMock.on(BatchWriteItemCommand).rejects('It broke');
+      dynamodbMock.on(BatchWriteCommand).rejects('It broke');
       expect.assertions(1);
       try {
         await new DynamoDBService().batchDelete([{ testNumber: 'abc123' }]);
