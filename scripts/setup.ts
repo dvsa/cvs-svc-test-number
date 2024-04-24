@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable import/no-import-module-exports */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { spawn } from 'child_process';
+// eslint-disable-next-line import/no-import-module-exports
+import { exec } from 'child_process';
 
 // We hook to serverless offline when firing its process
 const SERVER_OK = 'http://localhost:3008';
@@ -40,7 +39,12 @@ const setupServer = (process: any) => {
   });
 };
 
-const server = spawn('npm', ['run', 'start'], {});
+const server = exec('npm run start &', (error) => {
+  if (error) {
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string, @typescript-eslint/restrict-template-expressions
+    console.error(`error starting server: ${error}`);
+  }
+});
 
 module.exports = async () => {
   console.log('\nSetting up Integration tests...\n\n');
