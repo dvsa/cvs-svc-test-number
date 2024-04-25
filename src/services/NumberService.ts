@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { AWSError } from 'aws-sdk'; // Only used as a type, so not wrapped by XRay
-import { PlateSerialNumber, SystemNumber, TestNumber, TNumber, TrailerId, ZNumber } from '../models/NumberModel';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ServiceException } from '@smithy/smithy-client';
+import {
+  PlateSerialNumber, SystemNumber, TestNumber, TNumber, TrailerId, ZNumber,
+} from '../models/NumberModel';
 import { HTTPResponse } from '../utils/HTTPResponse';
 import { DynamoDBService } from './DynamoDBService';
 import { Configuration } from '../utils/Configuration';
@@ -24,27 +27,25 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a Test Number.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  private manageAttempts(attempts: number, awsError: AWSError | null) {
+  private manageAttempts(attempts: number, awsError: ServiceException | null) {
     if (attempts > Configuration.getInstance().getMaxAttempts()) {
       if (awsError) {
         throw new HTTPResponse(400, {
-          error: `${awsError.code}: ${awsError.message}
-            At: ${awsError.hostname} - ${awsError.region}
-            Request id: ${awsError.requestId}`,
+          error: `${awsError.name}: ${awsError.message}
+          Request id: ${awsError.$metadata.requestId}`,
         });
       }
     }
   }
 
   /**
-   * Throws an AWSError
-   * @param error - the AWSError
+   * Throws an ServiceException
+   * @param error - the ServiceException
    */
-  private formatAWSError(error: AWSError) {
-    return new HTTPResponse(error.statusCode, {
-      error: `${error.code}: ${error.message}
-                        At: ${error.hostname} - ${error.region}
-                        Request id: ${error.requestId}`,
+  private formatAWSError(error: ServiceException) {
+    return new HTTPResponse(error.$metadata.httpStatusCode, {
+      error: `${error.name}: ${error.message}
+                        Request id: ${error.$metadata.requestId}`,
     });
   }
 
@@ -53,7 +54,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a Test Number.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createTestNumber(attempts: number, awsError: AWSError | null): Promise<TestNumber> {
+  public async createTestNumber(attempts: number, awsError: ServiceException | null): Promise<TestNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastTestNumber: TestNumber = await this.getLastTestNumber();
@@ -69,13 +70,13 @@ export class NumberService {
       return nextTestNumberObject;
     } catch (error) {
       console.error(error); // limit to 5 attempts
-      if ((error as AWSError).statusCode === 400) {
+      if ((error as ServiceException).$metadata.httpStatusCode === 400) {
         console.error(
           `Attempt number ${attempts} for testNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`,
         );
-        return this.createTestNumber(attempts + 1, error as AWSError);
+        return this.createTestNumber(attempts + 1, error as ServiceException);
       }
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -84,7 +85,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a Test Number.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createTrailerId(attempts: number, awsError: AWSError | null): Promise<TrailerId> {
+  public async createTrailerId(attempts: number, awsError: ServiceException | null): Promise<TrailerId> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastTrailerId: TrailerId = await this.getLastTrailerId();
@@ -100,13 +101,13 @@ export class NumberService {
       return nextTrailerIdObject;
     } catch (error) {
       console.error(error); // limit to 5 attempts
-      if ((error as AWSError).statusCode === 400) {
+      if ((error as ServiceException).$metadata.httpStatusCode === 400) {
         console.error(
           `Attempt number ${attempts} for trailerId failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`,
         );
-        return this.createTrailerId(attempts + 1, error as AWSError);
+        return this.createTrailerId(attempts + 1, error as ServiceException);
       }
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -115,7 +116,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a System Number.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createSystemNumber(attempts: number, awsError: AWSError | null): Promise<SystemNumber> {
+  public async createSystemNumber(attempts: number, awsError: ServiceException | null): Promise<SystemNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastSystemNumber: SystemNumber = await this.getLastSystemNumber();
@@ -131,13 +132,13 @@ export class NumberService {
       return nextSystemNumberObject;
     } catch (error) {
       console.error(error); // limit to 5 attempts
-      if ((error as AWSError).statusCode === 400) {
+      if ((error as ServiceException).$metadata.httpStatusCode === 400) {
         console.error(
           `Attempt number ${attempts} for systemNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`,
         );
-        return this.createSystemNumber(attempts + 1, error as AWSError);
+        return this.createSystemNumber(attempts + 1, error as ServiceException);
       }
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -146,7 +147,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a Plate Serial Number.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createPlateSerialNumber(attempts: number, awsError: AWSError | null): Promise<PlateSerialNumber> {
+  public async createPlateSerialNumber(attempts: number, awsError: ServiceException | null): Promise<PlateSerialNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastPlateSerialNumber: PlateSerialNumber = await this.getLastPlateSerialNumber();
@@ -162,13 +163,13 @@ export class NumberService {
       return nextPlateSerialNumberObject;
     } catch (error) {
       console.error(error); // limit to 5 attempts
-      if ((error as AWSError).statusCode === 400) {
+      if ((error as ServiceException).$metadata.httpStatusCode === 400) {
         console.error(
           `Attempt number ${attempts} for plateSerialNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`,
         );
-        return this.createPlateSerialNumber(attempts + 1, error as AWSError);
+        return this.createPlateSerialNumber(attempts + 1, error as ServiceException);
       }
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -177,7 +178,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a ZNumber.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createZNumber(attempts: number, awsError: AWSError | null): Promise<ZNumber> {
+  public async createZNumber(attempts: number, awsError: ServiceException | null): Promise<ZNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastZNumber: ZNumber = await this.getLastZNumber();
@@ -193,13 +194,13 @@ export class NumberService {
       return nextZNumberObject;
     } catch (error) {
       console.error(error); // limit to 5 attempts
-      if ((error as AWSError).statusCode === 400) {
+      if ((error as ServiceException).$metadata.httpStatusCode === 400) {
         console.error(
           `Attempt number ${attempts} for ZNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`,
         );
-        return this.createZNumber(attempts + 1, error as AWSError);
+        return this.createZNumber(attempts + 1, error as ServiceException);
       }
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -208,7 +209,7 @@ export class NumberService {
    * @param attempt - the current number of attempts for generating a TNumber.
    * @param awsError - AWS error to be passed when the request fails otherwise null.
    */
-  public async createTNumber(attempts: number, awsError: AWSError | null): Promise<TNumber> {
+  public async createTNumber(attempts: number, awsError: ServiceException | null): Promise<TNumber> {
     this.manageAttempts(attempts, awsError);
     try {
       const lastTNumber: TNumber = await this.getLastTNumber();
@@ -228,15 +229,15 @@ export class NumberService {
     } catch (error) {
       console.error(error); // limit to 5 attempts
 
-      if ((error as AWSError).statusCode === 400) {
+      if ((error as ServiceException).$metadata.httpStatusCode === 400) {
         console.error(
           `Attempt number ${attempts} for TNumber failed. Retrying up to ${Configuration.getInstance().getMaxAttempts()} attempts.`,
         );
 
-        return this.createTNumber(attempts + 1, error as AWSError);
+        return this.createTNumber(attempts + 1, error as ServiceException);
       }
 
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -253,7 +254,7 @@ export class NumberService {
       }
       return data.Item;
     } catch (error) {
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as unknown as ServiceException);
     }
   }
 
@@ -270,7 +271,8 @@ export class NumberService {
       }
       return data.Item;
     } catch (error) {
-      throw this.formatAWSError(error as AWSError);
+      error.name = 'ServiceException';
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -290,7 +292,7 @@ export class NumberService {
 
       return data.Item;
     } catch (error) {
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -308,7 +310,7 @@ export class NumberService {
       }
       return data.Item;
     } catch (error) {
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -325,7 +327,7 @@ export class NumberService {
       }
       return data.Item;
     } catch (error) {
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -342,7 +344,7 @@ export class NumberService {
       }
       return data.Item;
     } catch (error) {
-      throw this.formatAWSError(error as AWSError);
+      throw this.formatAWSError(error as ServiceException);
     }
   }
 
@@ -411,9 +413,8 @@ export class NumberService {
    */
   public createNextTNumberObject(TNumberObject: TNumber): TNumber {
     const newSequenceNumber: number = TNumberObject.sequenceNumber + 1;
-    const newTNumber =
-      newSequenceNumber.toLocaleString('en', { minimumIntegerDigits: 6 }).replace(/,/g, '') +
-      TNumberObject.tNumberLetter;
+    const newTNumber = newSequenceNumber.toLocaleString('en', { minimumIntegerDigits: 6 }).replace(/,/g, '')
+      + TNumberObject.tNumberLetter;
     const newTNumberObject: TNumber = {
       tNumber: newTNumber,
       tNumberLetter: TNumberObject.tNumberLetter,
@@ -475,14 +476,13 @@ export class NumberService {
     const firstLetterAlphabeticalIndex = testNumber.charCodeAt(0) - 64;
     const secondLetterAlphabeticalIndex = testNumber.charCodeAt(3) - 64;
 
-    let checkSum =
-      firstLetterAlphabeticalIndex +
-      parseInt(testNumberWithoutLetters.charAt(0), 10) +
-      parseInt(testNumberWithoutLetters.charAt(1), 10) * 3 +
-      secondLetterAlphabeticalIndex +
-      parseInt(testNumberWithoutLetters.charAt(2), 10) +
-      parseInt(testNumberWithoutLetters.charAt(3), 10) * 3 +
-      parseInt(testNumberWithoutLetters.charAt(4), 10);
+    let checkSum = firstLetterAlphabeticalIndex
+      + parseInt(testNumberWithoutLetters.charAt(0), 10)
+      + parseInt(testNumberWithoutLetters.charAt(1), 10) * 3
+      + secondLetterAlphabeticalIndex
+      + parseInt(testNumberWithoutLetters.charAt(2), 10)
+      + parseInt(testNumberWithoutLetters.charAt(3), 10) * 3
+      + parseInt(testNumberWithoutLetters.charAt(4), 10);
 
     if (checkSum > 99) {
       checkSum %= 100;

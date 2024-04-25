@@ -3,9 +3,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable jest/no-conditional-expect */
-import { AWSError } from 'aws-sdk';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { ServiceException } from '@smithy/smithy-client';
 import { NumberService } from '../../src/services/NumberService';
-import { PlateSerialNumber, SystemNumber, TestNumber, TrailerId, ZNumber, TNumber } from '../../src/models/NumberModel';
+import {
+  PlateSerialNumber, SystemNumber, TestNumber, TrailerId, ZNumber, TNumber,
+} from '../../src/models/NumberModel';
 import { DynamoDBService } from '../../src/services/DynamoDBService';
 import { HTTPResponse } from '../../src/utils/HTTPResponse';
 
@@ -483,15 +486,21 @@ describe('NumberService', () => {
       expect(defaultTestNumber).toEqual(output);
     });
     it('throws expected errors if DBService request fails', async () => {
-      const error = new Error('I broke');
-      // @ts-ignore
-      error.statusCode = 418;
-
-      DynamoDBService.prototype.get = jest.fn().mockRejectedValue(error);
+      const err = new ServiceException({
+        name: 'test',
+        message: 'it broke',
+        $fault: 'client',
+        $metadata: {
+          requestId: '111',
+          httpStatusCode: 418,
+        },
+      });
+      DynamoDBService.prototype.get = jest.fn().mockRejectedValue(err);
       const service = new NumberService(new DynamoDBService());
       try {
         await service.getLastTestNumber();
       } catch (e) {
+        console.log(e);
         expect(e).toBeInstanceOf(HTTPResponse);
         expect((e as HTTPResponse).statusCode).toBe(418);
       }
@@ -526,7 +535,15 @@ describe('NumberService', () => {
       expect(defaultTrailerId).toEqual(output);
     });
     it('throws expected errors if DBService request fails', async () => {
-      const error = new Error('I broke');
+      const error = new ServiceException({
+        name: 'test',
+        message: 'it broke',
+        $fault: 'client',
+        $metadata: {
+          requestId: '111',
+          httpStatusCode: 418,
+        },
+      });
       // @ts-ignore
       error.statusCode = 418;
 
@@ -569,7 +586,15 @@ describe('NumberService', () => {
       expect(defaultZNumber).toEqual(output);
     });
     it('throws expected errors if DBService request fails', async () => {
-      const error = new Error('I broke');
+      const error = new ServiceException({
+        name: 'test',
+        message: 'it broke',
+        $fault: 'client',
+        $metadata: {
+          requestId: '111',
+          httpStatusCode: 418,
+        },
+      });
       // @ts-ignore
       error.statusCode = 418;
 
@@ -608,7 +633,15 @@ describe('NumberService', () => {
       expect(defaultSystemNumber).toEqual(output);
     });
     it('throws expected errors if DBService request fails', async () => {
-      const error = new Error('I broke');
+      const error = new ServiceException({
+        name: 'test',
+        message: 'it broke',
+        $fault: 'client',
+        $metadata: {
+          requestId: '111',
+          httpStatusCode: 418,
+        },
+      });
       // @ts-ignore
       error.statusCode = 418;
 
@@ -647,7 +680,15 @@ describe('NumberService', () => {
       expect(defaultPlateSerialNumber).toEqual(output);
     });
     it('throws expected errors if DBService request fails', async () => {
-      const error = new Error('I broke');
+      const error = new ServiceException({
+        name: 'test',
+        message: 'it broke',
+        $fault: 'client',
+        $metadata: {
+          requestId: '111',
+          httpStatusCode: 418,
+        },
+      });
       // @ts-ignore
       error.statusCode = 418;
 
@@ -663,7 +704,7 @@ describe('NumberService', () => {
   });
 
   describe('createTestNumber', () => {
-    context('happy path', () => {
+    describe('happy path', () => {
       it('returns next test number based on current number in DB', async () => {
         const lastTestNumber: TestNumber = {
           testNumber: 'W01A00128',
@@ -709,7 +750,7 @@ describe('NumberService', () => {
         expect(putSpy.mock.calls[0][0]).toEqual(expectedNextTestNumber);
       });
     });
-    context(
+    describe(
       'when DBClient.put throws a 400 "Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]" error',
       () => {
         it('tries again', async () => {
@@ -721,12 +762,15 @@ describe('NumberService', () => {
             testNumberKey: 1,
           };
 
-          const error400 = new Error(
-            'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
-          );
-          // @ts-ignore;
-          error400.statusCode = 400;
-
+          const error400 = new ServiceException({
+            name: 'test',
+            message: 'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
+            $fault: 'client',
+            $metadata: {
+              requestId: '111',
+              httpStatusCode: 400,
+            },
+          });
           DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTestNumber });
           const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
           DynamoDBService.prototype.transactWrite = putSpy;
@@ -738,7 +782,7 @@ describe('NumberService', () => {
       },
     );
 
-    context('when DBClient.put throws any other error', () => {
+    describe('when DBClient.put throws any other error', () => {
       it('throws an HTTPResponse error', async () => {
         const lastTestNumber: TestNumber = {
           testNumber: 'W01A00128',
@@ -748,9 +792,15 @@ describe('NumberService', () => {
           testNumberKey: 1,
         };
 
-        const error = new Error('Oh no!');
-        // @ts-ignore
-        error.statusCode = 418;
+        const error = new ServiceException({
+          name: 'test',
+          message: 'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 418,
+          },
+        });
 
         DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTestNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
@@ -766,18 +816,20 @@ describe('NumberService', () => {
       });
     });
 
-    context('when the function retried more than 5 times', () => {
+    describe('when the function retried more than 5 times', () => {
       it('throws an HTTPResponse error', async () => {
-        const awsError: any = {
-          code: '400',
+        const error = new ServiceException({
+          name: 'test',
           message: 'Attempted more than 5 times',
-          hostname: 'someHostname',
-          region: 'eu-east1',
-          requestId: '123454',
-        };
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 400,
+          },
+        });
         const service = new NumberService(new DynamoDBService());
         try {
-          await service.createTestNumber(6, awsError as AWSError);
+          await service.createTestNumber(6, error);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
           expect((e as HTTPResponse).statusCode).toBe(400);
@@ -787,7 +839,7 @@ describe('NumberService', () => {
   });
 
   describe('createTrailerId', () => {
-    context('happy path', () => {
+    describe('happy path', () => {
       it('returns next trailerId based on current number in DB', async () => {
         const lastTrailerId: TrailerId = {
           trailerId: 'C530000',
@@ -829,7 +881,7 @@ describe('NumberService', () => {
         expect(putSpy.mock.calls[0][0]).toEqual(expectedNextTrailerId);
       });
     });
-    context(
+    describe(
       'when DBClient.put throws a 400 "Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]" error',
       () => {
         it('tries again', async () => {
@@ -840,11 +892,15 @@ describe('NumberService', () => {
             testNumberKey: 2,
           };
 
-          const error400 = new Error(
-            'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
-          );
-          // @ts-ignore;
-          error400.statusCode = 400;
+          const error400 = new ServiceException({
+            name: 'test',
+            message: 'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
+            $fault: 'client',
+            $metadata: {
+              requestId: '111',
+              httpStatusCode: 400,
+            },
+          });
 
           DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTrailerId });
           const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
@@ -866,9 +922,15 @@ describe('NumberService', () => {
           testNumberKey: 2,
         };
 
-        const error = new Error('Oh no!');
-        // @ts-ignore
-        error.statusCode = 418;
+        const error = new ServiceException({
+          name: 'test',
+          message: 'Oh no',
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 418,
+          },
+        });
 
         DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastTrailerId });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
@@ -886,16 +948,18 @@ describe('NumberService', () => {
 
     context('when the function retried more than 5 times', () => {
       it('throws an HTTPResponse error', async () => {
-        const awsError: any = {
-          code: '400',
+        const awsError = new ServiceException({
+          name: 'test',
           message: 'Attempted more than 5 times',
-          hostname: 'someHostname',
-          region: 'eu-east1',
-          requestId: '123454',
-        };
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 400,
+          },
+        });
         const service = new NumberService(new DynamoDBService());
         try {
-          await service.createTrailerId(6, awsError as AWSError);
+          await service.createTrailerId(6, awsError);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
           expect((e as HTTPResponse).statusCode).toBe(400);
@@ -957,13 +1021,15 @@ describe('NumberService', () => {
             sequenceNumber: 530001,
             testNumberKey: 2,
           };
-
-          const error400 = new Error(
-            'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
-          );
-          // @ts-ignore;
-          error400.statusCode = 400;
-
+          const error400 = new ServiceException({
+            name: 'test',
+            message: 'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
+            $fault: 'client',
+            $metadata: {
+              requestId: '111',
+              httpStatusCode: 400,
+            },
+          });
           DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastZNumber });
           const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
           DynamoDBService.prototype.transactWrite = putSpy;
@@ -984,9 +1050,15 @@ describe('NumberService', () => {
           testNumberKey: 5,
         };
 
-        const error = new Error('Oh no!');
-        // @ts-ignore
-        error.statusCode = 418;
+        const error = new ServiceException({
+          name: 'test',
+          message: 'Oh no',
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 418,
+          },
+        });
 
         DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastZNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
@@ -1004,16 +1076,18 @@ describe('NumberService', () => {
 
     context('when the function retried more than 5 times', () => {
       it('throws an HTTPResponse error', async () => {
-        const awsError: any = {
-          code: '400',
+        const awsError = new ServiceException({
+          name: 'test',
           message: 'Attempted more than 5 times',
-          hostname: 'someHostname',
-          region: 'eu-east1',
-          requestId: '123454',
-        };
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 400,
+          },
+        });
         const service = new NumberService(new DynamoDBService());
         try {
-          await service.createZNumber(6, awsError as AWSError);
+          await service.createZNumber(6, awsError);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
           expect((e as HTTPResponse).statusCode).toBe(400);
@@ -1066,11 +1140,15 @@ describe('NumberService', () => {
             testNumberKey: 3,
           };
 
-          const error400 = new Error(
-            'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
-          );
-          // @ts-ignore;
-          error400.statusCode = 400;
+          const error400 = new ServiceException({
+            name: 'test',
+            message: 'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
+            $fault: 'client',
+            $metadata: {
+              requestId: '111',
+              httpStatusCode: 400,
+            },
+          });
 
           DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastSystemNumber });
           const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
@@ -1090,9 +1168,15 @@ describe('NumberService', () => {
           testNumberKey: 3,
         };
 
-        const error = new Error('Oh no!');
-        // @ts-ignore
-        error.statusCode = 418;
+        const error = new ServiceException({
+          name: 'test',
+          message: 'Oh no',
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 418,
+          },
+        });
 
         DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastSystemNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
@@ -1113,7 +1197,15 @@ describe('NumberService', () => {
           testNumberKey: 3,
         };
 
-        const error = new Error('Oh no!');
+        const error = new ServiceException({
+          name: 'test',
+          message: 'Oh no ',
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 500,
+          },
+        });
 
         DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastSystemNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
@@ -1131,16 +1223,18 @@ describe('NumberService', () => {
 
     context('when the function retried more than 5 times', () => {
       it('throws an HTTPResponse error', async () => {
-        const awsError: any = {
-          code: '400',
+        const awsError = new ServiceException({
+          name: 'test',
           message: 'Attempted more than 5 times',
-          hostname: 'someHostname',
-          region: 'eu-east1',
-          requestId: '123454',
-        };
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 400,
+          },
+        });
         const service = new NumberService(new DynamoDBService());
         try {
-          await service.createSystemNumber(6, awsError as AWSError);
+          await service.createSystemNumber(6, awsError);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
           expect((e as HTTPResponse).statusCode).toBe(400);
@@ -1193,12 +1287,15 @@ describe('NumberService', () => {
             testNumberKey: 4,
           };
 
-          const error400 = new Error(
-            'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
-          );
-          // @ts-ignore;
-          error400.statusCode = 400;
-
+          const error400 = new ServiceException({
+            name: 'test',
+            message: 'Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed]',
+            $fault: 'client',
+            $metadata: {
+              requestId: '111',
+              httpStatusCode: 400,
+            },
+          });
           DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastPlateSerialNumber });
           const putSpy = jest.fn().mockRejectedValueOnce(error400).mockResolvedValueOnce('');
           DynamoDBService.prototype.transactWrite = putSpy;
@@ -1217,9 +1314,15 @@ describe('NumberService', () => {
           testNumberKey: 4,
         };
 
-        const error = new Error('Oh no!');
-        // @ts-ignore
-        error.statusCode = 418;
+        const error = new ServiceException({
+          name: 'test',
+          message: 'Oh no',
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 418,
+          },
+        });
 
         DynamoDBService.prototype.get = jest.fn().mockResolvedValue({ Item: lastPlateSerialNumber });
         const transactSpy = jest.fn().mockRejectedValueOnce(error);
@@ -1237,16 +1340,18 @@ describe('NumberService', () => {
 
     context('when the function retried more than 5 times', () => {
       it('throws an HTTPResponse error', async () => {
-        const awsError: any = {
-          code: '400',
+        const awsError = new ServiceException({
+          name: 'test',
           message: 'Attempted more than 5 times',
-          hostname: 'someHostname',
-          region: 'eu-east1',
-          requestId: '123454',
-        };
+          $fault: 'client',
+          $metadata: {
+            requestId: '111',
+            httpStatusCode: 400,
+          },
+        });
         const service = new NumberService(new DynamoDBService());
         try {
-          await service.createPlateSerialNumber(6, awsError as AWSError);
+          await service.createPlateSerialNumber(6, awsError);
         } catch (e) {
           expect(e).toBeInstanceOf(HTTPResponse);
           expect((e as HTTPResponse).statusCode).toBe(400);
