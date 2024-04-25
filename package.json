@@ -60,7 +60,7 @@
     "lodash": "^4.17.21",
     "node-yaml": "4.0.1",
     "path-parser": "^4.2.0",
-    "reflect-metadata": "^0.1.13",
+    "reflect-metadata": "^0.2.2",
     "serverless-dynamodb": "^0.2.43",
     "ts-node-register": "^1.0.0",
     "uuid": "^9.0.0"
