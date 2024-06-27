@@ -30,6 +30,7 @@ jobs:
       - name: Setup local dynamo
         run: npm run tools-setup
       - name: Build and test
+        timeout-minutes: 20
         run: npm run prepush
         env:
           AWS_ACCESS_KEY_ID: foo

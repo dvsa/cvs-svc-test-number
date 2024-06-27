@@ -3,7 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { APIGatewayProxyResult, Callback, Context, Handler } from 'aws-lambda';
+import {
+  APIGatewayProxyResult, Callback, Context, Handler,
+} from 'aws-lambda';
 import Path from 'path-parser';
 import { Configuration, IFunctionEvent } from './utils/Configuration';
 import { HTTPResponse } from './utils/HTTPResponse';
